@@ -1,5 +1,5 @@
 # Add more folders to ship with the application, here
-folder_01.source = qml/Evernote
+folder_01.source = qml/EverN9
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
@@ -46,10 +46,10 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/changelog \
     images/login_icon.png \
     images/login_bg.png \
-    evernote.ru.ts \
-    evernote.ru.qm \
-    evernote.en.ts \
-    evernote.en.qm
+    evern9.ru.ts \
+    evern9.ru.qm \
+    evern9.en.ts \
+    evern9.en.qm
 
 RESOURCES += \
-    evernote.qrc
+    evern9.qrc

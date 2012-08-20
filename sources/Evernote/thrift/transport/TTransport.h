@@ -21,7 +21,7 @@
 #define _THRIFT_TRANSPORT_TTRANSPORT_H_ 1
 
 #include "thrift/Thrift.h"
-#include "/usr/include/boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 #include "thrift/transport/TTransportException.h"
 #include <string>
 

@@ -40,9 +40,9 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     }else{
         viewer->setMainQmlFile(QLatin1String("qml/Evernote/mainLogin.qml"));
     }
-    viewer->getMainView()->rootContext()->setContextProperty("EvernoteSession",EvernoteSession::instance());
-    viewer->getMainView()->rootContext()->setContextProperty("DatabaseManager",DatabaseManager::instance());
-    viewer->getMainView()->rootContext()->setContextProperty("Cache",Cache::instance());
+    viewer->rootContext()->setContextProperty("EvernoteSession",EvernoteSession::instance());
+    viewer->rootContext()->setContextProperty("DatabaseManager",DatabaseManager::instance());
+    viewer->rootContext()->setContextProperty("Cache",Cache::instance());
 
     QObject::connect(viewer->engine(), SIGNAL(quit()), viewer.data(), SLOT(close()));
     viewer->showExpanded();

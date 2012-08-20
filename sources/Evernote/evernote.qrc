@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>evernote.en.qm</file>
+        <file>evernote.ru.qm</file>
+    </qresource>
+</RCC>

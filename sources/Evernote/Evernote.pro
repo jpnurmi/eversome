@@ -29,6 +29,9 @@ QT += sql
 # Add dependency to Symbian components
 # CONFIG += qt-components
 
+INCLUDEPATH += thrift
+DEFINES += HAVE_CONFIG_H
+
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
     edam/UserStore_types.cpp \

@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>evern9.en.qm</file>
-        <file>evern9.ru.qm</file>
-    </qresource>
-</RCC>

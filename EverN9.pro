@@ -17,10 +17,10 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/control \
     qtc_packaging/debian_harmattan/compat \
     qtc_packaging/debian_harmattan/changelog \
-    translatiosn/EverN9.ru.ts \
-    translatiosn/EverN9.ru.qm \
-    translatiosn/EverN9.en.ts \
-    translatiosn/EverN9.en.qm
+    translations/EverN9.ru.ts \
+    translations/EverN9.ru.qm \
+    translations/EverN9.en.ts \
+    translations/EverN9.en.qm
 
 RESOURCES += \
     EverN9.qrc

@@ -44,9 +44,9 @@ public slots:
     NotebookWrapper* getNotebook(NoteWrapper* note);
 private:
     static Cache* m_instance;
-    QVector <Tag>* tags;
-    QVector <Notebook>* notebooks;
-    QVector <Note>* notes;
+    QVector<Tag> tags;
+    QVector<Notebook> notebooks;
+    QVector<Note> notes;
 };
 
 #endif // CACHE_H

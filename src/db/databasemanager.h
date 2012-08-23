@@ -13,40 +13,37 @@
 #include "wrappers/resourcewrapper.h"
 using namespace std;
 using namespace evernote::edam;
+
 class DatabaseManager : public QObject
 {
     Q_OBJECT
+
 public:
     static const QString DB_NAME;
 
-
     static DatabaseManager* instance();
-    DatabaseManager(QObject *parent = 0);
+    DatabaseManager(QObject* parent = 0);
     ~DatabaseManager();
-
 
 signals:
     void dbOpened();
     void dbOpenError();
 
 public slots:
-    static void drop();
     void close();
 
     void beginTransacton();
     void commitTransaction();
 
-
-
     bool saveTag(Tag tag);
-    QVector <Tag>* getTags();
+    QVector<Tag> getTags() const;
 
     bool saveNotebook(Notebook notebook);
-    QVector <Notebook>* getNotebooks();
+    QVector<Notebook> getNotebooks() const;
 
     bool saveNote(Note note);
     void deleteNote(Note note);
-    QVector <Note>* getNotes();
+    QVector<Note> getNotes() const;
 
     bool saveResources(Note note);
     void deleteNoteResources(Note note);
@@ -59,17 +56,12 @@ public slots:
 
     void createTables();
     void makeSetting(const QString& key, const QString& value);
-    void makeIntSetting(const QString& key, const int& value);
-
+    void makeIntSetting(const QString& key, int value);
 
     QString getSetting(const QString& key);
     int getIntSetting(const QString& key);
     void dropTable(const QString& tableName);
     void clear();
-
-private:
-    static DatabaseManager* m_instance;
-    QSqlDatabase* db;
 };
 
 #endif // DATABASEMANAGER_H

@@ -1,56 +1,40 @@
 #include "databasemanager.h"
 
-DatabaseManager* DatabaseManager::m_instance = NULL;
 const QString DatabaseManager::DB_NAME = "EvernoteDb";
 
 DatabaseManager::DatabaseManager(QObject *parent) :
     QObject(parent)
 {
-    qDebug() << "DatabaseManager created" << endl;
-    db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE"));
-    db->setDatabaseName(DB_NAME);
-    qDebug()  << "DatabaseManager: opening db..." << endl;
-    bool ok = db->open();
-    if(ok){
-        qDebug()  << "DatabaseManager: db opened." << endl;
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(DB_NAME);
+    bool ok = db.open();
+    if (ok)
         dbOpened();
-    }else{
-        qDebug()  << "DatabaseManager: db open error" << endl;
+    else
         dbOpenError();
-    }
     createTables();
 }
-DatabaseManager* DatabaseManager::instance(){
-    if(!m_instance){
-        m_instance = new DatabaseManager();
-    }
-    return m_instance;
+
+DatabaseManager* DatabaseManager::instance()
+{
+    static DatabaseManager manager;
+    return &manager;
 }
 
-void DatabaseManager::drop(){
-    if(m_instance){
-        delete m_instance;
-        m_instance = 0;
-    }
-}
-DatabaseManager::~DatabaseManager() {
-    if(db){
-        delete db;
-        db = 0;
-    }
+DatabaseManager::~DatabaseManager()
+{
 }
 
-void DatabaseManager::close(){
-    qDebug() << "DatabaseManager closed" << endl;
-    if(db){
-        db->removeDatabase(DatabaseManager::DB_NAME);
-        db->close();
-    }
+void DatabaseManager::close()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    db.removeDatabase(DatabaseManager::DB_NAME);
+    db.close();
 }
 
-
-void DatabaseManager::createTables(){
-    QVector <QString> queries;
+void DatabaseManager::createTables()
+{
+    QStringList queries;
     queries.append(DatabaseConstants::CREATE_SETTINGS_TABLE_QUERY);
     queries.append(DatabaseConstants::CREATE_TAGS_TABLE_QUERY);
     queries.append(DatabaseConstants::CREATE_NOTEBOOKS_TABLE_QUERY);
@@ -58,14 +42,14 @@ void DatabaseManager::createTables(){
     queries.append(DatabaseConstants::CREATE_NOTE_TAGS_TABLE_QUERY);
     queries.append(DatabaseConstants::CREATE_RESOURCES_TABLE);
 
-    for(int i=0;i<queries.size();i++){
-        db->exec(queries.at(i));
-    }
-
+    QSqlDatabase db = QSqlDatabase::database();
+    foreach (const QString& query, queries)
+        db.exec(query);
 }
 
-void DatabaseManager::makeSetting(const QString &key, const QString &value){
-    QSqlQuery query = QSqlQuery(DatabaseConstants::CREATE_UPDATE_SETTING_QUERY, *db);
+void DatabaseManager::makeSetting(const QString &key, const QString &value)
+{
+    QSqlQuery query(DatabaseConstants::CREATE_UPDATE_SETTING_QUERY);
     query.addBindValue(key);
     query.addBindValue(value);
     bool ok = query.exec();
@@ -74,14 +58,16 @@ void DatabaseManager::makeSetting(const QString &key, const QString &value){
     }else{
         qDebug() << "DatabaseManager: cannot create settings ("<<key<<", "<<value<<") : "<<query.lastError();
     }
-
 }
-void DatabaseManager::makeIntSetting(const QString &key, const int &value){
+
+void DatabaseManager::makeIntSetting(const QString &key, int value)
+{
     makeSetting(key, QString::number(value));
 }
 
-QString DatabaseManager::getSetting(const QString &key){
-    QSqlQuery query = QSqlQuery(DatabaseConstants::GET_SETTING_QUERY, *db);
+QString DatabaseManager::getSetting(const QString &key)
+{
+    QSqlQuery query(DatabaseConstants::GET_SETTING_QUERY);
     query.addBindValue(key);
     bool ok = query.exec();
 
@@ -93,24 +79,30 @@ QString DatabaseManager::getSetting(const QString &key){
     query.next();
     return query.record().value("value").toString();
 }
-int DatabaseManager::getIntSetting(const QString& key){
+
+int DatabaseManager::getIntSetting(const QString& key)
+{
     QString value = getSetting(key);
     return value.toInt();
 }
 
-
-void DatabaseManager::dropTable(const QString& tableName){
-    QString text = QString(DatabaseConstants::DROP_TABLE_QUERY).arg(tableName);
-    db->exec(text);
+void DatabaseManager::dropTable(const QString& tableName)
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    db.exec(QString(DatabaseConstants::DROP_TABLE_QUERY).arg(tableName));
 }
-void DatabaseManager::clear(){
+
+void DatabaseManager::clear()
+{
     dropTable(DatabaseConstants::SETTINGS_TABLE);
     dropTable(DatabaseConstants::NOTEBOOKS_TABLE);
     dropTable(DatabaseConstants::TAGS_TABLE);
     dropTable(DatabaseConstants::NOTES_TABLE);
 }
-bool DatabaseManager::saveTag(Tag tag){
-    QSqlQuery query = QSqlQuery(DatabaseConstants::INSERT_TAG_QUERY, *db);
+
+bool DatabaseManager::saveTag(Tag tag)
+{
+    QSqlQuery query(DatabaseConstants::INSERT_TAG_QUERY);
     query.addBindValue(QString::fromStdString(tag.guid.c_str()));
     query.addBindValue(QString::fromStdString(tag.parentGuid.c_str()));
     query.addBindValue(tag.updateSequenceNum);
@@ -121,12 +113,12 @@ bool DatabaseManager::saveTag(Tag tag){
     }else{
         qDebug() << "DatabaseManager :: cannot save tag ("<<tag.name.c_str()<< ") : "<<query.lastError();
     }
-
 }
-QVector <Tag>* DatabaseManager::getTags(){
-    QVector <Tag>* result = new QVector <Tag>();
 
-    QSqlQuery query = QSqlQuery(DatabaseConstants::SELECT_TAGS_QUERY, *db);
+QVector<Tag> DatabaseManager::getTags() const
+{
+    QVector<Tag> result;
+    QSqlQuery query(DatabaseConstants::SELECT_TAGS_QUERY);
     bool ok = query.exec();
     while(query.next()){
         /*qDebug() << "Got tag :" << query.record().value("name").toString() << ","
@@ -138,12 +130,14 @@ QVector <Tag>* DatabaseManager::getTags(){
         tag.updateSequenceNum = query.record().value("usn").toInt();
         tag.guid = query.record().value("guid").toString().toStdString();
         tag.parentGuid = query.record().value("parentGuid").toString().toStdString();
-        result->append(tag);
+        result.append(tag);
     }
     return result;
 }
-bool DatabaseManager::saveNotebook(Notebook notebook){
-    QSqlQuery query = QSqlQuery(DatabaseConstants::INSERT_NOTEBOOK_QUERY, *db);
+
+bool DatabaseManager::saveNotebook(Notebook notebook)
+{
+    QSqlQuery query(DatabaseConstants::INSERT_NOTEBOOK_QUERY);
     query.addBindValue(QString::fromStdString(notebook.guid));
     query.addBindValue(QString::fromStdString(notebook.name));
     query.addBindValue(notebook.updateSequenceNum);
@@ -154,10 +148,11 @@ bool DatabaseManager::saveNotebook(Notebook notebook){
         qDebug() << "DatabaseManager :: cannot save notebook ("<<notebook.name.c_str()<< ") : "<<query.lastError();
     }
 }
-QVector <Notebook>* DatabaseManager::getNotebooks(){
-    QVector <Notebook>* result = new QVector <Notebook>();
 
-    QSqlQuery query = QSqlQuery(DatabaseConstants::SELECT_NOTEBOOKS_QUERY, *db);
+QVector<Notebook> DatabaseManager::getNotebooks() const
+{
+    QVector<Notebook> result;
+    QSqlQuery query(DatabaseConstants::SELECT_NOTEBOOKS_QUERY);
     bool ok = query.exec();
     while(query.next()){
        /* qDebug() << "Got notebook :" << query.record().value("name").toString() << ","
@@ -167,12 +162,14 @@ QVector <Notebook>* DatabaseManager::getNotebooks(){
         notebook.name = query.record().value("name").toString().toStdString();
         notebook.updateSequenceNum = query.record().value("usn").toInt();
         notebook.guid = query.record().value("guid").toString().toStdString();
-        result->append(notebook);
+        result.append(notebook);
     }
     return result;
 }
-void DatabaseManager::deleteNote(Note note){
-    QSqlQuery query = QSqlQuery(DatabaseConstants::DELETE_NOTE, *db);
+
+void DatabaseManager::deleteNote(Note note)
+{
+    QSqlQuery query(DatabaseConstants::DELETE_NOTE);
     query.addBindValue(QString::fromStdString(note.guid));
     bool ok = query.exec();
     if(ok){
@@ -185,10 +182,11 @@ void DatabaseManager::deleteNote(Note note){
     FileUtils::removeNoteCache(note);
 }
 
-bool DatabaseManager::saveNote(Note note){
+bool DatabaseManager::saveNote(Note note)
+{
     deleteNote(note);
 
-    QSqlQuery query = QSqlQuery(DatabaseConstants::INSERT_NOTE_QUERY, *db);
+    QSqlQuery query(DatabaseConstants::INSERT_NOTE_QUERY);
 
     query.addBindValue(QString::fromStdString(note.guid));
     query.addBindValue(QString::fromStdString(note.title));
@@ -223,11 +221,12 @@ bool DatabaseManager::saveNote(Note note){
 
     saveNoteTags(note);
     saveResources(note);
-
 }
-bool DatabaseManager::saveNoteTags(Note note){
+
+bool DatabaseManager::saveNoteTags(Note note)
+{
     for(int i=0;i<note.tagGuids.size();i++){
-        QSqlQuery noteTagQuery = QSqlQuery(DatabaseConstants::INSERT_NOTE_TAG_QUERY, *db);
+        QSqlQuery noteTagQuery(DatabaseConstants::INSERT_NOTE_TAG_QUERY);
         noteTagQuery.addBindValue(QString::fromStdString(note.guid));
         noteTagQuery.addBindValue(QString::fromStdString((std::string)note.tagGuids.at(i)));
         if(noteTagQuery.exec()){
@@ -237,13 +236,16 @@ bool DatabaseManager::saveNoteTags(Note note){
         }
     }
 }
-void DatabaseManager::deleteNoteTags(Note note){
-    QSqlQuery noteTagQuery = QSqlQuery(DatabaseConstants::DELETE_NOTE_TAGS, *db);
+
+void DatabaseManager::deleteNoteTags(Note note)
+{
+    QSqlQuery noteTagQuery(DatabaseConstants::DELETE_NOTE_TAGS);
     noteTagQuery.addBindValue(QString::fromStdString(note.guid));
     noteTagQuery.exec();
 }
 
-bool DatabaseManager::saveResources(Note note){
+bool DatabaseManager::saveResources(Note note)
+{
 /*
         "guid TEXT PRIMARY KEY,"+
         "noteGuid TEXT,"+
@@ -256,13 +258,13 @@ bool DatabaseManager::saveResources(Note note){
 
 */
     for(int i=0;i<note.resources.size();i++){
-        QSqlQuery noteTagQuery = QSqlQuery(DatabaseConstants::INSERT_RESOURCE, *db);
+        QSqlQuery noteTagQuery(DatabaseConstants::INSERT_RESOURCE);
         Resource r = note.resources.at(i);
 
         noteTagQuery.addBindValue(QString::fromStdString(r.guid));
         noteTagQuery.addBindValue(QString::fromStdString(note.guid));
         noteTagQuery.addBindValue(ResourceWrapper::convertToHex(r.data.bodyHash));
-         noteTagQuery.addBindValue(r.data.size);
+        noteTagQuery.addBindValue(r.data.size);
         noteTagQuery.addBindValue(QString::fromStdString(r.mime));
         noteTagQuery.addBindValue(r.attributes.attachment);
         noteTagQuery.addBindValue(QString::fromStdString(r.attributes.fileName));
@@ -274,15 +276,18 @@ bool DatabaseManager::saveResources(Note note){
         }
     }
 }
-void DatabaseManager::deleteNoteResources(Note note){
-    QSqlQuery noteTagQuery = QSqlQuery(DatabaseConstants::DELETE_NOTE_RESOURCES, *db);
+
+void DatabaseManager::deleteNoteResources(Note note)
+{
+    QSqlQuery noteTagQuery(DatabaseConstants::DELETE_NOTE_RESOURCES);
     noteTagQuery.addBindValue(QString::fromStdString(note.guid));
     noteTagQuery.exec();
 }
 
-std::vector <std::string> DatabaseManager::getNoteTagGuids(Note note){
+std::vector <std::string> DatabaseManager::getNoteTagGuids(Note note)
+{
     std::vector <std::string> tagGuids;
-    QSqlQuery query = QSqlQuery(DatabaseConstants::SELECT_TAGS_FOR_NOTE, *db);
+    QSqlQuery query(DatabaseConstants::SELECT_TAGS_FOR_NOTE);
     query.addBindValue(QString::fromStdString(note.guid));
 
     if(!query.exec()){
@@ -295,9 +300,11 @@ std::vector <std::string> DatabaseManager::getNoteTagGuids(Note note){
     }
     return tagGuids;
 }
-std::vector <Resource> DatabaseManager::getNoteResources(Note note){
+
+std::vector <Resource> DatabaseManager::getNoteResources(Note note)
+{
     std::vector <Resource> result;
-    QSqlQuery query = QSqlQuery(DatabaseConstants::SELECT_RESOURCES_FOR_NOTE, *db);
+    QSqlQuery query(DatabaseConstants::SELECT_RESOURCES_FOR_NOTE);
     /*
             "guid TEXT PRIMARY KEY,"+
             "noteGuid TEXT,"+
@@ -331,10 +338,10 @@ std::vector <Resource> DatabaseManager::getNoteResources(Note note){
     return result;
 }
 
-QVector <Note>* DatabaseManager::getNotes(){
-    QVector <Note>* result = new QVector <Note>();
-
-    QSqlQuery query = QSqlQuery(DatabaseConstants::SELECT_ALL_NOTES_QUERY, *db);
+QVector<Note> DatabaseManager::getNotes() const
+{
+    QVector<Note> result;
+    QSqlQuery query(DatabaseConstants::SELECT_ALL_NOTES_QUERY);
     bool ok = query.exec();
     while(query.next()){
         Note note;
@@ -365,14 +372,19 @@ QVector <Note>* DatabaseManager::getNotes(){
         query.addBindValue(QString::fromStdString(note.attributes.contentClass));
         */
 
-        result->append(note);
+        result.append(note);
     }
     return result;
 }
 
-void DatabaseManager::beginTransacton(){
-    this->db->transaction();
+void DatabaseManager::beginTransacton()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
 }
-void DatabaseManager::commitTransaction(){
-    this->db->commit();
+
+void DatabaseManager::commitTransaction()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    db.commit();
 }

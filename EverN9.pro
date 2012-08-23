@@ -2,7 +2,7 @@ qmlfolder.source = qml/EverN9
 qmlfolder.target = qml
 DEPLOYMENTFOLDERS = qmlfolder
 
-CONFIG += qdeclarative-boostable
+#CONFIG += qdeclarative-boostable
 QT += sql
 
 include(src/src.pri)

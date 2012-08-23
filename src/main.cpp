@@ -16,10 +16,10 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     QString locale = QLocale::system().name();
 
     QTranslator translator;
-    if (translator.load("evernote." + locale, ":/")){
+    if (translator.load("EverN9." + locale, ":/")){
         app.data()->installTranslator(&translator);
     }else{
-        translator.load("evernote.en", ":/");
+        translator.load("EverN9.en", ":/");
         app.data()->installTranslator(&translator);
 
     }
@@ -32,17 +32,17 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
-
-    viewer->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    if(Settings::instance()->areCredentialsSaved()){
-        viewer->setMainQmlFile(QLatin1String("qml/Evernote/main.qml"));
-        EvernoteSession::instance()->syncAsync();
-    }else{
-        viewer->setMainQmlFile(QLatin1String("qml/Evernote/mainLogin.qml"));
-    }
     viewer->rootContext()->setContextProperty("EvernoteSession",EvernoteSession::instance());
     viewer->rootContext()->setContextProperty("DatabaseManager",DatabaseManager::instance());
     viewer->rootContext()->setContextProperty("Cache",Cache::instance());
+
+    viewer->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    if(Settings::instance()->areCredentialsSaved()){
+        viewer->setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
+        EvernoteSession::instance()->syncAsync();
+    }else{
+        viewer->setMainQmlFile(QLatin1String("qml/EverN9/mainLogin.qml"));
+    }
 
     QObject::connect(viewer->engine(), SIGNAL(quit()), viewer.data(), SLOT(close()));
     viewer->showExpanded();

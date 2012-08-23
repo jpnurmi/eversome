@@ -1,7 +1,7 @@
 #include "fileutils.h"
 
 const QString FileUtils::NOTES_FOLDER = "notes";
-const QString FileUtils::APP_FOLDER = ".evernote";
+const QString FileUtils::APP_FOLDER = ".evern9";
 const QString FileUtils::MY_DOCS_FOLDER = "/home/user/MyDocs";
 const QString FileUtils::CONTENT_FILENAME = "content.html";
 
@@ -38,7 +38,7 @@ void FileUtils::cacheNoteContent(NoteWrapper *note, QString content){
 
     out << "<head>";
     out << "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /> ";
-    out << "<script src = '/opt/Evernote/qml/Evernote/engine.js' type='text/javascript' language='JavaScript'></script></head>";
+    out << "<script src = '/opt/EverN9/qml/EverN9/engine.js' type='text/javascript' language='JavaScript'></script></head>";
     out.flush();
 
     out << "<body onload='onLoadHandler();' onclick='onClickHandler(event);' >";

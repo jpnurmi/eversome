@@ -14,9 +14,7 @@
 #include "edam/NoteStore_types.h"
 #include "edam/Errors_constants.h"
 #include "edam/Errors_types.h"
-#include "db/databasemanager.h"
-#include "db/databaseconstants.h"
-#include "constants/settingskeys.h"
+#include "db/database.h"
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "settings.h"
@@ -80,14 +78,12 @@ public slots:
 
 
     void exit();
-    static void drop();
     void logout();
     void logoutAsync();
     bool isSyncInProgress();
     void cancelGetNoteContent();
     void cancelSync();
 private:
-    static EvernoteSession* m_instance;
     UserStoreClient* userStoreClient;
     shared_ptr<TTransport> userStoreTransport;
     NoteStoreClient* syncClient;

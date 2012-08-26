@@ -2,52 +2,46 @@
 
 #include <QtCore>
 #include "evernotesession.h"
+#include "fileutils.h"
+#include "db/database.h"
+
 const std::string EvernoteSession::CONSUMER_KEY = "everel";
 const std::string EvernoteSession::CONSUMER_SECRET = "201d20eb3ee1f74d";
-
-EvernoteSession* EvernoteSession::m_instance = NULL;
 
 EvernoteSession::EvernoteSession(QObject *parent) :
     QObject(parent)
 {
-    qDebug() << "EvernoteSession created" << endl;
+    Database::initialize();
     userStoreClient = NULL;
     syncClient = NULL;
     syncInProgress = false;
     syncCancelled = false;
     cancelGetNote = false;
 }
-EvernoteSession::~EvernoteSession() {
+
+EvernoteSession::~EvernoteSession()
+{
     if(userStoreClient){
         qDebug() << "EvernoteSession :: free UserStore client" << endl;
         delete userStoreClient;
     }
-
+    Database::uninitialize();
 }
 
 EvernoteSession* EvernoteSession::instance(){
-    if(!m_instance){
-        m_instance = new EvernoteSession();
-    }
-    return m_instance;
+    static EvernoteSession session;
+    return &session;
 }
 
-void EvernoteSession::drop(){
-    if(m_instance){
-        delete m_instance;
-        m_instance = 0;
-    }
-}
 void EvernoteSession::logout(){
     if(syncInProgress){
         return;
     }
     logoutStarted();
     cancelSync();
-    DatabaseManager::instance()->clear();
+    Database::reset();
     Cache::instance()->clear();
     Cache::instance()->clearFileCache();
-    DatabaseManager::instance()->createTables();
     logoutFinished();
 }
 void EvernoteSession::logoutAsync(){
@@ -106,7 +100,8 @@ void EvernoteSession::recreateSyncClient(bool force){
         }
     }
     if(syncClient == NULL){
-        User user = Settings::instance()->getUser();
+        User user;
+        user.shardId = Settings::value(Settings::UserShardID).toStdString();
         syncTransport = shared_ptr<TTransport> (new THttpClient(Constants::EDAM_HOST,80,Constants::EDAM_NOTE_ROOT+user.shardId));
         shared_ptr<TProtocol> protocol(new TBinaryProtocol(syncTransport));
         syncClient = new NoteStoreClient(protocol);
@@ -119,14 +114,14 @@ void EvernoteSession::getNoteContent(NoteWrapper* note){
     qDebug() << "EvernoteSession :: auth" << endl;
     noteLoadStarted(note);
     try {
-        note->note.tagGuids = DatabaseManager::instance()->getNoteTagGuids(note->note);
-        note->note.resources = DatabaseManager::instance()->getNoteResources(note->note);
+        note->note.tagGuids = Database::getNoteTagGuids(note->note).toStdVector();
+        note->note.resources = Database::getNoteResources(note->note).toStdVector();
 
 
         if(!FileUtils::noteCached(note)){
             recreateSyncClient(false);
             std::string content = "";
-            syncClient->getNoteContent(content, Settings::instance()->getAuthToken().toStdString(),note->getGuid());
+            syncClient->getNoteContent(content, Settings::value(Settings::AuthToken).toStdString(),note->getGuid());
             FileUtils::cacheNoteContent(note, QString::fromStdString(content));
         }
         if(cancelGetNote){
@@ -138,7 +133,7 @@ void EvernoteSession::getNoteContent(NoteWrapper* note){
             Resource r = note->note.resources.at(i);
             if(!FileUtils::resourceCached(r)){
                 recreateSyncClient(false);
-                syncClient->getResource(r, Settings::instance()->getAuthToken().toStdString(),r.guid, true, false, true, false);
+                syncClient->getResource(r, Settings::value(Settings::AuthToken).toStdString(),r.guid, true, false, true, false);
                 FileUtils::cacheResourceContent(r);
                 r.data.bodyHash = ResourceWrapper::convertToHex(r.data.bodyHash).toStdString();
             }
@@ -151,7 +146,7 @@ void EvernoteSession::getNoteContent(NoteWrapper* note){
 
         noteLoadFinished(note);
     } catch (TException &tx) {
-        qDebug() << "EvernoteSession :: excetion while getNoteContent: " << tx.what();
+        qDebug() << "EvernoteSession :: exception while getNoteContent: " << tx.what();
         if(!cancelGetNote){
             noteLoadError(QString::fromAscii(tx.what()));
         }else{
@@ -186,10 +181,10 @@ void EvernoteSession::auth(const QString& username, const QString& password){
         AuthenticationResult result;
         userStoreClient->authenticate(result,username.toStdString(),password.toStdString(),CONSUMER_KEY,CONSUMER_SECRET);
         qDebug() << "EvernoteSession :: got auth token " << result.authenticationToken.c_str();
-        Settings::instance()->setUsername(username);
-        Settings::instance()->setPassword(password);
-        Settings::instance()->setAuthToken(result.authenticationToken.c_str());
-        Settings::instance()->setUser(result.user);
+        Settings::setValue(Settings::Username, username);
+        Settings::setValue(Settings::Password, password);
+        Settings::setValue(Settings::AuthToken, QString::fromStdString(result.authenticationToken));
+        Settings::setValue(Settings::UserShardID, QString::fromStdString(result.user.shardId));
         recreateSyncClient(true);
         authenticationSuccess();
     }catch (EDAMUserException& e){
@@ -217,7 +212,7 @@ void EvernoteSession::auth(const QString& username, const QString& password){
     }
 }
 void EvernoteSession::reauth(){
-    auth(Settings::instance()->getUsername(), Settings::instance()->getPassword());
+    auth(Settings::value(Settings::Username), Settings::value(Settings::Password));
 }
 
 void EvernoteSession::sync(){
@@ -235,13 +230,13 @@ void EvernoteSession::sync(){
                 recreateSyncClient(false);
 
                 qDebug() << "EvernoteSession :: start sync...";
-                int cacheUsn = DatabaseManager::instance()->getIntSetting(SettingsKeys::SERVER_USN);
+                int cacheUsn = Settings::value(Settings::ServerUSN).toInt();
                 qDebug() << "EvernoteSession :: saved USN: " << cacheUsn;
                 SyncChunk chunk;
                 int percent = 0;
                 while(true){
                     syncStarted(percent);
-                    syncClient->getSyncChunk(chunk, Settings::instance()->getAuthToken().toStdString(), cacheUsn, 1024, false);
+                    syncClient->getSyncChunk(chunk, Settings::value(Settings::AuthToken).toStdString(), cacheUsn, 1024, false);
 
                     if(cacheUsn >= chunk.updateCount){
                         break;
@@ -254,7 +249,7 @@ void EvernoteSession::sync(){
 
 
                         tagsSyncStarted();
-                        DatabaseManager::instance()->beginTransacton();
+                        Database::beginTransaction();
                         for(int i=0;i<tags.size();i++){
                             if(syncCancelled){
                                 syncCancelled = false;
@@ -263,10 +258,10 @@ void EvernoteSession::sync(){
                                 return;
                             }
                             Tag tag = tags.at(i);
-                            DatabaseManager::instance()->saveTag(tag);
+                            Database::saveTag(tag);
                             qDebug() << "EvernoteSession :: tag " << tag.name.c_str();
                         }
-                        DatabaseManager::instance()->commitTransaction();
+                        Database::commitTransaction();
                     }
                     syncStarted(percent);
                     if(syncCancelled){
@@ -282,7 +277,7 @@ void EvernoteSession::sync(){
 
 
                         notebooksSyncStarted();
-                        DatabaseManager::instance()->beginTransacton();
+                        Database::beginTransaction();
                         for(int i=0;i<notebooks.size();i++){
                             if(syncCancelled){
                                 syncCancelled = false;
@@ -291,10 +286,10 @@ void EvernoteSession::sync(){
                                 return;
                             }
                             Notebook notebook = notebooks.at(i);
-                            DatabaseManager::instance()->saveNotebook(notebook);
+                            Database::saveNotebook(notebook);
                             qDebug() << "EvernoteSession :: notebook " << notebook.name.c_str();
                         }
-                        DatabaseManager::instance()->commitTransaction();
+                        Database::commitTransaction();
                     }
                     syncStarted(percent);
                     if(syncCancelled){
@@ -306,7 +301,7 @@ void EvernoteSession::sync(){
                     std::vector <Note> notes = chunk.notes;
                     qDebug() << "EvernoteSession :: notes " << chunk.notes.size();
                     if(!notes.empty()){
-                        DatabaseManager::instance()->beginTransacton();
+                        Database::beginTransaction();
                         for(int i=0;i<notes.size();i++){
                             if(syncCancelled){
                                 syncCancelled = false;
@@ -316,22 +311,21 @@ void EvernoteSession::sync(){
                             }
                             Note note = notes.at(i);
                             if(note.deleted){
-                                DatabaseManager::instance()->deleteNote(note);
+                                Database::deleteNote(note);
+                                FileUtils::removeNoteCache(note);
                             }else{
-                                DatabaseManager::instance()->saveNote(note);
+                                Database::saveNote(note);
                             }
                             qDebug() << "EvernoteSession :: note " << note.title.c_str();
                         }
-                        DatabaseManager::instance()->commitTransaction();
+                        Database::commitTransaction();
                     }
                     syncStarted(percent);
 
                     qDebug() << "expunged notes: " << chunk.expungedNotes.size();
 
                     cacheUsn = chunk.chunkHighUSN;
-                    DatabaseManager::instance()->beginTransacton();
-                    DatabaseManager::instance()->makeIntSetting(SettingsKeys::SERVER_USN, cacheUsn);
-                    DatabaseManager::instance()->commitTransaction();
+                    Settings::setValue(Settings::ServerUSN, QString::number(cacheUsn));
                     if(cacheUsn >= chunk.updateCount){
                         break;
                     }

@@ -1,4 +1,6 @@
 #include "fileutils.h"
+#include <QDebug>
+#include <QDir>
 
 static const QLatin1String NOTES_FOLDER("notes");
 static const QLatin1String APP_FOLDER(".evern9");

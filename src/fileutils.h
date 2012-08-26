@@ -2,13 +2,8 @@
 #define FILEUTILS_H
 
 #include <QObject>
+#include "edam/Types_types.h"
 #include "wrappers/notewrapper.h"
-#include <QtGui/QApplication>
-#include <QDir>
-#include <QFile>
-#include <QDebug>
-#include <QFileInfo>
-#include <QFileInfoList>
 
 class FileUtils : public QObject
 {

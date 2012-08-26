@@ -1,10 +1,9 @@
 #include "fileutils.h"
 
-const QString FileUtils::NOTES_FOLDER = "notes";
-const QString FileUtils::APP_FOLDER = ".evern9";
-const QString FileUtils::MY_DOCS_FOLDER = "/home/user/MyDocs";
-const QString FileUtils::CONTENT_FILENAME = "content.html";
-
+static const QLatin1String NOTES_FOLDER("notes");
+static const QLatin1String APP_FOLDER(".evern9");
+static const QLatin1String MY_DOCS_FOLDER("/home/user/MyDocs");
+static const QLatin1String CONTENT_FILENAME("content.html");
 
 FileUtils::FileUtils(QObject *parent) :
     QObject(parent)

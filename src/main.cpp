@@ -10,6 +10,7 @@
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {
     QApplication::setApplicationName("EverN9");
+    QApplication::setOrganizationName("Evernote");
     QScopedPointer<QApplication> app(createApplication(argc, argv));
 
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));

@@ -13,7 +13,6 @@
 #include "edam/NoteStore_types.h"
 #include "edam/Errors_constants.h"
 #include "edam/Errors_types.h"
-#include "db/database.h"
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "settings.h"

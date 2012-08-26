@@ -3,7 +3,7 @@
 #include <QtCore>
 #include "evernotesession.h"
 #include "fileutils.h"
-#include "db/database.h"
+#include "database.h"
 
 static const std::string CONSUMER_KEY = "everel";
 static const std::string CONSUMER_SECRET = "201d20eb3ee1f74d";

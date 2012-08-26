@@ -1,5 +1,5 @@
 #include "cache.h"
-#include "db/database.h"
+#include "database.h"
 #include "fileutils.h"
 
 Cache::Cache(QObject *parent) :

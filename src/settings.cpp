@@ -1,6 +1,7 @@
 #include "settings.h"
 #include <QSettings>
 #include <QVariant>
+#include <QFile>
 
 static QString keyToString(Settings::Key key)
 {
@@ -23,4 +24,9 @@ QString Settings::value(Settings::Key key)
 void Settings::setValue(Settings::Key key, const QString& value)
 {
     QSettings().setValue(keyToString(key), value);
+}
+
+bool Settings::reset()
+{
+    return QFile::remove(QSettings().fileName());
 }

@@ -39,6 +39,7 @@ void EvernoteSession::logout(){
     }
     logoutStarted();
     cancelSync();
+    Settings::reset();
     Database::reset();
     Cache::instance()->clear();
     Cache::instance()->clearFileCache();

@@ -1,7 +1,6 @@
 #ifndef EVERNOTESESSION_H
 #define EVERNOTESESSION_H
 #include "edam/UserStore.h"
-#include "constants/constants.h"
 #include "cache.h"
 #include "thrift/transport/THttpClient.h"
 #include "thrift/protocol/TBinaryProtocol.h"

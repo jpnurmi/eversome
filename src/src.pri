@@ -3,7 +3,6 @@ DEPENDPATH += $$PWD
 
 HEADERS += \
     cache.h \
-    constants/constants.h \
     db/database.h \
     fileutils.h \
     evernotesession.h \
@@ -15,7 +14,6 @@ HEADERS += \
 
 SOURCES += \
     cache.cpp \
-    constants/constants.cpp \
     db/database.cpp \
     fileutils.cpp \
     evernotesession.cpp \

@@ -4,7 +4,6 @@ DEPENDPATH += $$PWD
 HEADERS += \
     cache.h \
     constants/constants.h \
-    constants/settingskeys.h \
     db/databasemanager.h \
     db/databaseconstants.h \
     fileutils.h \
@@ -18,7 +17,6 @@ HEADERS += \
 SOURCES += \
     cache.cpp \
     constants/constants.cpp \
-    constants/settingskeys.cpp \
     db/databasemanager.cpp \
     db/databaseconstants.cpp \
     fileutils.cpp \

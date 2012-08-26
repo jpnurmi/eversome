@@ -1,61 +1,26 @@
 #include "settings.h"
+#include <QSettings>
+#include <QVariant>
 
-Settings* Settings::m_instance = NULL;
-
-Settings::Settings(QObject *parent) :
-    QObject(parent)
+static QString keyToString(Settings::Key key)
 {
-
-}
-
-Settings* Settings::instance(){
-   if(!m_instance){
-        m_instance = new Settings();
-   }
-   return m_instance;
-}
-
-void Settings::drop(){
-    if(m_instance){
-        delete m_instance;
-        m_instance = 0;
+    switch (key)
+    {
+        case Settings::Username: return QLatin1String("username");
+        case Settings::Password: return QLatin1String("password");
+        case Settings::AuthToken: return QLatin1String("auth_toke");
+        case Settings::ServerUSN: return QLatin1String("server_usn");
+        case Settings::UserShardID: return QLatin1String("user_shardid");
+        default: Q_ASSERT(false); return QString();
     }
 }
-Settings::~Settings() {
 
-}
-
-void Settings::setPassword(const QString &password){
-    DatabaseManager::instance()->makeSetting(SettingsKeys::PASSWORD, password);
-}
-QString Settings::getPassword(){
-    return DatabaseManager::instance()->getSetting(SettingsKeys::PASSWORD);
+QString Settings::value(Settings::Key key)
+{
+    return QSettings().value(keyToString(key)).toString();
 }
 
-void Settings::setUsername(const QString &username){
-    DatabaseManager::instance()->makeSetting(SettingsKeys::USERNAME, username);
+void Settings::setValue(Settings::Key key, const QString& value)
+{
+    QSettings().setValue(keyToString(key), value);
 }
-QString Settings::getUsername(){
-    return DatabaseManager::instance()->getSetting(SettingsKeys::USERNAME);
-}
-bool Settings::areCredentialsSaved(){
-    QString username = getUsername();
-    QString password = getPassword();
-    qDebug() << "Creds saved: " << (!username.isEmpty() && !password.isEmpty());
-    return !username.isEmpty() && !password.isEmpty();
-}
-void Settings::setAuthToken(const QString &token){
-    DatabaseManager::instance()->makeSetting(SettingsKeys::AUTH_TOKEN, token);
-}
-QString Settings::getAuthToken(){
-    return DatabaseManager::instance()->getSetting(SettingsKeys::AUTH_TOKEN);
-}
-void Settings::setUser(User user){
-    DatabaseManager::instance()->makeSetting(SettingsKeys::USER_SHARDID, user.shardId.c_str());
-}
-User Settings::getUser(){
-    User user;
-    user.shardId = DatabaseManager::instance()->getSetting(SettingsKeys::USER_SHARDID).toStdString();
-    return user;
-}
-

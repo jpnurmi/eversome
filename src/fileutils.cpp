@@ -7,11 +7,6 @@ static const QLatin1String APP_FOLDER(".evern9");
 static const QLatin1String MY_DOCS_FOLDER("/home/user/MyDocs");
 static const QLatin1String CONTENT_FILENAME("content.html");
 
-FileUtils::FileUtils(QObject *parent) :
-    QObject(parent)
-{
-}
-
 void FileUtils::cacheNoteContent(NoteWrapper *note, QString content){
     QDir mydocs(myDocsFolderPath());
     mydocs.mkdir(APP_FOLDER);

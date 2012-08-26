@@ -1,18 +1,13 @@
 #ifndef FILEUTILS_H
 #define FILEUTILS_H
 
-#include <QObject>
+#include <QString>
 #include "edam/Types_types.h"
 #include "wrappers/notewrapper.h"
 
-class FileUtils : public QObject
+class FileUtils
 {
-    Q_OBJECT
-
 public:
-    explicit FileUtils(QObject *parent = 0);
-
-public slots:
     static QString noteContentFilePath(NoteWrapper* note);
     static QString myDocsFolderPath();
     static QString noteFolderPath(NoteWrapper* note);

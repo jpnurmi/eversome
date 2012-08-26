@@ -5,8 +5,11 @@
 #include "fileutils.h"
 #include "db/database.h"
 
-const std::string EvernoteSession::CONSUMER_KEY = "everel";
-const std::string EvernoteSession::CONSUMER_SECRET = "201d20eb3ee1f74d";
+static const std::string CONSUMER_KEY = "everel";
+static const std::string CONSUMER_SECRET = "201d20eb3ee1f74d";
+static const std::string EDAM_HOST = "www.evernote.com";
+static const std::string EDAM_USER_ROOT = "/edam/user";
+static const std::string EDAM_NOTE_ROOT = "/edam/note/";
 
 EvernoteSession::EvernoteSession(QObject *parent) :
     QObject(parent)
@@ -79,7 +82,7 @@ void EvernoteSession::recreateUserStoreClient(bool force){
         }
     }
     if(userStoreClient == NULL){
-        userStoreTransport = shared_ptr<TTransport> (new THttpClient(Constants::EDAM_HOST,80,Constants::EDAM_USER_ROOT));
+        userStoreTransport = shared_ptr<TTransport> (new THttpClient(EDAM_HOST,80,EDAM_USER_ROOT));
         shared_ptr<TProtocol> protocol(new TBinaryProtocol(userStoreTransport));
         userStoreClient = new UserStoreClient(protocol);
     }
@@ -103,7 +106,7 @@ void EvernoteSession::recreateSyncClient(bool force){
     if(syncClient == NULL){
         User user;
         user.shardId = Settings::value(Settings::UserShardID).toStdString();
-        syncTransport = shared_ptr<TTransport> (new THttpClient(Constants::EDAM_HOST,80,Constants::EDAM_NOTE_ROOT+user.shardId));
+        syncTransport = shared_ptr<TTransport> (new THttpClient(EDAM_HOST,80,EDAM_NOTE_ROOT+user.shardId));
         shared_ptr<TProtocol> protocol(new TBinaryProtocol(syncTransport));
         syncClient = new NoteStoreClient(protocol);
     }

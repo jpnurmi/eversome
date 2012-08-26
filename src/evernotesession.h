@@ -35,15 +35,11 @@ using namespace evernote::edam;
 class EvernoteSession : public QObject
 {
     Q_OBJECT
-public:
-    static const std::string CONSUMER_KEY;
-    static const std::string CONSUMER_SECRET;
 
+public:
     static EvernoteSession* instance();
     EvernoteSession(QObject *parent = 0);
     ~EvernoteSession();
-
-
 
     void recreateUserStoreClient(bool force);
     void recreateSyncClient(bool force);

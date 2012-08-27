@@ -133,7 +133,7 @@ void Session::getNoteContent(NoteWrapper* note){
         }
         noteContentDownloaded(/*FileUtils::noteContentFilePath(note)*/note);
         sleep(1);
-        for(int i=0;i<note->note.resources.size();i++){
+        for(uint i=0;i<note->note.resources.size();i++){
             Resource r = note->note.resources.at(i);
             if(!FileUtils::resourceCached(r)){
                 recreateSyncClient(false);
@@ -254,7 +254,7 @@ void Session::sync(){
 
                         tagsSyncStarted();
                         Database::beginTransaction();
-                        for(int i=0;i<tags.size();i++){
+                        for(uint i=0;i<tags.size();i++){
                             if(syncCancelled){
                                 syncCancelled = false;
                                 syncInProgress = false;
@@ -282,7 +282,7 @@ void Session::sync(){
 
                         notebooksSyncStarted();
                         Database::beginTransaction();
-                        for(int i=0;i<notebooks.size();i++){
+                        for(uint i=0;i<notebooks.size();i++){
                             if(syncCancelled){
                                 syncCancelled = false;
                                 syncInProgress = false;
@@ -306,7 +306,7 @@ void Session::sync(){
                     qDebug() << "Session :: notes " << chunk.notes.size();
                     if(!notes.empty()){
                         Database::beginTransaction();
-                        for(int i=0;i<notes.size();i++){
+                        for(uint i=0;i<notes.size();i++){
                             if(syncCancelled){
                                 syncCancelled = false;
                                 syncInProgress = false;

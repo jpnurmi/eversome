@@ -27,7 +27,7 @@ Page {
     }
 
     Connections{
-        target: EvernoteSession
+        target: Session
         onNoteContentDownloaded:{
             webView.url = Cache.getCacheFileName(note);
         }
@@ -123,7 +123,7 @@ Page {
         id: commonTools
         visible: true
         ToolIcon { iconId: "icon-m-toolbar-back"; onClicked: {
-                EvernoteSession.cancelGetNoteContent();
+                Session.cancelGetNoteContent();
                 pageStack.pop();
             }
         }

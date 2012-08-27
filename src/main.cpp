@@ -1,6 +1,6 @@
 #include <QtDeclarative>
 #include "qmlapplicationviewer.h"
-#include "evernotesession.h"
+#include "session.h"
 #include "cache.h"
 #include "wrappers/tagwrapper.h"
 #include "wrappers/notewrapper.h"
@@ -27,13 +27,13 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     qmlRegisterType<NotebookWrapper>("com.evernote.types",1,0, "Notebook");
 
     QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("EvernoteSession", EvernoteSession::instance());
+    viewer.rootContext()->setContextProperty("Session", Session::instance());
     viewer.rootContext()->setContextProperty("Cache", Cache::instance());
 
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     if (!Settings::value(Settings::Username).isEmpty() && !Settings::value(Settings::Password).isEmpty()) {
         viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
-        EvernoteSession::instance()->syncAsync();
+        Session::instance()->syncAsync();
     } else {
         viewer.setMainQmlFile(QLatin1String("qml/EverN9/mainLogin.qml"));
     }

@@ -56,14 +56,14 @@ Page {
         echoMode: TextInput.Password
     }
     Connections{
-        target: EvernoteSession
+        target: Session
         onAuthenticationSuccess:
         {
             hideProgress()
             var mainPage = Qt.resolvedUrl("MainPage.qml")
             pageStack.pop()
             pageStack.push(mainPage)
-            EvernoteSession.syncAsync()
+            Session.syncAsync()
         }
         onAuthenticationFailed:
         {
@@ -84,7 +84,7 @@ Page {
         text: qsTr("__login__")
         onClicked: {
             showProgress();
-            EvernoteSession.authAsync(txtUsername.text,txtPassword.text)
+            Session.authAsync(txtUsername.text,txtPassword.text)
 
         }
     }

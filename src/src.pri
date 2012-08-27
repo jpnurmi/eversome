@@ -5,7 +5,7 @@ HEADERS += \
     cache.h \
     database.h \
     fileutils.h \
-    evernotesession.h \
+    session.h \
     settings.h \
     wrappers/notebookwrapper.h \
     wrappers/notewrapper.h \
@@ -16,8 +16,8 @@ SOURCES += \
     cache.cpp \
     database.cpp \
     fileutils.cpp \
-    evernotesession.cpp \
     main.cpp \
+    session.cpp \
     settings.cpp \
     wrappers/notebookwrapper.cpp \
     wrappers/notewrapper.cpp \

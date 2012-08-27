@@ -86,7 +86,7 @@ NotebookWrapper* Cache::getNotebook(NoteWrapper* note)
 }
 
 /*void Cache::loadTags(){
-    if(isTagsLoaded() || EvernoteSession::instance()->isSyncInProgress()){
+    if(isTagsLoaded() || Session::instance()->isSyncInProgress()){
        return;
     }
     clearTags();

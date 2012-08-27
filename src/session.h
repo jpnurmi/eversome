@@ -1,5 +1,6 @@
-#ifndef EVERNOTESESSION_H
-#define EVERNOTESESSION_H
+#ifndef SESSION_H
+#define SESSION_H
+
 #include "edam/UserStore.h"
 #include "cache.h"
 #include "thrift/transport/THttpClient.h"
@@ -30,14 +31,14 @@ using namespace apache::thrift;
 using namespace evernote::edam;
 
 
-class EvernoteSession : public QObject
+class Session : public QObject
 {
     Q_OBJECT
 
 public:
-    static EvernoteSession* instance();
-    EvernoteSession(QObject *parent = 0);
-    ~EvernoteSession();
+    static Session* instance();
+    Session(QObject *parent = 0);
+    ~Session();
 
     void recreateUserStoreClient(bool force);
     void recreateSyncClient(bool force);

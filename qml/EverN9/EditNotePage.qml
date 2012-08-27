@@ -18,7 +18,7 @@ Page {
     tools:commonTools
 
     Connections{
-        target: EvernoteSession
+        target: Session
         onNoteContentDownloaded:{
             txtText.text = Cache.getNoteContent(note);
         }

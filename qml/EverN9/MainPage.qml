@@ -23,7 +23,7 @@ Page {
     }
 
     function setStatusText(){
-        if(EvernoteSession.isSyncInProgress()){
+        if(Session.isSyncInProgress()){
             return;
         }
         header.statusText =  qsTr("__title__")
@@ -53,7 +53,7 @@ Page {
 
 
     Connections{
-        target: EvernoteSession
+        target: Session
         onSyncStarted:
         {
             header.statusText =  qsTr("__syncing__").arg(percent)
@@ -108,12 +108,12 @@ Page {
            onItemClicked: {
                var viewPage = Qt.resolvedUrl("NoteView.qml")
                pageStack.push(viewPage, {note: Cache.getNote(index)})
-               EvernoteSession.getNoteContentAsync(Cache.getNote(index));
+               Session.getNoteContentAsync(Cache.getNote(index));
            }
            onLongItemClicked: {
                var editPage = Qt.resolvedUrl("EditNotePage.qml")
                pageStack.push(editPage, {note: Cache.getNote(index)})
-               EvernoteSession.getNoteContentAsync(Cache.getNote(index));
+               Session.getNoteContentAsync(Cache.getNote(index));
            }
 
         }
@@ -165,7 +165,7 @@ Page {
             id: icnSync
             platformIconId: "toolbar-refresh"
             anchors.right: icnViewMenu.left
-            onClicked: {  EvernoteSession.syncAsync() }
+            onClicked: {  Session.syncAsync() }
         }
         ToolIcon{
             id: icnAddNew
@@ -188,7 +188,7 @@ Page {
                 id: miLogout
                 text: qsTr("__logout__")
                 onClicked: {
-                    EvernoteSession.logoutAsync();
+                    Session.logoutAsync();
                 }
             }
 

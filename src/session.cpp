@@ -1,7 +1,7 @@
 #include <QDebug>
 
 #include <QtCore>
-#include "evernotesession.h"
+#include "session.h"
 #include "fileutils.h"
 #include "database.h"
 
@@ -11,7 +11,7 @@ static const std::string EDAM_HOST = "www.evernote.com";
 static const std::string EDAM_USER_ROOT = "/edam/user";
 static const std::string EDAM_NOTE_ROOT = "/edam/note/";
 
-EvernoteSession::EvernoteSession(QObject *parent) :
+Session::Session(QObject *parent) :
     QObject(parent)
 {
     Database::initialize();
@@ -22,21 +22,21 @@ EvernoteSession::EvernoteSession(QObject *parent) :
     cancelGetNote = false;
 }
 
-EvernoteSession::~EvernoteSession()
+Session::~Session()
 {
     if(userStoreClient){
-        qDebug() << "EvernoteSession :: free UserStore client" << endl;
+        qDebug() << "Session :: free UserStore client" << endl;
         delete userStoreClient;
     }
     Database::uninitialize();
 }
 
-EvernoteSession* EvernoteSession::instance(){
-    static EvernoteSession session;
+Session* Session::instance(){
+    static Session session;
     return &session;
 }
 
-void EvernoteSession::logout(){
+void Session::logout(){
     if(syncInProgress){
         return;
     }
@@ -48,28 +48,28 @@ void EvernoteSession::logout(){
     Cache::instance()->clearFileCache();
     logoutFinished();
 }
-void EvernoteSession::logoutAsync(){
+void Session::logoutAsync(){
     if(syncInProgress){
         return;
     }
-    QtConcurrent::run(this, &EvernoteSession::logout);
+    QtConcurrent::run(this, &Session::logout);
 }
 
-void EvernoteSession::exit(){
-    qDebug() << "EvernoteSession :: exit" << endl;
+void Session::exit(){
+    qDebug() << "Session :: exit" << endl;
     if(userStoreTransport){
         if(userStoreTransport->isOpen()){
-            qDebug () << "EvernoteSession :: close UserStore transport... ";
+            qDebug () << "Session :: close UserStore transport... ";
             userStoreTransport->close();
             qDebug () << "closed" << endl;
         }else{
-            qDebug() << "EvernoteSession :: UserStore transport already closed" << endl;
+            qDebug() << "Session :: UserStore transport already closed" << endl;
         }
     }
 
 }
 
-void EvernoteSession::recreateUserStoreClient(bool force){
+void Session::recreateUserStoreClient(bool force){
     if(force){
         if(userStoreTransport != NULL){
             if(userStoreTransport->isOpen()){
@@ -90,7 +90,7 @@ void EvernoteSession::recreateUserStoreClient(bool force){
         userStoreTransport->open();
     }
 }
-void EvernoteSession::recreateSyncClient(bool force){
+void Session::recreateSyncClient(bool force){
     if(force){
         if(syncTransport != NULL){
             if(syncTransport->isOpen()){
@@ -114,8 +114,8 @@ void EvernoteSession::recreateSyncClient(bool force){
         syncTransport->open();
     }
 }
-void EvernoteSession::getNoteContent(NoteWrapper* note){
-    qDebug() << "EvernoteSession :: auth" << endl;
+void Session::getNoteContent(NoteWrapper* note){
+    qDebug() << "Session :: auth" << endl;
     noteLoadStarted(note);
     try {
         note->note.tagGuids = Database::getNoteTagGuids(note->note).toStdVector();
@@ -150,7 +150,7 @@ void EvernoteSession::getNoteContent(NoteWrapper* note){
 
         noteLoadFinished(note);
     } catch (TException &tx) {
-        qDebug() << "EvernoteSession :: exception while getNoteContent: " << tx.what();
+        qDebug() << "Session :: exception while getNoteContent: " << tx.what();
         if(!cancelGetNote){
             noteLoadError(QString::fromAscii(tx.what()));
         }else{
@@ -158,11 +158,11 @@ void EvernoteSession::getNoteContent(NoteWrapper* note){
         }
     }
 }
-void EvernoteSession::getNoteContentAsync(NoteWrapper* note){
+void Session::getNoteContentAsync(NoteWrapper* note){
     cancelGetNote = false;
-    QtConcurrent::run(this, &EvernoteSession::getNoteContent, note);
+    QtConcurrent::run(this, &Session::getNoteContent, note);
 }
-void EvernoteSession::cancelGetNoteContent(){
+void Session::cancelGetNoteContent(){
     cancelGetNote = true;
     try{
         if(syncTransport != NULL){
@@ -174,17 +174,17 @@ void EvernoteSession::cancelGetNoteContent(){
     }
 }
 
-void EvernoteSession::authAsync(const QString& username, const QString& password){
-    QtConcurrent::run(this, &EvernoteSession::auth, username, password);
+void Session::authAsync(const QString& username, const QString& password){
+    QtConcurrent::run(this, &Session::auth, username, password);
 }
 
-void EvernoteSession::auth(const QString& username, const QString& password){
-    qDebug() << "EvernoteSession :: auth" << endl;
+void Session::auth(const QString& username, const QString& password){
+    qDebug() << "Session :: auth" << endl;
     try {
         recreateUserStoreClient(true);
         AuthenticationResult result;
         userStoreClient->authenticate(result,username.toStdString(),password.toStdString(),CONSUMER_KEY,CONSUMER_SECRET);
-        qDebug() << "EvernoteSession :: got auth token " << result.authenticationToken.c_str();
+        qDebug() << "Session :: got auth token " << result.authenticationToken.c_str();
         Settings::setValue(Settings::Username, username);
         Settings::setValue(Settings::Password, password);
         Settings::setValue(Settings::AuthToken, QString::fromStdString(result.authenticationToken));
@@ -211,15 +211,15 @@ void EvernoteSession::auth(const QString& username, const QString& password){
     }
 
     catch (TException &tx) {
-        qDebug() << "EvernoteSession :: excetion while login: " << tx.what();
+        qDebug() << "Session :: excetion while login: " << tx.what();
         authenticationFailed(tr("__basic_network_error__"));
     }
 }
-void EvernoteSession::reauth(){
+void Session::reauth(){
     auth(Settings::value(Settings::Username), Settings::value(Settings::Password));
 }
 
-void EvernoteSession::sync(){
+void Session::sync(){
     if(syncInProgress){
         return;
     }
@@ -233,9 +233,9 @@ void EvernoteSession::sync(){
                 recreateUserStoreClient(false);
                 recreateSyncClient(false);
 
-                qDebug() << "EvernoteSession :: start sync...";
+                qDebug() << "Session :: start sync...";
                 int cacheUsn = Settings::value(Settings::ServerUSN).toInt();
-                qDebug() << "EvernoteSession :: saved USN: " << cacheUsn;
+                qDebug() << "Session :: saved USN: " << cacheUsn;
                 SyncChunk chunk;
                 int percent = 0;
                 while(true){
@@ -263,7 +263,7 @@ void EvernoteSession::sync(){
                             }
                             Tag tag = tags.at(i);
                             Database::saveTag(tag);
-                            qDebug() << "EvernoteSession :: tag " << tag.name.c_str();
+                            qDebug() << "Session :: tag " << tag.name.c_str();
                         }
                         Database::commitTransaction();
                     }
@@ -276,7 +276,7 @@ void EvernoteSession::sync(){
                     }
 
                     std::vector <Notebook> notebooks = chunk.notebooks;
-                    qDebug() << "EvernoteSession :: notebooks " << chunk.notebooks.size();
+                    qDebug() << "Session :: notebooks " << chunk.notebooks.size();
                     if(!notebooks.empty()){
 
 
@@ -291,7 +291,7 @@ void EvernoteSession::sync(){
                             }
                             Notebook notebook = notebooks.at(i);
                             Database::saveNotebook(notebook);
-                            qDebug() << "EvernoteSession :: notebook " << notebook.name.c_str();
+                            qDebug() << "Session :: notebook " << notebook.name.c_str();
                         }
                         Database::commitTransaction();
                     }
@@ -303,7 +303,7 @@ void EvernoteSession::sync(){
                         return;
                     }
                     std::vector <Note> notes = chunk.notes;
-                    qDebug() << "EvernoteSession :: notes " << chunk.notes.size();
+                    qDebug() << "Session :: notes " << chunk.notes.size();
                     if(!notes.empty()){
                         Database::beginTransaction();
                         for(int i=0;i<notes.size();i++){
@@ -320,7 +320,7 @@ void EvernoteSession::sync(){
                             }else{
                                 Database::saveNote(note);
                             }
-                            qDebug() << "EvernoteSession :: note " << note.title.c_str();
+                            qDebug() << "Session :: note " << note.title.c_str();
                         }
                         Database::commitTransaction();
                     }
@@ -336,7 +336,7 @@ void EvernoteSession::sync(){
                     qDebug() << "Current usn: " << cacheUsn << " high usn: " << chunk.chunkHighUSN << ", update count: " << chunk.updateCount;
                 }
 
-                qDebug() << "EvernoteSession :: sync finished";
+                qDebug() << "Session :: sync finished";
                 break;
             }catch(EDAMUserException &e){
                 if(e.errorCode == 9){
@@ -346,20 +346,20 @@ void EvernoteSession::sync(){
 
         }
     }catch(TException &tx){
-        qDebug() << "EvernoteSession :: excetion while sync: " << tx.what();
+        qDebug() << "Session :: excetion while sync: " << tx.what();
         syncFailed("Network error");
     }
     syncInProgress = false;
     syncFinished();
     Cache::instance()->load();
 }
-void EvernoteSession::syncAsync(){
+void Session::syncAsync(){
     qDebug() << "syncAsync called";
-    QtConcurrent::run(this, &EvernoteSession::sync);
+    QtConcurrent::run(this, &Session::sync);
 }
-bool EvernoteSession::isSyncInProgress(){
+bool Session::isSyncInProgress(){
     return syncInProgress;
 }
-void EvernoteSession::cancelSync(){
+void Session::cancelSync(){
     syncCancelled = true;
 }

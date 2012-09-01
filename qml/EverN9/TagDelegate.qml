@@ -6,12 +6,12 @@ import "UIConstants.js" as UI
 CommonDelegate {
     id: root
 
-    property Notebook notebook
+    property Tag tag
 
     Label {
         id: nameLabel
 
-        text: notebook ? notebook.name : ""
+        text: tag ? tag.name : ""
         font.pixelSize: UI.MEDIUM_FONT
         font.weight: Font.Bold
         wrapMode: Text.NoWrap
@@ -22,25 +22,10 @@ CommonDelegate {
         anchors.rightMargin: UI.MEDIUM_SPACING
     }
 
-    Label {
-        id: dateLabel
-
-        text: notebook ? Qt.formatDateTime(notebook.updated, qsTr("yyyy-MM-dd hh:mm")) : ""
-        font.pixelSize: UI.SMALL_FONT
-        font.weight: Font.Light
-        wrapMode: Text.NoWrap
-
-        anchors.top: nameLabel.bottom
-        anchors.left: parent.left
-        anchors.right: badge.left
-        anchors.topMargin: UI.TINY_SPACING
-        anchors.rightMargin: UI.MEDIUM_SPACING
-    }
-
     Badge {
         id: badge
 
-        value: notebook ? notebook.notes.count : ""
+        value: tag ? tag.notes.count : ""
 
         anchors.right: parent.right
         anchors.rightMargin: UI.PAGE_MARGIN

@@ -21,7 +21,7 @@ PageStackWindow {
             PageStack {
                 id: tagTab
                 objectName: "tags"
-                CommonPage {
+                TagListPage {
                     id: tagPage
                     tools: tabBar
                     title: "EverN9 - Tags"

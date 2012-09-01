@@ -88,6 +88,14 @@ void Synchronizer::syncImpl()
                     if (cancelled)
                         break;
 
+                    if (!chunk.tags.empty())
+                        emit tagsSynced(QVector<Tag>::fromStdVector(chunk.tags));
+                    qDebug() << Q_FUNC_INFO << "TAGS:" << chunk.tags.size();
+
+                    emit progress(percent);
+                    if (cancelled)
+                        break;
+
                     if (!chunk.resources.empty())
                         emit resourcesSynced(QVector<Resource>::fromStdVector(chunk.resources));
                     qDebug() << Q_FUNC_INFO << "RESOURCES:" << chunk.resources.size();
@@ -99,14 +107,6 @@ void Synchronizer::syncImpl()
                     if (!chunk.notes.empty())
                         emit notesSynced(QVector<Note>::fromStdVector(chunk.notes));
                     qDebug() << Q_FUNC_INFO << "NOTES:" << chunk.notes.size();
-
-                    emit progress(percent);
-                    if (cancelled)
-                        break;
-
-                    if (!chunk.tags.empty())
-                        emit tagsSynced(QVector<Tag>::fromStdVector(chunk.tags));
-                    qDebug() << Q_FUNC_INFO << "TAGS:" << chunk.tags.size();
 
                     emit progress(percent);
                     if (cancelled)

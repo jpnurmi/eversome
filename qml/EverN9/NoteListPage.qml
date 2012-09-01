@@ -19,14 +19,14 @@ import "UIConstants.js" as UI
 CommonPage {
     id: root
 
-    property Notebook notebook
+    property NoteModel notes
 
     title: notebook ? notebook.name : ""
 
     flickable: ListView {
         anchors.fill: parent
 
-        model: notebook ? notebook.notes : 0
+        model: notes
         delegate: NoteDelegate {
             highlighted: index % 2
             note: modelData

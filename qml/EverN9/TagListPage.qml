@@ -18,16 +18,16 @@ import "UIConstants.js" as UI
 CommonPage {
     id: root
 
-    title: "EverN9 - Notebooks"
+    title: "EverN9 - Tags"
 
     flickable: ListView {
         anchors.fill: parent
 
-        model: Notebooks
-        delegate: NotebookDelegate {
+        model: Tags
+        delegate: TagDelegate {
             highlighted: index % 2
-            notebook: modelData
-            onClicked: pageStack.push(noteListPage, {title: notebook.name, notes: notebook.notes})
+            tag: modelData
+            onClicked: pageStack.push(noteListPage, {title: tag.name, notes: tag.notes})
         }
     }
 

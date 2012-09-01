@@ -7,6 +7,7 @@ BorderImage {
 
     property alias value: label.text
 
+    visible: value != ""
     width: Math.max(label.width + 16, 25)
     height: label.height + 8
     source: "images/countindicator.png"

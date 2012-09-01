@@ -3,11 +3,17 @@
 TagItem::TagItem(evernote::edam::Tag tag, QObject* parent)
     : QObject(parent), m_tag(tag)
 {
+    m_notes = new NoteModel(this);
     qRegisterMetaType<TagItem*>();
 }
 
 TagItem::~TagItem()
 {
+}
+
+NoteModel* TagItem::notes() const
+{
+    return m_notes;
 }
 
 evernote::edam::Tag TagItem::tag() const

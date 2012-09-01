@@ -67,6 +67,12 @@ void Session::syncNotes(const QVector<evernote::edam::Note>& notes)
         NotebookItem* notebook = NotebookModel::instance()->get(guid);
         NoteItem* item = new NoteItem(note, notebook);
         notebook->notes()->addNote(item);
+
+        for (uint i = 0; i < note.tagGuids.size(); ++i) {
+            QString tagGuid = QString::fromStdString(note.tagGuids.at(i));
+            TagItem* tagItem = TagModel::instance()->get(tagGuid);
+            tagItem->notes()->addNote(item);
+        }
     }
 }
 

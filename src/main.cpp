@@ -1,11 +1,17 @@
 #include <QtDeclarative>
 #include "qmlapplicationviewer.h"
+
+#include "authenticator.h"
+#include "synchronizer.h"
+#include "settings.h"
 #include "session.h"
-#include "cache.h"
-#include "wrappers/tagwrapper.h"
-#include "wrappers/notewrapper.h"
-#include "wrappers/resourcewrapper.h"
-#include "wrappers/notebookwrapper.h"
+
+#include "notebookmodel.h"
+#include "notebookitem.h"
+#include "resourceitem.h"
+#include "noteitem.h"
+#include "tagmodel.h"
+#include "tagitem.h"
 
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {
@@ -21,22 +27,29 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     else if (translator.load("EverN9.en", ":/"))
         app->installTranslator(&translator);
 
-    qmlRegisterType<TagWrapper>("com.evernote.types",1,0, "Tag");
-    qmlRegisterType<NoteWrapper>("com.evernote.types",1,0, "Note");
-    qmlRegisterType<ResourceWrapper>("com.evernote.types",1,0, "Resource");
-    qmlRegisterType<NotebookWrapper>("com.evernote.types",1,0, "Notebook");
+    qmlRegisterType<TagItem>("com.evernote.types", 1,0, "Tag");
+    qmlRegisterType<NoteItem>("com.evernote.types", 1,0, "Note");
+    qmlRegisterType<NoteModel>("com.evernote.types", 1,0, "NoteModel");
+    qmlRegisterType<ResourceItem>("com.evernote.types", 1,0, "Resource");
+    qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
+    Session session;
     QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("Session", Session::instance());
-    viewer.rootContext()->setContextProperty("Cache", Cache::instance());
-
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    if (!Settings::value(Settings::Username).isEmpty() && !Settings::value(Settings::Password).isEmpty()) {
+    viewer.rootContext()->setContextProperty("Auth", session.authenticator());
+    viewer.rootContext()->setContextProperty("Sync", session.synchronizer());
+    viewer.rootContext()->setContextProperty("Tags", TagModel::instance());
+    viewer.rootContext()->setContextProperty("Notebooks", NotebookModel::instance());
+
+    QString username = Settings::value(Settings::Username);
+    QString password = Settings::value(Settings::Password);
+    if (!username.isEmpty() && !password.isEmpty()) {
         viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
-        Session::instance()->syncAsync();
+        session.authenticator()->auth(username, password);
     } else {
         viewer.setMainQmlFile(QLatin1String("qml/EverN9/mainLogin.qml"));
     }
+
     viewer.showExpanded();
     return app->exec();
 }

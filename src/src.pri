@@ -2,27 +2,20 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
-    cache.h \
+    authenticator.h \
     database.h \
-    fileutils.h \
     session.h \
     settings.h \
-    wrappers/notebookwrapper.h \
-    wrappers/notewrapper.h \
-    wrappers/resourcewrapper.h \
-    wrappers/tagwrapper.h
+    synchronizer.h
 
 SOURCES += \
-    cache.cpp \
+    authenticator.cpp \
     database.cpp \
-    fileutils.cpp \
     main.cpp \
     session.cpp \
     settings.cpp \
-    wrappers/notebookwrapper.cpp \
-    wrappers/notewrapper.cpp \
-    wrappers/resourcewrapper.cpp \
-    wrappers/tagwrapper.cpp
+    synchronizer.cpp
 
+include(model/model.pri)
 include(edam/edam.pri)
 include(thrift/thrift.pri)

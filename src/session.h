@@ -1,95 +1,32 @@
 #ifndef SESSION_H
 #define SESSION_H
 
-#include "edam/UserStore.h"
-#include "cache.h"
-#include "thrift/transport/THttpClient.h"
-#include "thrift/protocol/TBinaryProtocol.h"
-#include "thrift/transport/TSSLSocket.h"
-#include "thrift/Thrift.h"
-#include "edam/UserStore.h"
-#include "edam/UserStore_constants.h"
-#include "edam/NoteStore.h"
-#include "edam/NoteStore_constants.h"
-#include "edam/NoteStore_types.h"
-#include "edam/Errors_constants.h"
-#include "edam/Errors_types.h"
-#include <boost/shared_ptr.hpp>
 #include <QObject>
-#include "settings.h"
-#include "fileutils.h"
-#include "wrappers/resourcewrapper.h"
+#include "edam/Types_types.h"
 
-using namespace std;
-using namespace boost;
-
-using namespace apache::thrift::transport;
-using namespace apache::thrift::protocol;
-using namespace apache::thrift;
-
-
-using namespace evernote::edam;
-
+class Authenticator;
+class Synchronizer;
 
 class Session : public QObject
 {
     Q_OBJECT
 
 public:
-    static Session* instance();
-    Session(QObject *parent = 0);
-    ~Session();
+    explicit Session(QObject* parent = 0);
+    virtual ~Session();
 
-    void recreateUserStoreClient(bool force);
-    void recreateSyncClient(bool force);
-signals:
-    void authenticationSuccess();
-    void authenticationFailed(QString error);
+    Authenticator* authenticator() const;
+    Synchronizer* synchronizer() const;
 
-    void syncFailed(QString error);
-    void syncStarted(int percent);
-    void syncFinished();
+private slots:
+    void syncNotebooks(const QVector<evernote::edam::Notebook>& notebooks);
+    void syncResources(const QVector<evernote::edam::Resource>& resources);
+    void syncNotes(const QVector<evernote::edam::Note>& notes);
+    void syncTags(const QVector<evernote::edam::Tag>& tags);
 
-    void tagsSyncStarted();
-    void notebooksSyncStarted();
-    void noteLoadStarted(NoteWrapper* note);
-    void noteLoadFinished(NoteWrapper* note);
-    void noteLoadError(QString error);
-    void noteContentDownloaded(NoteWrapper* note);
-    void resourceDownloaded(ResourceWrapper* r);
-    void logoutStarted();
-    void logoutFinished();
-
-public slots:
-    void reauth();
-    void auth(const QString& username, const QString& password);
-    void authAsync(const QString& username, const QString& password);
-
-    void sync();
-    void syncAsync();
-
-    void getNoteContentAsync(NoteWrapper* note);
-    void getNoteContent(NoteWrapper* note);
-
-
-    void exit();
-    void logout();
-    void logoutAsync();
-    bool isSyncInProgress();
-    void cancelGetNoteContent();
-    void cancelSync();
 private:
-    UserStoreClient* userStoreClient;
-    shared_ptr<TTransport> userStoreTransport;
-    NoteStoreClient* syncClient;
-    shared_ptr<TTransport> syncTransport;
-
-
-
-    bool syncInProgress;
-    bool cancelGetNote;
-    bool syncCancelled;
-
+    Authenticator* m_auth;
+    Synchronizer* m_sync;
 };
 
-#endif // EVERNOTESESSION_H
+#endif // SESSION_H

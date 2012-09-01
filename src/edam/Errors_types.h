@@ -6,10 +6,10 @@
 #ifndef Errors_TYPES_H
 #define Errors_TYPES_H
 
-#include "thrift/Thrift.h"
-#include "thrift/TApplicationException.h"
-#include "thrift/protocol/TProtocol.h"
-#include "thrift/transport/TTransport.h"
+#include <Thrift.h>
+#include <TApplicationException.h>
+#include <protocol/TProtocol.h>
+#include <transport/TTransport.h>
 
 
 
@@ -27,7 +27,12 @@ enum EDAMErrorCode {
   AUTH_EXPIRED = 9,
   DATA_CONFLICT = 10,
   ENML_VALIDATION = 11,
-  SHARD_UNAVAILABLE = 12
+  SHARD_UNAVAILABLE = 12,
+  LEN_TOO_SHORT = 13,
+  LEN_TOO_LONG = 14,
+  TOO_FEW = 15,
+  TOO_MANY = 16,
+  UNSUPPORTED_OPERATION = 17
 };
 
 typedef struct _EDAMUserException__isset {

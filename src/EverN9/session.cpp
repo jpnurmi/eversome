@@ -113,5 +113,5 @@ void Session::onResourceFetched(ResourceItem* resource)
 
 void Session::onNoteFetched(NoteItem* note)
 {
-    // TODO
+    Database::saveNotes(QList<NoteItem*>() << note);
 }

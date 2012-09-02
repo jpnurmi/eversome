@@ -168,12 +168,16 @@ void Synchronizer::fetchImpl(NoteItem* note)
         init(false);
         std::string content = "";
         client->getNoteContent(content, Settings::value(Settings::AuthToken).toStdString(), note->guid().toStdString());
-        note->setContent(content);
+
+        if (!content.empty()) {
+            note->setContent(content);
+            emit noteFetched(note);
+        }
 
         if (cancelled)
             return;
 
-        // TODO: get resources
+        // TODO: fetch resources
 
     } catch (TException& e) {
         qDebug() << Q_FUNC_INFO << "?" << e.what();

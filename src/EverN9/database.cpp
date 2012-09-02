@@ -21,6 +21,10 @@ bool Database::initialize()
     db.setDatabaseName("EverN9");
     if (db.open()) {
         QStringList queries;
+        queries += "DROP TABLE IF EXISTS Notebooks";
+        queries += "DROP TABLE IF EXISTS Resources";
+        queries += "DROP TABLE IF EXISTS Tags";
+        queries += "DROP TABLE IF EXISTS Notes";
         queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER)";
         queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, filePath TEXT)";
         queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT)";

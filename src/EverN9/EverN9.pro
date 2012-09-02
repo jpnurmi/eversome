@@ -31,3 +31,10 @@ SOURCES += \
     synchronizer.cpp
 
 include(model/model.pri)
+
+OTHER_FILES += \
+    EverN9_harmattan.desktop \
+    EverN9.desktop \
+    EverN9.svg \
+    EverN964.png \
+    EverN980.png

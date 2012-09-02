@@ -17,5 +17,5 @@ SOURCES += \
     synchronizer.cpp
 
 include(model/model.pri)
-include(edam/edam.pri)
-include(thrift/thrift.pri)
+include(3rdparty/edam.pri)
+include(3rdparty/thrift.pri)

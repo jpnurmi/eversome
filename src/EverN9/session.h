@@ -6,6 +6,8 @@
 
 class Authenticator;
 class Synchronizer;
+class ResourceItem;
+class NoteItem;
 
 class Session : public QObject
 {
@@ -19,10 +21,12 @@ public:
     Synchronizer* synchronizer() const;
 
 private slots:
-    void syncNotebooks(const QVector<evernote::edam::Notebook>& notebooks);
-    void syncResources(const QVector<evernote::edam::Resource>& resources);
-    void syncNotes(const QVector<evernote::edam::Note>& notes);
-    void syncTags(const QVector<evernote::edam::Tag>& tags);
+    void onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks);
+    void onResourcesSynced(const QVector<evernote::edam::Resource>& resources);
+    void onNotesSynced(const QVector<evernote::edam::Note>& notes);
+    void onTagsSynced(const QVector<evernote::edam::Tag>& tags);
+    void onResourceFetched(ResourceItem* resource);
+    void onNoteFetched(NoteItem* note);
 
 private:
     Authenticator* m_auth;

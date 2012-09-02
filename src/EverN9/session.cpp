@@ -4,6 +4,7 @@
 #include "authenticator.h"
 #include "notebookmodel.h"
 #include "notebookitem.h"
+#include "resourceitem.h"
 #include "notemodel.h"
 #include "noteitem.h"
 #include "tagmodel.h"
@@ -40,13 +41,17 @@ Session::Session(QObject *parent) : QObject(parent)
     connect(m_auth, SIGNAL(succeed()), m_sync, SLOT(sync()), Qt::QueuedConnection);
 
     connect(m_sync, SIGNAL(notebooksSynced(QVector<evernote::edam::Notebook>)),
-              this, SLOT(syncNotebooks(QVector<evernote::edam::Notebook>)), Qt::QueuedConnection);
+              this, SLOT(onNotebooksSynced(QVector<evernote::edam::Notebook>)), Qt::QueuedConnection);
     connect(m_sync, SIGNAL(resourcesSynced(QVector<evernote::edam::Resource>)),
-              this, SLOT(syncResources(QVector<evernote::edam::Resource>)), Qt::QueuedConnection);
+              this, SLOT(onResourcesSynced(QVector<evernote::edam::Resource>)), Qt::QueuedConnection);
     connect(m_sync, SIGNAL(notesSynced(QVector<evernote::edam::Note>)),
-              this, SLOT(syncNotes(QVector<evernote::edam::Note>)), Qt::QueuedConnection);
+              this, SLOT(onNotesSynced(QVector<evernote::edam::Note>)), Qt::QueuedConnection);
     connect(m_sync, SIGNAL(tagsSynced(QVector<evernote::edam::Tag>)),
-              this, SLOT(syncTags(QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
+              this, SLOT(onTagsSynced(QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
+    connect(m_sync, SIGNAL(resourceFetched(ResourceItem*)),
+              this, SLOT(onResourceFetched(ResourceItem*)));
+    connect(m_sync, SIGNAL(noteFetched(NoteItem*)),
+              this, SLOT(onNoteFetched(NoteItem*)));
 
     Database::initialize();
     TagModel::instance()->add(Database::loadTags(this));
@@ -69,7 +74,7 @@ Synchronizer* Session::synchronizer() const
     return m_sync;
 }
 
-void Session::syncNotebooks(const QVector<evernote::edam::Notebook>& notebooks)
+void Session::onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks)
 {
     QList<NotebookItem*> items;
     foreach (const evernote::edam::Notebook& notebook, notebooks)
@@ -78,12 +83,12 @@ void Session::syncNotebooks(const QVector<evernote::edam::Notebook>& notebooks)
     Database::saveNotebooks(NotebookModel::instance()->notebooks());
 }
 
-void Session::syncResources(const QVector<evernote::edam::Resource>& resources)
+void Session::onResourcesSynced(const QVector<evernote::edam::Resource>& resources)
 {
     // TODO
 }
 
-void Session::syncNotes(const QVector<evernote::edam::Note>& notes)
+void Session::onNotesSynced(const QVector<evernote::edam::Note>& notes)
 {
     QList<NoteItem*> items;
     foreach (const evernote::edam::Note& note, notes)
@@ -92,11 +97,21 @@ void Session::syncNotes(const QVector<evernote::edam::Note>& notes)
     setupNotes(items);
 }
 
-void Session::syncTags(const QVector<evernote::edam::Tag>& tags)
+void Session::onTagsSynced(const QVector<evernote::edam::Tag>& tags)
 {
     QList<TagItem*> items;
     foreach (const evernote::edam::Tag& tag, tags)
         items += new TagItem(tag, this);
     TagModel::instance()->add(items);
     Database::saveTags(TagModel::instance()->tags());
+}
+
+void Session::onResourceFetched(ResourceItem* resource)
+{
+    // TODO
+}
+
+void Session::onNoteFetched(NoteItem* note)
+{
+    // TODO
 }

@@ -66,9 +66,10 @@ void Synchronizer::fetch(const evernote::edam::Note& note)
 
 void Synchronizer::syncImpl()
 {
-    qDebug() << Q_FUNC_INFO;
     if (syncing)
         return;
+
+    qDebug() << Q_FUNC_INFO;
 
     syncing = true;
     cancelled = false;
@@ -94,12 +95,10 @@ void Synchronizer::syncImpl()
                         break;
 
                     percent = (int)((double)(100*(double)usn/(double)chunk.updateCount));
-                    qDebug() << Q_FUNC_INFO << "PROGRESS:" << usn << "/" << chunk.updateCount << "=" << percent;
                     emit progress(percent);
 
                     if (!chunk.notebooks.empty())
                         emit notebooksSynced(QVector<Notebook>::fromStdVector(chunk.notebooks));
-                    qDebug() << Q_FUNC_INFO << "NOTEBOOKS:" << chunk.notebooks.size();
 
                     emit progress(percent);
                     if (cancelled)
@@ -107,7 +106,6 @@ void Synchronizer::syncImpl()
 
                     if (!chunk.tags.empty())
                         emit tagsSynced(QVector<Tag>::fromStdVector(chunk.tags));
-                    qDebug() << Q_FUNC_INFO << "TAGS:" << chunk.tags.size();
 
                     emit progress(percent);
                     if (cancelled)
@@ -115,7 +113,6 @@ void Synchronizer::syncImpl()
 
                     if (!chunk.resources.empty())
                         emit resourcesSynced(QVector<Resource>::fromStdVector(chunk.resources));
-                    qDebug() << Q_FUNC_INFO << "RESOURCES:" << chunk.resources.size();
 
                     emit progress(percent);
                     if (cancelled)
@@ -123,45 +120,47 @@ void Synchronizer::syncImpl()
 
                     if (!chunk.notes.empty())
                         emit notesSynced(QVector<Note>::fromStdVector(chunk.notes));
-                    qDebug() << Q_FUNC_INFO << "NOTES:" << chunk.notes.size();
 
                     emit progress(percent);
                     if (cancelled)
                         break;
 
+                    qDebug() << Q_FUNC_INFO
+                             << "NB:" << chunk.notebooks.size()
+                             << "T:" << chunk.tags.size()
+                             << "R:" << chunk.resources.size()
+                             << "N:" << chunk.notes.size()
+                             << "USN:" << chunk.chunkHighUSN;
+
                     usn = chunk.chunkHighUSN;
-                    qDebug() << Q_FUNC_INFO << "USN:" << usn;
                     Settings::setValue(Settings::ServerUSN, QString::number(usn));
                     if (usn >= chunk.updateCount)
                         break;
                 }
                 break;
             } catch (EDAMUserException& e) {
-                if (e.errorCode == 9) {
-                    // TODO: reauth();
-                    qDebug("REAUTH NEEDED");
-                }
-                emit failed(tr("__sync_error__"));
+                if (e.errorCode == 9)
+                    qDebug() << "### TODO: REAUTH NEEDED";
+                emit failed(e.what());
             }
-            qDebug() << Q_FUNC_INFO << i;
         }
     } catch(TException& e) {
         qDebug() << Q_FUNC_INFO << "?" << e.what();
-        emit failed(tr("__unknown_error__"));
+        emit failed(QString::fromStdString(e.what()));
     }
 
     syncing = false;
     emit activeChanged();
     if (!cancelled)
         emit finished();
-    //TODO: Cache::instance()->load();
 }
 
 void Synchronizer::fetchImpl(const evernote::edam::Note& note)
 {
-    qDebug() << Q_FUNC_INFO;
     if (fetching)
         return;
+
+    qDebug() << Q_FUNC_INFO;
 
     fetching = true;
     cancelled = false;
@@ -184,7 +183,7 @@ void Synchronizer::fetchImpl(const evernote::edam::Note& note)
 
     } catch (TException& e) {
         qDebug() << Q_FUNC_INFO << "?" << e.what();
-        emit failed(tr("__unknown_error__"));
+        emit failed(QString::fromStdString(e.what()));
     }
 
     fetching = false;
@@ -195,7 +194,6 @@ void Synchronizer::fetchImpl(const evernote::edam::Note& note)
 
 void Synchronizer::init(bool force)
 {
-    qDebug() << Q_FUNC_INFO << force;
     if (force) {
         if (transport && transport->isOpen())
             transport->close();

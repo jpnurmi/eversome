@@ -40,11 +40,8 @@ BorderImage {
         onPressAndHold: root.pressAndHold()
     }
 
-    Image {
+    Separator {
         visible: index < root.ListView.view.count - 1
-        source: "images/listitem-separator.png"
-        anchors.left: parent.left
-        anchors.right: parent.right
         anchors.verticalCenter: parent.bottom
         anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
         anchors.rightMargin: UI.LARGE_SPACING

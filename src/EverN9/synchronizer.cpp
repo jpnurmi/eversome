@@ -36,6 +36,11 @@ Synchronizer::~Synchronizer()
     delete client;
 }
 
+bool Synchronizer::isActive() const
+{
+    return syncing;
+}
+
 void Synchronizer::sync()
 {
     qDebug() << Q_FUNC_INFO;
@@ -57,6 +62,7 @@ void Synchronizer::syncImpl()
     syncing = true;
     cancelled = false;
     emit started();
+    emit activeChanged();
 
     try {
         init(true);
@@ -134,6 +140,7 @@ void Synchronizer::syncImpl()
     }
 
     syncing = false;
+    emit activeChanged();
     if (!cancelled)
         emit finished();
     //TODO: Cache::instance()->load();

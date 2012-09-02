@@ -22,6 +22,7 @@ Page {
 
     Header {
         id: header
+        busy: Sync.active
         width: parent.width
     }
 

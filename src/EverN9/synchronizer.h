@@ -8,10 +8,13 @@
 class Synchronizer : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool active READ isActive NOTIFY activeChanged)
 
 public:
     explicit Synchronizer(QObject *parent = 0);
     ~Synchronizer();
+
+    bool isActive() const;
 
 public slots:
     void sync();
@@ -22,6 +25,7 @@ signals:
     void progress(int percent);
     void failed(const QString& error);
     void finished();
+    void activeChanged();
 
     void notebooksSynced(const QVector<evernote::edam::Notebook>& notebooks);
     void resourcesSynced(const QVector<evernote::edam::Resource>& resources);

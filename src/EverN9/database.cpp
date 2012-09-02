@@ -2,6 +2,7 @@
 
 #include "database.h"
 #include "notebookitem.h"
+#include "resourceitem.h"
 #include "noteitem.h"
 #include "tagitem.h"
 #include "edam/Types_types.h"
@@ -10,6 +11,7 @@
 #include <QSqlRecord>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QFileInfo>
 #include <QVariant>
 #include <QDebug>
 
@@ -20,8 +22,9 @@ bool Database::initialize()
     if (db.open()) {
         QStringList queries;
         queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER)";
+        queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, filePath TEXT)";
         queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT)";
-        queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT)";
+        queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT)";
         foreach (const QString& query, queries)
             db.exec(query);
     }
@@ -41,6 +44,7 @@ bool Database::reset()
 {
     QStringList queries;
     queries += "DELETE FROM Notebooks";
+    queries += "DELETE FROM Resources";
     queries += "DELETE FROM Tags";
     queries += "DELETE FROM Notes";
 
@@ -93,6 +97,39 @@ bool Database::saveNotebooks(const QList<NotebookItem*>& notebooks)
     query.addBindValue(updates);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << notebooks.count() << res;
+    return res;
+}
+
+QList<ResourceItem*> Database::loadResources(QObject* parent)
+{
+    QList<ResourceItem*> res;
+    QSqlQuery query("SELECT * FROM Resources");
+    if (query.exec()) {
+        while (query.next()) {
+            evernote::edam::Resource resource;
+            QSqlRecord record = query.record();
+            resource.guid = record.value("guid").toString().toStdString();
+            resource.mime = QFileInfo(record.value("filePath").toString()).suffix().toStdString();
+            res += new ResourceItem(resource, parent);
+        }
+    }
+    qDebug() << Q_FUNC_INFO << res.count();
+    return res;
+}
+
+bool Database::saveResources(const QList<ResourceItem*>& resources)
+{
+    QVariantList guids, filePaths;
+    foreach (ResourceItem* resource, resources) {
+        guids += resource->guid();
+        filePaths += resource->filePath();
+    }
+
+    QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?)");
+    query.addBindValue(guids);
+    query.addBindValue(filePaths);
+    bool res = query.execBatch();
+    qDebug() << Q_FUNC_INFO << resources.count() << res;
     return res;
 }
 
@@ -151,6 +188,12 @@ QList<NoteItem*> Database::loadNotes(QObject* parent)
             QStringList tags = record.value("tagGuids").toString().split(";", QString::SkipEmptyParts);
             foreach (const QString& tag, tags)
                 note.tagGuids.push_back(tag.toStdString());
+            QStringList resources = record.value("resourceGuids").toString().split(";", QString::SkipEmptyParts);
+            foreach (const QString& resource, resources) {
+                evernote::edam::Resource r;
+                r.guid = resource.toStdString();
+                note.resources.push_back(r);
+            }
             res += new NoteItem(note, parent);
         }
     }
@@ -160,7 +203,8 @@ QList<NoteItem*> Database::loadNotes(QObject* parent)
 
 bool Database::saveNotes(const QList<NoteItem*>& notes)
 {
-    QVariantList guids, titles, contents, creates, updates, deletes, actives, notebooks, tags;
+    QVariantList guids, titles, contents, creates, updates,
+                 deletes, actives, notebooks, tags, resources;
     foreach (NoteItem* note, notes) {
         guids += note->guid();
         titles += note->title();
@@ -174,9 +218,13 @@ bool Database::saveNotes(const QList<NoteItem*>& notes)
         for (uint i = 0; i < note->note().tagGuids.size(); ++i)
             tagGuids += QString::fromStdString(note->note().tagGuids.at(i));
         tags += tagGuids.join(";");
+        QStringList resourceGuids;
+        for (uint i = 0; i < note->note().resources.size(); ++i)
+            resourceGuids += QString::fromStdString(note->note().resources.at(i).guid);
+        resources += resourceGuids.join(";");
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(titles);
     query.addBindValue(contents);
@@ -186,6 +234,7 @@ bool Database::saveNotes(const QList<NoteItem*>& notes)
     query.addBindValue(actives);
     query.addBindValue(notebooks);
     query.addBindValue(tags);
+    query.addBindValue(resources);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << notes.count() << res;
     return res;

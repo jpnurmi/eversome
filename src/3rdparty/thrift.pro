@@ -1,8 +1,10 @@
 TEMPLATE = lib
 TARGET = thrift
-CONFIG += static
 CONFIG -= qt
 DESTDIR = ../../lib
+
+target.path = /opt/EverN9/lib
+INSTALLS += target
 
 INCLUDEPATH += $$PWD $$PWD/thrift
 DEPENDPATH += $$PWD/thrift
@@ -89,8 +91,3 @@ SOURCES += \
     $$PWD/thrift/transport/TFileTransport.cpp \
     $$PWD/thrift/transport/TFDTransport.cpp \
     $$PWD/thrift/transport/TBufferTransports.cpp
-
-# just to avoid qt creator's deployment popup
-target.path = /tmp
-target.files = dummy
-INSTALLS += target

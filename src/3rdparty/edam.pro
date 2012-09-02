@@ -1,8 +1,10 @@
 TEMPLATE = lib
 TARGET = edam
-CONFIG += static
 CONFIG -= qt
 DESTDIR = ../../lib
+
+target.path = /opt/EverN9/lib
+INSTALLS += target
 
 INCLUDEPATH += $$PWD $$PWD/edam
 DEPENDPATH += $$PWD/edam
@@ -37,8 +39,3 @@ SOURCES += \
     $$PWD/edam/UserStore.cpp \
     $$PWD/edam/UserStore_constants.cpp \
     $$PWD/edam/UserStore_types.cpp
-
-# just to avoid qt creator's deployment popup
-target.path = /tmp
-target.files = dummy
-INSTALLS += target

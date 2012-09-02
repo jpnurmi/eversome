@@ -81,7 +81,7 @@ void Synchronizer::syncImpl()
         while (!cancelled && ++i <= 5) {
             try {
                 int percent = 0;
-                int usn = 0; //Settings::value(Settings::ServerUSN).toInt();
+                int usn = Settings::value(Settings::ServerUSN).toInt();
 
                 init(false);
 

@@ -23,7 +23,7 @@ Page {
 
     Header {
         id: header
-        busy: Sync.active
+        busy: NoteStore.active
         width: parent.width
     }
 

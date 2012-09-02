@@ -1,18 +1,18 @@
-#ifndef SYNCHRONIZER_H
-#define SYNCHRONIZER_H
+#ifndef NOTESTORE_H
+#define NOTESTORE_H
 
 #include <QObject>
 #include "edam/NoteStore.h"
 #include "edam/Types_types.h"
 
-class Synchronizer : public QObject
+class NoteStore : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool active READ isActive NOTIFY activeChanged)
 
 public:
-    explicit Synchronizer(QObject *parent = 0);
-    ~Synchronizer();
+    explicit NoteStore(QObject *parent = 0);
+    virtual ~NoteStore();
 
     bool isActive() const;
 
@@ -48,4 +48,4 @@ private:
     boost::shared_ptr<apache::thrift::transport::TTransport> transport;
 };
 
-#endif // SYNCHRONIZER_H
+#endif // NOTESTORE_H

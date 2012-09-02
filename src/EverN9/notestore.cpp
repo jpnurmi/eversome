@@ -1,6 +1,6 @@
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "synchronizer.h"
+#include "notestore.h"
 #include "settings.h"
 #include "noteitem.h"
 #include <QtConcurrentRun>
@@ -9,7 +9,6 @@
 #include "thrift/transport/THttpClient.h"
 #include "thrift/protocol/TBinaryProtocol.h"
 
-using namespace evernote::edam;
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
@@ -25,7 +24,7 @@ Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
-Synchronizer::Synchronizer(QObject *parent) : QObject(parent),
+NoteStore::NoteStore(QObject *parent) : QObject(parent),
     syncing(false), fetching(false), cancelled(false), client(0)
 {
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
@@ -36,35 +35,35 @@ Synchronizer::Synchronizer(QObject *parent) : QObject(parent),
     qRegisterMetaType<evernote::edam::Note>();
 }
 
-Synchronizer::~Synchronizer()
+NoteStore::~NoteStore()
 {
     delete client;
 }
 
-bool Synchronizer::isActive() const
+bool NoteStore::isActive() const
 {
     return syncing || fetching;
 }
 
-void Synchronizer::sync()
+void NoteStore::sync()
 {
     qDebug() << Q_FUNC_INFO;
-    QtConcurrent::run(this, &Synchronizer::syncImpl);
+    QtConcurrent::run(this, &NoteStore::syncImpl);
 }
 
-void Synchronizer::cancel()
+void NoteStore::cancel()
 {
     qDebug() << Q_FUNC_INFO;
     cancelled = true;
 }
 
-void Synchronizer::fetch(const evernote::edam::Note& note)
+void NoteStore::fetch(const evernote::edam::Note& note)
 {
     qDebug() << Q_FUNC_INFO;
-    QtConcurrent::run(this, &Synchronizer::fetchImpl, note);
+    QtConcurrent::run(this, &NoteStore::fetchImpl, note);
 }
 
-void Synchronizer::syncImpl()
+void NoteStore::syncImpl()
 {
     if (syncing)
         return;
@@ -86,7 +85,7 @@ void Synchronizer::syncImpl()
 
                 init(false);
 
-                SyncChunk chunk;
+                evernote::edam::SyncChunk chunk;
                 while (!cancelled) {
                     emit progress(percent);
                     client->getSyncChunk(chunk, Settings::value(Settings::AuthToken).toStdString(), usn, 1024, false);
@@ -98,28 +97,28 @@ void Synchronizer::syncImpl()
                     emit progress(percent);
 
                     if (!chunk.notebooks.empty())
-                        emit notebooksSynced(QVector<Notebook>::fromStdVector(chunk.notebooks));
+                        emit notebooksSynced(QVector<evernote::edam::Notebook>::fromStdVector(chunk.notebooks));
 
                     emit progress(percent);
                     if (cancelled)
                         break;
 
                     if (!chunk.tags.empty())
-                        emit tagsSynced(QVector<Tag>::fromStdVector(chunk.tags));
+                        emit tagsSynced(QVector<evernote::edam::Tag>::fromStdVector(chunk.tags));
 
                     emit progress(percent);
                     if (cancelled)
                         break;
 
                     if (!chunk.resources.empty())
-                        emit resourcesSynced(QVector<Resource>::fromStdVector(chunk.resources));
+                        emit resourcesSynced(QVector<evernote::edam::Resource>::fromStdVector(chunk.resources));
 
                     emit progress(percent);
                     if (cancelled)
                         break;
 
                     if (!chunk.notes.empty())
-                        emit notesSynced(QVector<Note>::fromStdVector(chunk.notes));
+                        emit notesSynced(QVector<evernote::edam::Note>::fromStdVector(chunk.notes));
 
                     emit progress(percent);
                     if (cancelled)
@@ -138,7 +137,7 @@ void Synchronizer::syncImpl()
                         break;
                 }
                 break;
-            } catch (EDAMUserException& e) {
+            } catch (evernote::edam::EDAMUserException& e) {
                 if (e.errorCode == 9)
                     qDebug() << "### TODO: REAUTH NEEDED";
                 emit failed(e.what());
@@ -155,7 +154,7 @@ void Synchronizer::syncImpl()
         emit finished();
 }
 
-void Synchronizer::fetchImpl(const evernote::edam::Note& note)
+void NoteStore::fetchImpl(const evernote::edam::Note& note)
 {
     if (fetching)
         return;
@@ -176,7 +175,7 @@ void Synchronizer::fetchImpl(const evernote::edam::Note& note)
             emit noteFetched(copy);
 
         for (uint i = 0; !cancelled && i < copy.resources.size(); ++i) {
-            Resource res = copy.resources.at(i);
+            evernote::edam::Resource res = copy.resources.at(i);
             client->getResource(res, Settings::value(Settings::AuthToken).toStdString(), res.guid, true, false, false, false);
             emit resourceFetched(res);
         }
@@ -192,7 +191,7 @@ void Synchronizer::fetchImpl(const evernote::edam::Note& note)
         emit finished();
 }
 
-void Synchronizer::init(bool force)
+void NoteStore::init(bool force)
 {
     if (force) {
         if (transport && transport->isOpen())
@@ -205,7 +204,7 @@ void Synchronizer::init(bool force)
     if (!client) {
         QString shardId = Settings::value(Settings::UserShardID);
         transport = boost::shared_ptr<TTransport>(new THttpClient(EDAM_HOST, EDAM_PORT, EDAM_ROOT + shardId.toStdString()));
-        client = new NoteStoreClient(boost::shared_ptr<TProtocol>(new TBinaryProtocol(transport)));
+        client = new evernote::edam::NoteStoreClient(boost::shared_ptr<TProtocol>(new TBinaryProtocol(transport)));
     }
 
     if (!transport->isOpen())

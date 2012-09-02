@@ -1,7 +1,7 @@
 #include <QtDeclarative>
 #include "qmlapplicationviewer.h"
 
-#include "synchronizer.h"
+#include "notestore.h"
 #include "userstore.h"
 #include "settings.h"
 #include "session.h"
@@ -31,7 +31,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     QmlApplicationViewer viewer;
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     viewer.rootContext()->setContextProperty("UserStore", session.userStore());
-    viewer.rootContext()->setContextProperty("Sync", session.synchronizer());
+    viewer.rootContext()->setContextProperty("NoteStore", session.noteStore());
     viewer.rootContext()->setContextProperty("Tags", TagModel::instance());
     viewer.rootContext()->setContextProperty("Notebooks", NotebookModel::instance());
 

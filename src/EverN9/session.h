@@ -5,7 +5,7 @@
 #include "edam/Types_types.h"
 
 class UserStore;
-class Synchronizer;
+class NoteStore;
 class ResourceItem;
 class NoteItem;
 
@@ -18,7 +18,7 @@ public:
     virtual ~Session();
 
     UserStore* userStore() const;
-    Synchronizer* synchronizer() const;
+    NoteStore* noteStore() const;
 
 private slots:
     void onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks);
@@ -30,7 +30,7 @@ private slots:
 
 private:
     UserStore* m_user;
-    Synchronizer* m_sync;
+    NoteStore* m_note;
 };
 
 #endif // SESSION_H

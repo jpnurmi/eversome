@@ -1,7 +1,7 @@
 #include "session.h"
 #include "database.h"
 #include "userstore.h"
-#include "synchronizer.h"
+#include "notestore.h"
 #include "notebookmodel.h"
 #include "resourcemodel.h"
 #include "notebookitem.h"
@@ -40,21 +40,21 @@ static void setupNotes(const QList<NoteItem*>& notes)
 Session::Session(QObject *parent) : QObject(parent)
 {
     m_user = new UserStore(this);
-    m_sync = new Synchronizer(this);
+    m_note = new NoteStore(this);
 
-    connect(m_user, SIGNAL(succeed()), m_sync, SLOT(sync()), Qt::QueuedConnection);
+    connect(m_user, SIGNAL(succeed()), m_note, SLOT(sync()), Qt::QueuedConnection);
 
-    connect(m_sync, SIGNAL(notebooksSynced(QVector<evernote::edam::Notebook>)),
+    connect(m_note, SIGNAL(notebooksSynced(QVector<evernote::edam::Notebook>)),
               this, SLOT(onNotebooksSynced(QVector<evernote::edam::Notebook>)), Qt::QueuedConnection);
-    connect(m_sync, SIGNAL(resourcesSynced(QVector<evernote::edam::Resource>)),
+    connect(m_note, SIGNAL(resourcesSynced(QVector<evernote::edam::Resource>)),
               this, SLOT(onResourcesSynced(QVector<evernote::edam::Resource>)), Qt::QueuedConnection);
-    connect(m_sync, SIGNAL(notesSynced(QVector<evernote::edam::Note>)),
+    connect(m_note, SIGNAL(notesSynced(QVector<evernote::edam::Note>)),
               this, SLOT(onNotesSynced(QVector<evernote::edam::Note>)), Qt::QueuedConnection);
-    connect(m_sync, SIGNAL(tagsSynced(QVector<evernote::edam::Tag>)),
+    connect(m_note, SIGNAL(tagsSynced(QVector<evernote::edam::Tag>)),
               this, SLOT(onTagsSynced(QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
-    connect(m_sync, SIGNAL(resourceFetched(evernote::edam::Resource)),
+    connect(m_note, SIGNAL(resourceFetched(evernote::edam::Resource)),
               this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
-    connect(m_sync, SIGNAL(noteFetched(evernote::edam::Note)),
+    connect(m_note, SIGNAL(noteFetched(evernote::edam::Note)),
               this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
 
     Database::initialize();
@@ -74,9 +74,9 @@ UserStore* Session::userStore() const
     return m_user;
 }
 
-Synchronizer* Session::synchronizer() const
+NoteStore* Session::noteStore() const
 {
-    return m_sync;
+    return m_note;
 }
 
 void Session::onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks)

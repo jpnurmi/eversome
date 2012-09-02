@@ -22,7 +22,7 @@ CommonPage {
     property Note note
 
     title: note ? note.title : ""
-    busy: Sync.active || contentLabel.openingLink
+    busy: NoteStore.active || contentLabel.openingLink
 
     flickable: Flickable {
         anchors.fill: parent
@@ -99,7 +99,7 @@ CommonPage {
     onStatusChanged: {
         if (status == PageStatus.Activating) {
             if (note && !note.content)
-                Sync.fetch(note.note());
+                NoteStore.fetch(note.note());
         }
     }
 }

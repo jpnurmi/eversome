@@ -3,14 +3,18 @@
 #include "synchronizer.h"
 #include "authenticator.h"
 #include "notebookmodel.h"
+#include "resourcemodel.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "notemodel.h"
 #include "noteitem.h"
 #include "tagmodel.h"
 #include "tagitem.h"
+#include <QFileInfo>
 #include <QVector>
 #include <QDebug>
+#include <QFile>
+#include <QDir>
 
 static void setupNotes(const QList<NoteItem*>& notes)
 {
@@ -48,13 +52,14 @@ Session::Session(QObject *parent) : QObject(parent)
               this, SLOT(onNotesSynced(QVector<evernote::edam::Note>)), Qt::QueuedConnection);
     connect(m_sync, SIGNAL(tagsSynced(QVector<evernote::edam::Tag>)),
               this, SLOT(onTagsSynced(QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
-    connect(m_sync, SIGNAL(resourceFetched(ResourceItem*)),
-              this, SLOT(onResourceFetched(ResourceItem*)));
-    connect(m_sync, SIGNAL(noteFetched(NoteItem*)),
-              this, SLOT(onNoteFetched(NoteItem*)));
+    connect(m_sync, SIGNAL(resourceFetched(evernote::edam::Resource)),
+              this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
+    connect(m_sync, SIGNAL(noteFetched(evernote::edam::Note)),
+              this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
 
     Database::initialize();
     TagModel::instance()->add(Database::loadTags(this));
+    ResourceModel::instance()->add(Database::loadResources(this));
     NotebookModel::instance()->add(Database::loadNotebooks(this));
     setupNotes(Database::loadNotes(this));
 }
@@ -85,7 +90,11 @@ void Session::onNotebooksSynced(const QVector<evernote::edam::Notebook>& noteboo
 
 void Session::onResourcesSynced(const QVector<evernote::edam::Resource>& resources)
 {
-    // TODO
+    QList<ResourceItem*> items;
+    foreach (const evernote::edam::Resource& resource, resources)
+        items += new ResourceItem(resource, this);
+    ResourceModel::instance()->add(items);
+    Database::saveResources(ResourceModel::instance()->resources());
 }
 
 void Session::onNotesSynced(const QVector<evernote::edam::Note>& notes)
@@ -93,7 +102,7 @@ void Session::onNotesSynced(const QVector<evernote::edam::Note>& notes)
     QList<NoteItem*> items;
     foreach (const evernote::edam::Note& note, notes)
         items += new NoteItem(note, this);
-    Database::saveNotes(NoteModel::allNotes.values());
+    Database::saveNotes(NoteItem::allNotes.values());
     setupNotes(items);
 }
 
@@ -106,12 +115,23 @@ void Session::onTagsSynced(const QVector<evernote::edam::Tag>& tags)
     Database::saveTags(TagModel::instance()->tags());
 }
 
-void Session::onResourceFetched(ResourceItem* resource)
+void Session::onNoteFetched(const evernote::edam::Note& note)
 {
-    // TODO
+    NoteItem* item = NoteItem::get(QString::fromStdString(note.guid));
+    if (item) {
+        item->setContent(note.content);
+    }
 }
 
-void Session::onNoteFetched(NoteItem* note)
+void Session::onResourceFetched(const evernote::edam::Resource& resource)
 {
-    Database::saveNotes(QList<NoteItem*>() << note);
+    ResourceItem* item = ResourceModel::instance()->get(QString::fromStdString(resource.guid));
+    if (item) {
+        QFileInfo info(item->filePath());
+        if (QDir().mkpath(info.absolutePath())) {
+            QFile file(item->filePath());
+            if (file.open(QFile::WriteOnly))
+                file.write(resource.data.body.c_str(), resource.data.size);
+        }
+    }
 }

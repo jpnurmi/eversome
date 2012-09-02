@@ -25,8 +25,8 @@ private slots:
     void onResourcesSynced(const QVector<evernote::edam::Resource>& resources);
     void onNotesSynced(const QVector<evernote::edam::Note>& notes);
     void onTagsSynced(const QVector<evernote::edam::Tag>& tags);
-    void onResourceFetched(ResourceItem* resource);
-    void onNoteFetched(NoteItem* note);
+    void onResourceFetched(const evernote::edam::Resource& resource);
+    void onNoteFetched(const evernote::edam::Note& note);
 
 private:
     Authenticator* m_auth;

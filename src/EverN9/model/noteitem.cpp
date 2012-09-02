@@ -65,3 +65,11 @@ QStringList NoteItem::tags() const
     }
     return res;
 }
+
+void NoteItem::setContent(const std::string& content)
+{
+    if (m_note.content != content) {
+        m_note.content = content;
+        emit contentChanged();
+    }
+}

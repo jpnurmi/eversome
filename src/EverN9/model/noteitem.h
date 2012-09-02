@@ -14,7 +14,7 @@ class NoteItem : public QObject
     Q_OBJECT
     Q_PROPERTY(QString guid READ guid CONSTANT)
     Q_PROPERTY(QString title READ title CONSTANT)
-    Q_PROPERTY(QString content READ content CONSTANT)
+    Q_PROPERTY(QString content READ content NOTIFY contentChanged)
     Q_PROPERTY(QDateTime created READ created CONSTANT)
     Q_PROPERTY(QDateTime updated READ updated CONSTANT)
     Q_PROPERTY(QDateTime deleted READ deleted CONSTANT)
@@ -35,6 +35,11 @@ public:
     QDateTime deleted() const;
     bool isActive() const;
     QStringList tags() const;
+
+    void setContent(const std::string& content);
+
+signals:
+    void contentChanged();
 
 private:
     evernote::edam::Note m_note;

@@ -72,4 +72,11 @@ CommonPage {
             }
         }
     }
+
+    onStatusChanged: {
+        if (status == PageStatus.Activating) {
+            if (note && !note.content)
+                Sync.fetch(note);
+        }
+    }
 }

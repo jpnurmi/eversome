@@ -5,6 +5,8 @@
 #include "edam/NoteStore.h"
 #include "edam/Types_types.h"
 
+class NoteItem;
+
 class Synchronizer : public QObject
 {
     Q_OBJECT
@@ -19,6 +21,7 @@ public:
 public slots:
     void sync();
     void cancel();
+    void fetch(NoteItem* note);
 
 signals:
     void started();
@@ -34,10 +37,12 @@ signals:
 
 private slots:
     void syncImpl();
+    void fetchImpl(NoteItem* note);
     void init(bool force);
 
 private:
     volatile bool syncing;
+    volatile bool fetching;
     volatile bool cancelled;
     evernote::edam::NoteStoreClient* client;
     boost::shared_ptr<apache::thrift::transport::TTransport> transport;

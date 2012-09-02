@@ -2,6 +2,7 @@
 
 #include "synchronizer.h"
 #include "settings.h"
+#include "noteitem.h"
 #include <QtConcurrentRun>
 #include <QMetaType>
 #include <QtDebug>
@@ -23,7 +24,7 @@ Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
 
 Synchronizer::Synchronizer(QObject *parent) : QObject(parent),
-    syncing(false), cancelled(false), client(0)
+    syncing(false), fetching(false), cancelled(false), client(0)
 {
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
@@ -38,7 +39,7 @@ Synchronizer::~Synchronizer()
 
 bool Synchronizer::isActive() const
 {
-    return syncing;
+    return syncing || fetching;
 }
 
 void Synchronizer::sync()
@@ -51,6 +52,12 @@ void Synchronizer::cancel()
 {
     qDebug() << Q_FUNC_INFO;
     cancelled = true;
+}
+
+void Synchronizer::fetch(NoteItem* note)
+{
+    qDebug() << Q_FUNC_INFO;
+    QtConcurrent::run(this, &Synchronizer::fetchImpl, note);
 }
 
 void Synchronizer::syncImpl()
@@ -125,7 +132,7 @@ void Synchronizer::syncImpl()
                         break;
                 }
                 break;
-            } catch (EDAMUserException &e) {
+            } catch (EDAMUserException& e) {
                 if (e.errorCode == 9) {
                     // TODO: reauth();
                     qDebug("REAUTH NEEDED");
@@ -144,6 +151,39 @@ void Synchronizer::syncImpl()
     if (!cancelled)
         emit finished();
     //TODO: Cache::instance()->load();
+}
+
+void Synchronizer::fetchImpl(NoteItem* note)
+{
+    qDebug() << Q_FUNC_INFO;
+    if (syncing)
+        return;
+
+    syncing = true;
+    cancelled = false;
+    emit started();
+    emit activeChanged();
+
+    try {
+        init(false);
+        std::string content = "";
+        client->getNoteContent(content, Settings::value(Settings::AuthToken).toStdString(), note->guid().toStdString());
+        note->setContent(content);
+
+        if (cancelled)
+            return;
+
+        // TODO: get resources
+
+    } catch (TException& e) {
+        qDebug() << Q_FUNC_INFO << "?" << e.what();
+        emit failed(tr("__unknown_error__"));
+    }
+
+    syncing = false;
+    emit activeChanged();
+    if (!cancelled)
+        emit finished();
 }
 
 void Synchronizer::init(bool force)

@@ -4,7 +4,7 @@
 #include <QObject>
 #include "edam/Types_types.h"
 
-class Authenticator;
+class UserStore;
 class Synchronizer;
 class ResourceItem;
 class NoteItem;
@@ -17,7 +17,7 @@ public:
     explicit Session(QObject* parent = 0);
     virtual ~Session();
 
-    Authenticator* authenticator() const;
+    UserStore* userStore() const;
     Synchronizer* synchronizer() const;
 
 private slots:
@@ -29,7 +29,7 @@ private slots:
     void onNoteFetched(const evernote::edam::Note& note);
 
 private:
-    Authenticator* m_auth;
+    UserStore* m_user;
     Synchronizer* m_sync;
 };
 

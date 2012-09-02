@@ -1,7 +1,7 @@
 #include "session.h"
 #include "database.h"
+#include "userstore.h"
 #include "synchronizer.h"
-#include "authenticator.h"
 #include "notebookmodel.h"
 #include "resourcemodel.h"
 #include "notebookitem.h"
@@ -39,10 +39,10 @@ static void setupNotes(const QList<NoteItem*>& notes)
 
 Session::Session(QObject *parent) : QObject(parent)
 {
-    m_auth = new Authenticator(this);
+    m_user = new UserStore(this);
     m_sync = new Synchronizer(this);
 
-    connect(m_auth, SIGNAL(succeed()), m_sync, SLOT(sync()), Qt::QueuedConnection);
+    connect(m_user, SIGNAL(succeed()), m_sync, SLOT(sync()), Qt::QueuedConnection);
 
     connect(m_sync, SIGNAL(notebooksSynced(QVector<evernote::edam::Notebook>)),
               this, SLOT(onNotebooksSynced(QVector<evernote::edam::Notebook>)), Qt::QueuedConnection);
@@ -69,9 +69,9 @@ Session::~Session()
     Database::uninitialize();
 }
 
-Authenticator* Session::authenticator() const
+UserStore* Session::userStore() const
 {
-    return m_auth;
+    return m_user;
 }
 
 Synchronizer* Session::synchronizer() const

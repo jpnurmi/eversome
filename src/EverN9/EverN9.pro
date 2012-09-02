@@ -16,19 +16,19 @@ include(../3rdparty/edam.pri)
 include(../3rdparty/thrift.pri)
 
 HEADERS += \
-    authenticator.h \
     database.h \
     session.h \
     settings.h \
-    synchronizer.h
+    synchronizer.h \
+    userstore.h
 
 SOURCES += \
-    authenticator.cpp \
     database.cpp \
     main.cpp \
     session.cpp \
     settings.cpp \
-    synchronizer.cpp
+    synchronizer.cpp \
+    userstore.cpp
 
 include(model/model.pri)
 

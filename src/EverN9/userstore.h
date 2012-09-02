@@ -1,16 +1,16 @@
-#ifndef AUTHENTICATOR_H
-#define AUTHENTICATOR_H
+#ifndef USERSTORE_H
+#define USERSTORE_H
 
 #include <QObject>
 #include "edam/UserStore.h"
 
-class Authenticator : public QObject
+class UserStore : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Authenticator(QObject *parent = 0);
-    ~Authenticator();
+    explicit UserStore(QObject *parent = 0);
+    virtual ~UserStore();
 
 public slots:
     void auth(const QString& username, const QString& password);
@@ -27,4 +27,4 @@ private:
     boost::shared_ptr<apache::thrift::transport::TTransport> transport;
 };
 
-#endif // AUTHENTICATOR_H
+#endif // USERSTORE_H

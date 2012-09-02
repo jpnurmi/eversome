@@ -1,8 +1,8 @@
 #include <QtDeclarative>
 #include "qmlapplicationviewer.h"
 
-#include "authenticator.h"
 #include "synchronizer.h"
+#include "userstore.h"
 #include "settings.h"
 #include "session.h"
 
@@ -30,7 +30,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     Session session;
     QmlApplicationViewer viewer;
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    viewer.rootContext()->setContextProperty("Auth", session.authenticator());
+    viewer.rootContext()->setContextProperty("UserStore", session.userStore());
     viewer.rootContext()->setContextProperty("Sync", session.synchronizer());
     viewer.rootContext()->setContextProperty("Tags", TagModel::instance());
     viewer.rootContext()->setContextProperty("Notebooks", NotebookModel::instance());
@@ -39,7 +39,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     QString password = Settings::value(Settings::Password);
     if (!username.isEmpty() && !password.isEmpty()) {
         viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
-        session.authenticator()->auth(username, password);
+        session.userStore()->auth(username, password);
     } else {
         viewer.setMainQmlFile(QLatin1String("qml/EverN9/mainLogin.qml"));
     }

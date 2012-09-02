@@ -27,10 +27,6 @@ signals:
 
 private:
     QList<NoteItem*> m_notes;
-
-    friend class Session;
-    friend class NoteItem;
-    static QHash<QString, NoteItem*> allNotes;
 };
 
 Q_DECLARE_METATYPE(NoteModel*)

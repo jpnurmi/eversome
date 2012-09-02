@@ -2,8 +2,6 @@
 #include "noteitem.h"
 #include <QDebug>
 
-QHash<QString, NoteItem*> NoteModel::allNotes;
-
 NoteModel::NoteModel(QObject *parent) : QAbstractListModel(parent)
 {
     qRegisterMetaType<NoteModel*>();

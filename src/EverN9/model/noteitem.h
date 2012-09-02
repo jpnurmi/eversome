@@ -7,8 +7,6 @@
 #include <QStringList>
 #include "edam/Types_types.h"
 
-class ResourceItem;
-
 class NoteItem : public QObject
 {
     Q_OBJECT
@@ -20,12 +18,15 @@ class NoteItem : public QObject
     Q_PROPERTY(QDateTime deleted READ deleted CONSTANT)
     Q_PROPERTY(bool isActive READ isActive CONSTANT)
     Q_PROPERTY(QStringList tags READ tags CONSTANT)
+    Q_PROPERTY(QStringList resources READ resources CONSTANT)
 
 public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
     virtual ~NoteItem();
 
-    evernote::edam::Note note() const;
+    static NoteItem* get(const QString& guid);
+
+    Q_INVOKABLE evernote::edam::Note note() const;
 
     QString guid() const;
     QString title() const;
@@ -35,6 +36,7 @@ public:
     QDateTime deleted() const;
     bool isActive() const;
     QStringList tags() const;
+    QStringList resources() const;
 
     void setContent(const std::string& content);
 
@@ -42,8 +44,9 @@ signals:
     void contentChanged();
 
 private:
+    friend class Session;
     evernote::edam::Note m_note;
-    QList<ResourceItem*> m_resources;
+    static QHash<QString, NoteItem*> allNotes;
 };
 
 Q_DECLARE_METATYPE(NoteItem*)

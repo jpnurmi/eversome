@@ -1,17 +1,26 @@
 #include "noteitem.h"
+#include "resourcemodel.h"
+#include "resourceitem.h"
 #include "notemodel.h"
 #include "tagmodel.h"
 #include "tagitem.h"
+
+QHash<QString, NoteItem*> NoteItem::allNotes;
 
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     : QObject(parent), m_note(note)
 {
     qRegisterMetaType<NoteItem*>();
-    NoteModel::allNotes[guid()] = this;
+    allNotes[guid()] = this;
 }
 
 NoteItem::~NoteItem()
 {
+}
+
+NoteItem* NoteItem::get(const QString& guid)
+{
+    return allNotes.value(guid);
 }
 
 evernote::edam::Note NoteItem::note() const
@@ -62,6 +71,18 @@ QStringList NoteItem::tags() const
         TagItem* tag = TagModel::instance()->get(guid);
         if (tag)
             res += tag->name();
+    }
+    return res;
+}
+
+QStringList NoteItem::resources() const
+{
+    QStringList res;
+    for (uint i = 0; i < m_note.resources.size(); ++i) {
+        QString guid = QString::fromStdString(m_note.resources.at(i).guid);
+        ResourceItem* resource = ResourceModel::instance()->get(guid);
+        if (resource)
+            res += resource->filePath();
     }
     return res;
 }

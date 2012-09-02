@@ -4,28 +4,24 @@
 #include <QHash>
 #include <QDir>
 
-static void fill_file_extensions();
 typedef QHash<QString, QString> StringHash;
-Q_GLOBAL_STATIC_WITH_INITIALIZER(StringHash, file_extensions, fill_file_extensions())
-
-void fill_file_extensions()
-{
-    file_extensions()->insert("application/msword", "doc");
-    file_extensions()->insert("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
-    file_extensions()->insert("application/pdf", "pdf");
-    file_extensions()->insert("audio/amr", "amr");
-    file_extensions()->insert("audio/mpeg", "mp3");
-    file_extensions()->insert("audio/wav", "wav");
-    file_extensions()->insert("audio/vnd.wave", "wav");
-    file_extensions()->insert("image/bmp", "bmp");
-    file_extensions()->insert("image/gif", "gif");
-    file_extensions()->insert("image/jpg", "jpg");
-    file_extensions()->insert("image/jpeg", "jpg");
-    file_extensions()->insert("image/pjpeg", "jpg");
-    file_extensions()->insert("image/png", "png");
-    file_extensions()->insert("text/plain", "txt");
-    file_extensions()->insert("text/html", "html");
-}
+Q_GLOBAL_STATIC_WITH_INITIALIZER(StringHash, file_extensions, {
+    x->insert("application/msword", "doc");
+    x->insert("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
+    x->insert("application/pdf", "pdf");
+    x->insert("audio/amr", "amr");
+    x->insert("audio/mpeg", "mp3");
+    x->insert("audio/wav", "wav");
+    x->insert("audio/vnd.wave", "wav");
+    x->insert("image/bmp", "bmp");
+    x->insert("image/gif", "gif");
+    x->insert("image/jpg", "jpg");
+    x->insert("image/jpeg", "jpg");
+    x->insert("image/pjpeg", "jpg");
+    x->insert("image/png", "png");
+    x->insert("text/plain", "txt");
+    x->insert("text/html", "html");
+})
 
 ResourceItem::ResourceItem(evernote::edam::Resource resource, QObject* parent)
     : QObject(parent), m_resource(resource)

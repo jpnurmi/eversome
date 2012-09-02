@@ -18,7 +18,7 @@ import "UIConstants.js" as UI
 CommonPage {
     id: root
 
-    title: "EverN9 - Notebooks"
+    title: qsTr("Notebooks")
 
     flickable: ListView {
         anchors.fill: parent

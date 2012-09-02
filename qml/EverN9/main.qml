@@ -24,7 +24,6 @@ PageStackWindow {
                 TagListPage {
                     id: tagPage
                     tools: tabBar
-                    title: "EverN9 - Tags"
                 }
                 Component.onCompleted: tagTab.push(tagPage)
             }
@@ -34,7 +33,7 @@ PageStackWindow {
                 CommonPage {
                     id: searchPage
                     tools: tabBar
-                    title: "EverN9 - Search"
+                    title: qsTr("Search")
                 }
                 Component.onCompleted: searchTab.push(searchPage)
             }

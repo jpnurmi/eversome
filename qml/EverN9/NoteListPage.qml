@@ -30,6 +30,12 @@ CommonPage {
         delegate: NoteDelegate {
             highlighted: index % 2
             note: modelData
+            onClicked: pageStack.push(notePage, {note: modelData})
         }
+    }
+
+    Component {
+        id: notePage
+        NotePage { }
     }
 }

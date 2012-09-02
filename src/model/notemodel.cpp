@@ -2,6 +2,8 @@
 #include "noteitem.h"
 #include <QDebug>
 
+QHash<QString, NoteItem*> NoteModel::allNotes;
+
 NoteModel::NoteModel(QObject *parent) : QAbstractListModel(parent)
 {
     qRegisterMetaType<NoteModel*>();
@@ -28,7 +30,7 @@ QVariant NoteModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-void NoteModel::addNote(NoteItem* note)
+void NoteModel::add(NoteItem* note)
 {
     const int row = rowCount();
     beginInsertRows(QModelIndex(), row, row);

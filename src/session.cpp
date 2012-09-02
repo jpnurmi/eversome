@@ -9,6 +9,28 @@
 #include "tagmodel.h"
 #include "tagitem.h"
 #include <QVector>
+#include <QDebug>
+
+static void setupNotes(const QList<NoteItem*>& notes)
+{
+    foreach (NoteItem* note, notes) {
+        QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
+        NotebookItem* notebook = NotebookModel::instance()->get(notebookGuid);
+        if (notebook)
+            notebook->notes()->add(note);
+        else
+            qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
+
+        for (uint i = 0; i < note->note().tagGuids.size(); ++i) {
+            QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
+            TagItem* tag = TagModel::instance()->get(tagGuid);
+            if (tag)
+                tag->notes()->add(note);
+            else
+                qCritical() << Q_FUNC_INFO << "MISSING TAG:" << tagGuid;
+        }
+    }
+}
 
 Session::Session(QObject *parent) : QObject(parent)
 {
@@ -29,6 +51,7 @@ Session::Session(QObject *parent) : QObject(parent)
     Database::initialize();
     TagModel::instance()->add(Database::loadTags(this));
     NotebookModel::instance()->add(Database::loadNotebooks(this));
+    setupNotes(Database::loadNotes(this));
 }
 
 Session::~Session()
@@ -62,18 +85,11 @@ void Session::syncResources(const QVector<evernote::edam::Resource>& resources)
 
 void Session::syncNotes(const QVector<evernote::edam::Note>& notes)
 {
-    foreach (const evernote::edam::Note& note, notes) {
-        QString guid = QString::fromStdString(note.notebookGuid);
-        NotebookItem* notebook = NotebookModel::instance()->get(guid);
-        NoteItem* item = new NoteItem(note, notebook);
-        notebook->notes()->addNote(item);
-
-        for (uint i = 0; i < note.tagGuids.size(); ++i) {
-            QString tagGuid = QString::fromStdString(note.tagGuids.at(i));
-            TagItem* tagItem = TagModel::instance()->get(tagGuid);
-            tagItem->notes()->addNote(item);
-        }
-    }
+    QList<NoteItem*> items;
+    foreach (const evernote::edam::Note& note, notes)
+        items += new NoteItem(note, this);
+    Database::saveNotes(NoteModel::allNotes.values());
+    setupNotes(items);
 }
 
 void Session::syncTags(const QVector<evernote::edam::Tag>& tags)

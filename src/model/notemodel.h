@@ -20,13 +20,17 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
 public slots:
-    void addNote(NoteItem* note);
+    void add(NoteItem* note);
 
 signals:
     void countChanged();
 
 private:
     QList<NoteItem*> m_notes;
+
+    friend class Session;
+    friend class NoteItem;
+    static QHash<QString, NoteItem*> allNotes;
 };
 
 Q_DECLARE_METATYPE(NoteModel*)

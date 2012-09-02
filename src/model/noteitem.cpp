@@ -1,4 +1,5 @@
 #include "noteitem.h"
+#include "notemodel.h"
 #include "tagmodel.h"
 #include "tagitem.h"
 
@@ -6,6 +7,7 @@ NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     : QObject(parent), m_note(note)
 {
     qRegisterMetaType<NoteItem*>();
+    NoteModel::allNotes[guid()] = this;
 }
 
 NoteItem::~NoteItem()

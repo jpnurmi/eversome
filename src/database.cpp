@@ -2,6 +2,7 @@
 
 #include "database.h"
 #include "notebookitem.h"
+#include "noteitem.h"
 #include "tagitem.h"
 #include "edam/Types_types.h"
 #include <QSqlDatabase>
@@ -20,6 +21,7 @@ bool Database::initialize()
         QStringList queries;
         queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER)";
         queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT)";
+        queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT)";
         foreach (const QString& query, queries)
             db.exec(query);
     }
@@ -40,6 +42,7 @@ bool Database::reset()
     QStringList queries;
     queries += "DELETE FROM Notebooks";
     queries += "DELETE FROM Tags";
+    queries += "DELETE FROM Notes";
 
     QSqlDatabase db = QSqlDatabase::database();
     foreach (const QString& query, queries)
@@ -77,8 +80,8 @@ bool Database::saveNotebooks(const QList<NotebookItem*>& notebooks)
         names += notebook->name();
         defs += notebook->isDefault();
         pubs += notebook->isPublished();
-        creates += notebook->created();
-        updates += notebook->updated();
+        creates += notebook->created().toMSecsSinceEpoch();
+        updates += notebook->updated().toMSecsSinceEpoch();
     }
 
     QSqlQuery query("INSERT OR REPLACE INTO NoteBooks VALUES(?,?,?,?,?,?)");
@@ -126,5 +129,64 @@ bool Database::saveTags(const QList<TagItem*>& tags)
     query.addBindValue(parents);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << tags.count() << res;
+    return res;
+}
+
+QList<NoteItem*> Database::loadNotes(QObject* parent)
+{
+    QList<NoteItem*> res;
+    QSqlQuery query("SELECT * FROM Notes");
+    if (query.exec()) {
+        while (query.next()) {
+            evernote::edam::Note note;
+            QSqlRecord record = query.record();
+            note.guid = record.value("guid").toString().toStdString();
+            note.title = record.value("title").toString().toStdString();
+            note.content = record.value("content").toString().toStdString();
+            note.created = record.value("created").toLongLong();
+            note.updated = record.value("updated").toLongLong();
+            note.deleted = record.value("deleted").toLongLong();
+            note.active = record.value("isActive").toBool();
+            note.notebookGuid = record.value("notebookGuid").toString().toStdString();
+            QStringList tags = record.value("tagGuids").toString().split(";", QString::SkipEmptyParts);
+            foreach (const QString& tag, tags)
+                note.tagGuids.push_back(tag.toStdString());
+            res += new NoteItem(note, parent);
+        }
+    }
+    qDebug() << Q_FUNC_INFO << res.count();
+    return res;
+}
+
+bool Database::saveNotes(const QList<NoteItem*>& notes)
+{
+    QVariantList guids, titles, contents, creates, updates, deletes, actives, notebooks, tags;
+    foreach (NoteItem* note, notes) {
+        guids += note->guid();
+        titles += note->title();
+        contents += note->content();
+        creates += note->created().toMSecsSinceEpoch();
+        updates += note->updated().toMSecsSinceEpoch();
+        deletes += note->deleted().toMSecsSinceEpoch();
+        actives += note->isActive();
+        notebooks += QString::fromStdString(note->note().notebookGuid);
+        QStringList tagGuids;
+        for (uint i = 0; i < note->note().tagGuids.size(); ++i)
+            tagGuids += QString::fromStdString(note->note().tagGuids.at(i));
+        tags += tagGuids.join(";");
+    }
+
+    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?)");
+    query.addBindValue(guids);
+    query.addBindValue(titles);
+    query.addBindValue(contents);
+    query.addBindValue(creates);
+    query.addBindValue(updates);
+    query.addBindValue(deletes);
+    query.addBindValue(actives);
+    query.addBindValue(notebooks);
+    query.addBindValue(tags);
+    bool res = query.execBatch();
+    qDebug() << Q_FUNC_INFO << notes.count() << res;
     return res;
 }

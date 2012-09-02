@@ -5,6 +5,7 @@
 #include <QObject>
 
 class TagItem;
+class NoteItem;
 class NotebookItem;
 
 class Database
@@ -20,6 +21,9 @@ public:
 
     static QList<TagItem*> loadTags(QObject* parent = 0);
     static bool saveTags(const QList<TagItem*>& tags);
+
+    static QList<NoteItem*> loadNotes(QObject* parent = 0);
+    static bool saveNotes(const QList<NoteItem*>& notes);
 };
 
 #endif // DATABASE_H

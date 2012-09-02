@@ -7,6 +7,7 @@ HEADERS += \
     noteitem.h \
     notemodel.h \
     resourceitem.h \
+    resourcemodel.h \
     tagitem.h \
     tagmodel.h
 
@@ -16,5 +17,6 @@ SOURCES += \
     noteitem.cpp \
     notemodel.cpp \
     resourceitem.cpp \
+    resourcemodel.cpp \
     tagitem.cpp \
     tagmodel.cpp

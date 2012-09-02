@@ -89,3 +89,8 @@ SOURCES += \
     $$PWD/thrift/transport/TFileTransport.cpp \
     $$PWD/thrift/transport/TFDTransport.cpp \
     $$PWD/thrift/transport/TBufferTransports.cpp
+
+# just to avoid qt creator's deployment popup
+target.path = /tmp
+target.files = dummy
+INSTALLS += target

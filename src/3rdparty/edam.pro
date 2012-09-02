@@ -37,3 +37,8 @@ SOURCES += \
     $$PWD/edam/UserStore.cpp \
     $$PWD/edam/UserStore_constants.cpp \
     $$PWD/edam/UserStore_types.cpp
+
+# just to avoid qt creator's deployment popup
+target.path = /tmp
+target.files = dummy
+INSTALLS += target

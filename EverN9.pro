@@ -2,10 +2,10 @@ TEMPLATE = subdirs
 
 3rdparty.subdir = src/3rdparty
 
-src.depends = 3rdparty
-src.subdir = src
+evern9.depends = 3rdparty
+evern9.subdir = src/EverN9
 
-SUBDIRS += 3rdparty src
+SUBDIRS += 3rdparty evern9
 
 OTHER_FILES += \
     qtc_packaging/debian_harmattan/rules \

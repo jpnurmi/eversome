@@ -1,7 +1,7 @@
 #CONFIG += qdeclarative-boostable
 QT += sql
 
-qmlfolder.source = ../qml/EverN9
+qmlfolder.source = ../../qml/EverN9
 qmlfolder.target = qml
 DEPLOYMENTFOLDERS = qmlfolder
 
@@ -11,9 +11,9 @@ qtcAddDeployment()
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
-LIBDIR = $$OUT_PWD/../lib
-include(3rdparty/edam.pri)
-include(3rdparty/thrift.pri)
+LIBDIR = $$OUT_PWD/../../lib
+include(../3rdparty/edam.pri)
+include(../3rdparty/thrift.pri)
 
 HEADERS += \
     authenticator.h \

@@ -22,6 +22,7 @@ CommonPage {
     property Note note
 
     title: note ? note.title : ""
+    busy: Sync.active || contentLabel.openingLink
 
     flickable: Flickable {
         anchors.fill: parent
@@ -66,9 +67,24 @@ CommonPage {
             Label {
                 id: contentLabel
 
+                property bool openingLink: false
+
                 text: note ? note.content : ""
                 font.pixelSize: UI.MEDIUM_FONT
                 width: parent.width
+
+                onLinkActivated: {
+                    openingLink = true;
+                    Qt.openUrlExternally(link);
+                }
+
+                Connections {
+                    target: Qt.application
+                    onActiveChanged: {
+                        if (!Qt.application.active)
+                            contentLabel.openingLink = false;
+                    }
+                }
             }
         }
     }

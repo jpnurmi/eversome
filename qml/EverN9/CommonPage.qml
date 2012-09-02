@@ -4,6 +4,7 @@ import com.nokia.meego 1.0
 Page {
     id: root
 
+    property alias busy: header.busy
     property alias title: header.title
     property Flickable flickable
 

@@ -1,4 +1,5 @@
 #include "resourceitem.h"
+#include "resourcemodel.h"
 #include <QDesktopServices>
 #include <QHash>
 #include <QDir>
@@ -29,6 +30,7 @@ void fill_file_extensions()
 ResourceItem::ResourceItem(evernote::edam::Resource resource, QObject* parent)
     : QObject(parent), m_resource(resource)
 {
+    qRegisterMetaType<ResourceItem*>();
 }
 
 ResourceItem::~ResourceItem()

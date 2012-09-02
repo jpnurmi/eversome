@@ -2,6 +2,7 @@
 #define RESOURCEITEM_H
 
 #include <QObject>
+#include <QMetaType>
 #include "edam/Types_types.h"
 
 class ResourceItem : public QObject
@@ -22,5 +23,7 @@ public:
 private:
     evernote::edam::Resource m_resource;
 };
+
+Q_DECLARE_METATYPE(ResourceItem*)
 
 #endif // RESOURCEITEM_H

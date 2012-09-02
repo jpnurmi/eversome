@@ -86,13 +86,20 @@ CommonPage {
                     }
                 }
             }
+
+            Repeater {
+                model: note ? note.resources : null
+                Image {
+                    source: modelData
+                }
+            }
         }
     }
 
     onStatusChanged: {
         if (status == PageStatus.Activating) {
             if (note && !note.content)
-                Sync.fetch(note);
+                Sync.fetch(note.note());
         }
     }
 }

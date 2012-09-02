@@ -43,8 +43,10 @@ BorderImage {
     Image {
         visible: index < root.ListView.view.count - 1
         source: "images/listitem-separator.png"
-        width: parent.width * 3/4
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.verticalCenter: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
+        anchors.rightMargin: UI.LARGE_SPACING
     }
 }

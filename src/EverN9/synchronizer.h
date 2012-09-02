@@ -5,9 +5,6 @@
 #include "edam/NoteStore.h"
 #include "edam/Types_types.h"
 
-class NoteItem;
-class ResourceItem;
-
 class Synchronizer : public QObject
 {
     Q_OBJECT
@@ -22,7 +19,7 @@ public:
 public slots:
     void sync();
     void cancel();
-    void fetch(NoteItem* note);
+    void fetch(const evernote::edam::Note& note);
 
 signals:
     void started();
@@ -35,12 +32,12 @@ signals:
     void resourcesSynced(const QVector<evernote::edam::Resource>& resources);
     void notesSynced(const QVector<evernote::edam::Note>& notes);
     void tagsSynced(const QVector<evernote::edam::Tag>& tags);
-    void resourceFetched(ResourceItem* resource);
-    void noteFetched(NoteItem* note);
+    void resourceFetched(const evernote::edam::Resource& resource);
+    void noteFetched(const evernote::edam::Note& note);
 
 private slots:
     void syncImpl();
-    void fetchImpl(NoteItem* note);
+    void fetchImpl(const evernote::edam::Note& note);
     void init(bool force);
 
 private:

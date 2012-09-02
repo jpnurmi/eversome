@@ -22,6 +22,8 @@ Q_DECLARE_METATYPE(QVector<evernote::edam::Notebook>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
+Q_DECLARE_METATYPE(evernote::edam::Resource)
+Q_DECLARE_METATYPE(evernote::edam::Note)
 
 Synchronizer::Synchronizer(QObject *parent) : QObject(parent),
     syncing(false), fetching(false), cancelled(false), client(0)
@@ -30,6 +32,8 @@ Synchronizer::Synchronizer(QObject *parent) : QObject(parent),
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
     qRegisterMetaType<QVector<evernote::edam::Note> >();
     qRegisterMetaType<QVector<evernote::edam::Tag> >();
+    qRegisterMetaType<evernote::edam::Resource>();
+    qRegisterMetaType<evernote::edam::Note>();
 }
 
 Synchronizer::~Synchronizer()
@@ -54,7 +58,7 @@ void Synchronizer::cancel()
     cancelled = true;
 }
 
-void Synchronizer::fetch(NoteItem* note)
+void Synchronizer::fetch(const evernote::edam::Note& note)
 {
     qDebug() << Q_FUNC_INFO;
     QtConcurrent::run(this, &Synchronizer::fetchImpl, note);
@@ -153,38 +157,37 @@ void Synchronizer::syncImpl()
     //TODO: Cache::instance()->load();
 }
 
-void Synchronizer::fetchImpl(NoteItem* note)
+void Synchronizer::fetchImpl(const evernote::edam::Note& note)
 {
     qDebug() << Q_FUNC_INFO;
-    if (syncing)
+    if (fetching)
         return;
 
-    syncing = true;
+    fetching = true;
     cancelled = false;
     emit started();
     emit activeChanged();
 
     try {
         init(false);
-        std::string content = "";
-        client->getNoteContent(content, Settings::value(Settings::AuthToken).toStdString(), note->guid().toStdString());
+        evernote::edam::Note copy(note);
+        client->getNoteContent(copy.content, Settings::value(Settings::AuthToken).toStdString(), copy.guid);
 
-        if (!content.empty()) {
-            note->setContent(content);
-            emit noteFetched(note);
+        if (!copy.content.empty())
+            emit noteFetched(copy);
+
+        for (uint i = 0; !cancelled && i < copy.resources.size(); ++i) {
+            Resource res = copy.resources.at(i);
+            client->getResource(res, Settings::value(Settings::AuthToken).toStdString(), res.guid, true, false, false, false);
+            emit resourceFetched(res);
         }
-
-        if (cancelled)
-            return;
-
-        // TODO: fetch resources
 
     } catch (TException& e) {
         qDebug() << Q_FUNC_INFO << "?" << e.what();
         emit failed(tr("__unknown_error__"));
     }
 
-    syncing = false;
+    fetching = false;
     emit activeChanged();
     if (!cancelled)
         emit finished();

@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file alias="EverN9.en.qm">translations/EverN9.en.qm</file>
-        <file alias="EverN9.ru.qm">translations/EverN9.ru.qm</file>
-    </qresource>
-</RCC>

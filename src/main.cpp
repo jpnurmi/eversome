@@ -21,12 +21,6 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
-    QTranslator translator;
-    if (translator.load("EverN9." + QLocale::system().name(), ":/"))
-        app->installTranslator(&translator);
-    else if (translator.load("EverN9.en", ":/"))
-        app->installTranslator(&translator);
-
     qmlRegisterType<TagItem>("com.evernote.types", 1,0, "Tag");
     qmlRegisterType<NoteItem>("com.evernote.types", 1,0, "Note");
     qmlRegisterType<NoteModel>("com.evernote.types", 1,0, "NoteModel");

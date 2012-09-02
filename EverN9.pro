@@ -1,13 +1,11 @@
-qmlfolder.source = qml/EverN9
-qmlfolder.target = qml
-DEPLOYMENTFOLDERS = qmlfolder
+TEMPLATE = subdirs
 
-#CONFIG += qdeclarative-boostable
-QT += sql
+3rdparty.subdir = src/3rdparty
 
-include(src/src.pri)
-include(qmlapplicationviewer/qmlapplicationviewer.pri)
-qtcAddDeployment()
+src.depends = 3rdparty
+src.subdir = src
+
+SUBDIRS += 3rdparty src
 
 OTHER_FILES += \
     qtc_packaging/debian_harmattan/rules \
@@ -16,11 +14,4 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/copyright \
     qtc_packaging/debian_harmattan/control \
     qtc_packaging/debian_harmattan/compat \
-    qtc_packaging/debian_harmattan/changelog \
-    translations/EverN9.ru.ts \
-    translations/EverN9.ru.qm \
-    translations/EverN9.en.ts \
-    translations/EverN9.en.qm
-
-RESOURCES += \
-    EverN9.qrc
+    qtc_packaging/debian_harmattan/changelog

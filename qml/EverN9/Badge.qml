@@ -8,7 +8,7 @@ BorderImage {
     property alias value: label.text
 
     visible: value != ""
-    width: Math.max(label.width + 16, 25)
+    width: Math.max(label.width + 20, 26)
     height: label.height + 8
     source: "images/countindicator.png"
     border { top: 12; left: 12; right: 12; bottom: 12 }

@@ -9,11 +9,13 @@ class UserStore : public QObject
     Q_OBJECT
 
 public:
-    explicit UserStore(QObject *parent = 0);
+    explicit UserStore(QObject* parent = 0);
     virtual ~UserStore();
 
+    Q_INVOKABLE bool hasCredentials() const;
+
 public slots:
-    void auth(const QString& username, const QString& password);
+    void authenticate(const QString& username = QString(), const QString& password = QString());
 
 signals:
     void succeed();

@@ -3,7 +3,6 @@
 
 #include "notestore.h"
 #include "userstore.h"
-#include "settings.h"
 #include "session.h"
 
 #include "notebookmodel.h"
@@ -29,21 +28,12 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 
     Session session;
     QmlApplicationViewer viewer;
-    viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     viewer.rootContext()->setContextProperty("UserStore", session.userStore());
     viewer.rootContext()->setContextProperty("NoteStore", session.noteStore());
     viewer.rootContext()->setContextProperty("Tags", TagModel::instance());
     viewer.rootContext()->setContextProperty("Notebooks", NotebookModel::instance());
-
-    QString username = Settings::value(Settings::Username);
-    QString password = Settings::value(Settings::Password);
-    if (!username.isEmpty() && !password.isEmpty()) {
-        viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
-        session.userStore()->auth(username, password);
-    } else {
-        viewer.setMainQmlFile(QLatin1String("qml/EverN9/mainLogin.qml"));
-    }
-
+    viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
     viewer.showExpanded();
     return app->exec();
 }

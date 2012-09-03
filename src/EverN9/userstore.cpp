@@ -28,7 +28,13 @@ UserStore::~UserStore()
     delete client;
 }
 
-void UserStore::auth(const QString& username, const QString& password)
+bool UserStore::hasCredentials() const
+{
+    return !Settings::value(Settings::Username).isEmpty() &&
+           !Settings::value(Settings::Password).isEmpty();
+}
+
+void UserStore::authenticate(const QString& username, const QString& password)
 {
     qDebug() << Q_FUNC_INFO << username << password;
     QtConcurrent::run(this, &UserStore::authImpl, username, password);

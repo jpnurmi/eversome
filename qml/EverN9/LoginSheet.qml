@@ -6,6 +6,8 @@ Sheet {
     id: sheet
 
     property bool acceptable: username.text && password.text
+    property alias username: username.text
+    property alias password: password.text
 
     acceptButtonText: acceptable ? qsTr("Sign in") : ""
     rejectButtonText: qsTr("Cancel")

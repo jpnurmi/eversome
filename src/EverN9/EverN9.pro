@@ -1,5 +1,5 @@
 #CONFIG += qdeclarative-boostable
-QT += sql xml
+QT += sql
 
 qmlfolder.source = ../../qml/EverN9
 qmlfolder.target = qml
@@ -14,9 +14,6 @@ DEPENDPATH += $$PWD
 LIBDIR = $$OUT_PWD/../../lib
 include(../3rdparty/edam.pri)
 include(../3rdparty/thrift.pri)
-
-INCLUDEPATH += /usr/include/accounts-qt
-LIBS += -laccounts-qt
 
 HEADERS += \
     database.h \

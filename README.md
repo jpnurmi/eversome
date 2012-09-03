@@ -21,6 +21,6 @@ dfl61-harmattan_3.2012.07-1  (installable)
 
 $ ~/QtSDK/Madde/bin/mad-admin set harmattan_10.2011.34-1_rt1.2
 
-$ ~/QtSDK/Madde/bin/mad-admin xdpkg -i path/to/EverN9/pkg/libboost1.46-dev_1.46.1-6_armel.deb
-Package 'libboost1.46-dev' installed.
+$ ~/QtSDK/Madde/bin/mad-admin xdpkg -i path/to/EverN9/pkg/libboost1.42-dev_1.42.0-3maemo2+0m6_armel.deb
+Package 'libboost1.42-dev' installed.
 </pre>

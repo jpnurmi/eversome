@@ -5,28 +5,18 @@ import "UIConstants.js" as UI
 PageStackWindow {
     id: window
 
-    Component {
-        id: mainPage
-        MainPage { }
-    }
+    initialPage: MainPage { }
 
-    Component {
-        id: loginPage
-        LoginPage {
-            onAccepted: {
-                UserStore.authenticate(username, password);
-                pageStack.replace(mainPage);
-            }
-        }
+    LoginSheet {
+        id: loginSheet
+        onAccepted: UserStore.authenticate(username, password)
     }
 
     Component.onCompleted: {
         theme.colorScheme = 2
-        if (UserStore.hasCredentials()) {
+        if (UserStore.hasCredentials())
             UserStore.authenticate();
-            pageStack.push(mainPage, {}, true);
-        } else {
-            pageStack.push(loginPage, {}, true);
-        }
+        else
+            loginSheet.open();
     }
 }

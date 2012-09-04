@@ -9,7 +9,6 @@ NotebookItem::NotebookItem(evernote::edam::Notebook notebook, QObject* parent)
 
 NotebookItem::~NotebookItem()
 {
-    m_notes->clear();
 }
 
 ItemModel* NotebookItem::notes() const

@@ -4,23 +4,14 @@
 #include "tagitem.h"
 #include "session.h"
 
-QHash<QString, NoteItem*> NoteItem::allNotes;
-
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     : QObject(parent), m_note(note)
 {
     qRegisterMetaType<NoteItem*>();
-    allNotes[guid()] = this;
 }
 
 NoteItem::~NoteItem()
 {
-    allNotes.remove(guid());
-}
-
-NoteItem* NoteItem::get(const QString& guid)
-{
-    return allNotes.value(guid);
 }
 
 evernote::edam::Note NoteItem::note() const

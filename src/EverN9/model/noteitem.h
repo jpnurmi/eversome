@@ -24,8 +24,6 @@ public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
     virtual ~NoteItem();
 
-    static NoteItem* get(const QString& guid);
-
     Q_INVOKABLE evernote::edam::Note note() const;
 
     QString guid() const;
@@ -46,7 +44,6 @@ signals:
 private:
     friend class Session;
     evernote::edam::Note m_note;
-    static QHash<QString, NoteItem*> allNotes;
 };
 
 Q_DECLARE_METATYPE(NoteItem*)

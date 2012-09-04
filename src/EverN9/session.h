@@ -24,6 +24,7 @@ public:
 
     ItemModel* notebookModel() const;
     ItemModel* resourceModel() const;
+    ItemModel* noteModel() const;
     ItemModel* tagModel() const;
 
 private slots:
@@ -43,6 +44,7 @@ private:
     NoteStore* m_note;
     ItemModel* m_notebooks;
     ItemModel* m_resources;
+    ItemModel* m_notes;
     ItemModel* m_tags;
 };
 

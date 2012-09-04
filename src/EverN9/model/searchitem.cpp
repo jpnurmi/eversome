@@ -3,10 +3,16 @@
 SearchItem::SearchItem(evernote::edam::SavedSearch search, QObject* parent)
     : QObject(parent), m_search(search)
 {
+    m_notes = new ItemModel(this);
 }
 
 SearchItem::~SearchItem()
 {
+}
+
+ItemModel* SearchItem::notes() const
+{
+    return m_notes;
 }
 
 evernote::edam::SavedSearch SearchItem::search() const

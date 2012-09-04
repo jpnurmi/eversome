@@ -20,6 +20,7 @@ public slots:
     void sync();
     void cancel();
     void fetch(const evernote::edam::Note& note);
+    void search(const evernote::edam::SavedSearch& search);
 
 signals:
     void started();
@@ -37,14 +38,18 @@ signals:
     void resourceFetched(const evernote::edam::Resource& resource);
     void noteFetched(const evernote::edam::Note& note);
 
+    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
+
 private slots:
     void syncImpl();
     void fetchImpl(const evernote::edam::Note& note);
+    void searchImpl(const evernote::edam::SavedSearch& search);
     void init(bool force);
 
 private:
     volatile bool syncing;
     volatile bool fetching;
+    volatile bool searching;
     volatile bool cancelled;
     evernote::edam::NoteStoreClient* client;
     boost::shared_ptr<apache::thrift::transport::TTransport> transport;

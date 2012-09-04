@@ -9,6 +9,7 @@
 #include <QtDebug>
 #include "thrift/transport/THttpClient.h"
 #include "thrift/protocol/TBinaryProtocol.h"
+#include "edam/Limits_constants.h"
 
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
@@ -18,22 +19,24 @@ static const std::string EDAM_HOST = "www.evernote.com";
 static const std::string EDAM_ROOT = "/edam/note/";
 static const int EDAM_PORT = 80;
 
+Q_DECLARE_METATYPE(QVector<evernote::edam::SavedSearch>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Notebook>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
-Q_DECLARE_METATYPE(QVector<evernote::edam::SavedSearch>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
+Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
 NoteStore::NoteStore(QObject *parent) : QObject(parent),
-    syncing(false), fetching(false), cancelled(false), client(0)
+    syncing(false), fetching(false), searching(false), cancelled(false), client(0)
 {
+    qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
-    qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
     qRegisterMetaType<QVector<evernote::edam::Note> >();
     qRegisterMetaType<QVector<evernote::edam::Tag> >();
+    qRegisterMetaType<evernote::edam::SavedSearch>();
     qRegisterMetaType<evernote::edam::Resource>();
     qRegisterMetaType<evernote::edam::Note>();
 }
@@ -64,6 +67,12 @@ void NoteStore::fetch(const evernote::edam::Note& note)
 {
     qDebug() << Q_FUNC_INFO;
     QtConcurrent::run(this, &NoteStore::fetchImpl, note);
+}
+
+void NoteStore::search(const evernote::edam::SavedSearch& search)
+{
+    qDebug() << Q_FUNC_INFO;
+    QtConcurrent::run(this, &NoteStore::searchImpl, search);
 }
 
 void NoteStore::syncImpl()
@@ -140,7 +149,7 @@ void NoteStore::fetchImpl(const evernote::edam::Note& note)
     if (fetching)
         return;
 
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << QString::fromStdString(note.title);
 
     fetching = true;
     cancelled = false;
@@ -180,6 +189,46 @@ void NoteStore::fetchImpl(const evernote::edam::Note& note)
     emit activeChanged();
     if (!cancelled)
         emit finished();
+}
+
+void NoteStore::searchImpl(const evernote::edam::SavedSearch& search)
+{
+    if (searching)
+        return;
+
+    qDebug() << Q_FUNC_INFO << QString::fromStdString(search.name);
+
+    searching = true;
+    emit activeChanged();
+
+    QString err;
+    try {
+        init(false);
+        evernote::edam::NoteList list;
+        evernote::edam::NoteFilter filter;
+        filter.words = search.query;
+        client->findNotes(list, Settings::value(Settings::AuthToken).toStdString(), filter, 0, evernote::limits::g_Limits_constants.EDAM_USER_NOTES_MAX);
+
+        if (list.notes.size())
+            emit searched(search, QVector<evernote::edam::Note>::fromStdVector(list.notes));
+
+    } catch (evernote::edam::EDAMUserException& e) {
+        err = Manager::errorString(e.errorCode);
+    } catch (evernote::edam::EDAMSystemException& e) {
+        err = Manager::errorString(e.errorCode);
+    } catch (evernote::edam::EDAMNotFoundException& e) {
+        err = Manager::errorString(-1);
+    } catch (TException& e) {
+        err = QString::fromUtf8(e.what());
+    }
+
+    if (!err.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << err;
+        emit error(err);
+    }
+
+    searching = false;
+    emit activeChanged();
 }
 
 void NoteStore::init(bool force)

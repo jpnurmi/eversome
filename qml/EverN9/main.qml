@@ -19,14 +19,6 @@ PageStackWindow {
                 id: banner
 
                 Connections {
-                    target: UserStore
-                    onError: {
-                        banner.text = error;
-                        banner.show();
-                    }
-                }
-
-                Connections {
                     target: NoteStore
                     onError: {
                         banner.text = error;
@@ -40,6 +32,15 @@ PageStackWindow {
     LoginSheet {
         id: loginSheet
         onAccepted: UserStore.login(username, password)
+
+        Connections {
+            target: UserStore
+            onError: {
+                loginSheet.error = error;
+                loginSheet.open();
+            }
+            onLoggedIn: loginSheet.error = ""
+        }
     }
 
     Component.onCompleted: {

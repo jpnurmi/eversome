@@ -29,11 +29,10 @@ Page {
         }
         PageStack {
             id: searchTab
-            objectName: "search"
-            CommonPage {
+            objectName: "searcesh"
+            SearchListPage {
                 id: searchPage
                 tools: tabBar
-                title: qsTr("Search")
             }
             Component.onCompleted: searchTab.push(searchPage)
         }

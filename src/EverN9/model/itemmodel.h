@@ -8,6 +8,7 @@
 class ItemModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
 
 public:
     explicit ItemModel(QObject* parent = 0);
@@ -27,6 +28,9 @@ public:
 
 public slots:
     void clear();
+
+signals:
+    void countChanged();
 
 private:
     QList<QObject*> m_items;
@@ -68,6 +72,7 @@ void ItemModel::add(const QList<T>& items)
         beginInsertRows(QModelIndex(), row, row + count - 1);
         m_items += unique;
         endInsertRows();
+        emit countChanged();
     }
 }
 

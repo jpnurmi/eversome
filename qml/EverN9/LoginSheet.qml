@@ -9,11 +9,23 @@ Sheet {
     property alias username: username.text
     property alias password: password.text
 
-    acceptButtonText: acceptable ? qsTr("Sign in") : ""
-    rejectButtonText: qsTr("Cancel")
+    acceptButtonText: acceptable ? qsTr("Ok") : ""
 
     style: SheetStyle {
         headerBackground: "images/header.png"
+    }
+
+    title: Text {
+        text: qsTr("Sign in")
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
+        font.weight: Font.Light
+        font.family: UI.FONT_FAMILY
+        font.pixelSize: UI.LARGE_FONT
+        textFormat: Text.PlainText
+        color: "white"
+        elide: Text.ElideRight
     }
 
     content: Flickable {

@@ -58,7 +58,7 @@ PageStackWindow {
 
             LoginSheet {
                 id: loginSheet
-                onAccepted: UserStore.login(username, password)
+                onAccepted: UserStore.login(username, password, remember)
 
                 Connections {
                     target: UserStore

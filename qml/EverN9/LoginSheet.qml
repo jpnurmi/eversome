@@ -9,6 +9,7 @@ Sheet {
     property alias username: username.text
     property alias password: password.text
     property alias error: errorLabel.text
+    property alias remember: remember.checked
 
     acceptButtonText: acceptable ? qsTr("Ok") : ""
 
@@ -40,42 +41,57 @@ Sheet {
             width: parent.width
             spacing: UI.LARGE_SPACING
 
+            Image {
+                id: banner
+                source: "images/banner.png"
+                opacity: mouseArea.pressed && mouseArea.containsMouse ? UI.DISABLED_OPACITY : 1.0
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    onClicked: Qt.openUrlExternally("https://www.evernote.com/mobile/Registration.action")
+                }
+            }
+
             Text {
                 id: errorLabel
                 color: "red"
                 font.pixelSize: UI.MEDIUM_FONT
             }
 
-            Text {
-                id: accountLabel
-                text: qsTr("<a href='https://www.evernote.com/mobile/Registration.action'>Create an account</a>")
-                font.pixelSize: UI.SMALL_FONT
-                anchors.right: parent.right
-                onLinkActivated: Qt.openUrlExternally(link)
-            }
-
-            TextField {
-                id: username
+            Column {
                 width: parent.width
-                placeholderText: qsTr("Username")
-                errorHighlight: !text || sheet.error
-                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+                spacing: UI.SMALL_SPACING
+                Text {
+                    text: qsTr("Username")
+                    font.pixelSize: UI.SMALL_FONT
+                }
+                TextField {
+                    id: username
+                    width: parent.width
+                    errorHighlight: !text || sheet.error
+                    inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+                }
             }
 
-            TextField{
-                id: password
+            Column {
                 width: parent.width
-                placeholderText: qsTr("Password")
-                errorHighlight: !text || sheet.error
-                echoMode: TextInput.Password
+                spacing: UI.SMALL_SPACING
+                Text {
+                    text: qsTr("Password")
+                    font.pixelSize: UI.SMALL_FONT
+                }
+                TextField{
+                    id: password
+                    width: parent.width
+                    errorHighlight: !text || sheet.error
+                    echoMode: TextInput.Password
+                }
             }
 
-            Text {
-                id: passwordLabel
-                text: qsTr("<a href='https://www.evernote.com/ForgotPassword.action'>Forgot your password?</a>")
-                font.pixelSize: UI.SMALL_FONT
-                anchors.right: parent.right
-                onLinkActivated: Qt.openUrlExternally(link)
+            CheckBox {
+                id: remember
+                width: parent.width
+                text: qsTr("Remember me")
             }
         }
     }

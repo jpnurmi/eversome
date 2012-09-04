@@ -1,4 +1,4 @@
-#include "session.h"
+#include "manager.h"
 #include "database.h"
 #include "settings.h"
 #include "userstore.h"
@@ -14,7 +14,7 @@
 #include <QFile>
 #include <QDir>
 
-Session::Session(QObject *parent) : QObject(parent)
+Manager::Manager(QObject *parent) : QObject(parent)
 {
     m_user = new UserStore(this);
     m_note = new NoteStore(this);
@@ -61,53 +61,53 @@ Session::Session(QObject *parent) : QObject(parent)
     m_tags = new ItemModel(this);
 }
 
-Session::~Session()
+Manager::~Manager()
 {
 }
 
-Session* Session::instance()
+Manager* Manager::instance()
 {
-    static Session session;
+    static Manager session;
     return &session;
 }
 
-UserStore* Session::userStore() const
+UserStore* Manager::userStore() const
 {
     return m_user;
 }
 
-NoteStore* Session::noteStore() const
+NoteStore* Manager::noteStore() const
 {
     return m_note;
 }
 
-ItemModel* Session::notebookModel() const
+ItemModel* Manager::notebookModel() const
 {
     return m_notebooks;
 }
 
-ItemModel* Session::resourceModel() const
+ItemModel* Manager::resourceModel() const
 {
     return m_resources;
 }
 
-ItemModel* Session::noteModel() const
+ItemModel* Manager::noteModel() const
 {
     return m_notes;
 }
 
-ItemModel* Session::tagModel() const
+ItemModel* Manager::tagModel() const
 {
     return m_tags;
 }
 
-void Session::onLoggedIn()
+void Manager::onLoggedIn()
 {
     m_database->load(this);
     m_note->sync();
 }
 
-void Session::onLoggedOut()
+void Manager::onLoggedOut()
 {
     m_note->cancel();
     Settings::reset();
@@ -119,7 +119,7 @@ void Session::onLoggedOut()
     m_tags->clear();
 }
 
-void Session::onLoaded(const QList<NotebookItem*>& notebooks,
+void Manager::onLoaded(const QList<NotebookItem*>& notebooks,
                        const QList<ResourceItem*>& resources,
                        const QList<NoteItem*>& notes,
                        const QList<TagItem*>& tags)
@@ -132,7 +132,7 @@ void Session::onLoaded(const QList<NotebookItem*>& notebooks,
     setupNotes(m_notes->items<NoteItem*>());
 }
 
-void Session::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
+void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
                        const QVector<evernote::edam::Resource>& resources,
                        const QVector<evernote::edam::Note>& notes,
                        const QVector<evernote::edam::Tag>& tags)
@@ -165,14 +165,14 @@ void Session::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
     setupNotes(m_notes->items<NoteItem*>());
 }
 
-void Session::onNoteFetched(const evernote::edam::Note& note)
+void Manager::onNoteFetched(const evernote::edam::Note& note)
 {
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item)
         item->setContent(note.content);
 }
 
-void Session::onResourceFetched(const evernote::edam::Resource& resource)
+void Manager::onResourceFetched(const evernote::edam::Resource& resource)
 {
     ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
     if (item) {
@@ -185,7 +185,7 @@ void Session::onResourceFetched(const evernote::edam::Resource& resource)
     }
 }
 
-void Session::setupNotes(const QList<NoteItem*>& notes)
+void Manager::setupNotes(const QList<NoteItem*>& notes)
 {
     foreach (NoteItem* note, notes) {
         QString notebookGuid = QString::fromStdString(note->note().notebookGuid);

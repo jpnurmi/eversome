@@ -1,5 +1,5 @@
-#ifndef SESSION_H
-#define SESSION_H
+#ifndef MANAGER_H
+#define MANAGER_H
 
 #include <QObject>
 #include "edam/Types_types.h"
@@ -13,15 +13,15 @@ class ResourceItem;
 class NoteItem;
 class TagItem;
 
-class Session : public QObject
+class Manager : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Session(QObject* parent = 0);
-    virtual ~Session();
+    explicit Manager(QObject* parent = 0);
+    virtual ~Manager();
 
-    static Session* instance();
+    static Manager* instance();
 
     UserStore* userStore() const;
     NoteStore* noteStore() const;
@@ -60,4 +60,4 @@ private:
     ItemModel* m_tags;
 };
 
-#endif // SESSION_H
+#endif // MANAGER_H

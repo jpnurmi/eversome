@@ -42,7 +42,6 @@ signals:
     void contentChanged();
 
 private:
-    friend class Session;
     evernote::edam::Note m_note;
 };
 

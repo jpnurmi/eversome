@@ -17,16 +17,16 @@ include(../3rdparty/thrift.pri)
 
 HEADERS += \
     database.h \
+    manager.h \
     notestore.h \
-    session.h \
     settings.h \
     userstore.h
 
 SOURCES += \
     database.cpp \
     main.cpp \
+    manager.cpp \
     notestore.cpp \
-    session.cpp \
     settings.cpp \
     userstore.cpp
 

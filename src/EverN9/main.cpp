@@ -3,7 +3,7 @@
 
 #include "notestore.h"
 #include "userstore.h"
-#include "session.h"
+#include "manager.h"
 
 #include "itemmodel.h"
 #include "notebookitem.h"
@@ -26,12 +26,13 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
     QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("UserStore", Session::instance()->userStore());
-    viewer.rootContext()->setContextProperty("NoteStore", Session::instance()->noteStore());
-    viewer.rootContext()->setContextProperty("Tags", Session::instance()->tagModel());
-    viewer.rootContext()->setContextProperty("Notebooks", Session::instance()->notebookModel());
+    viewer.rootContext()->setContextProperty("UserStore", Manager::instance()->userStore());
+    viewer.rootContext()->setContextProperty("NoteStore", Manager::instance()->noteStore());
+    viewer.rootContext()->setContextProperty("Notebooks", Manager::instance()->notebookModel());
+    viewer.rootContext()->setContextProperty("Tags", Manager::instance()->tagModel());
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
+
     viewer.showExpanded();
     return app->exec();
 }

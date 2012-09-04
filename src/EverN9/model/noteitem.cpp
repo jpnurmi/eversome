@@ -2,7 +2,7 @@
 #include "itemmodel.h"
 #include "resourceitem.h"
 #include "tagitem.h"
-#include "session.h"
+#include "manager.h"
 
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     : QObject(parent), m_note(note)
@@ -58,7 +58,7 @@ QStringList NoteItem::tags() const
     QStringList res;
     for (uint i = 0; i < m_note.tagGuids.size(); ++i) {
         QString guid = QString::fromStdString(m_note.tagGuids.at(i));
-        TagItem* tag = Session::instance()->tagModel()->get<TagItem*>(guid);
+        TagItem* tag = Manager::instance()->tagModel()->get<TagItem*>(guid);
         if (tag)
             res += tag->name();
     }
@@ -70,7 +70,7 @@ QStringList NoteItem::resources() const
     QStringList res;
     for (uint i = 0; i < m_note.resources.size(); ++i) {
         QString guid = QString::fromStdString(m_note.resources.at(i).guid);
-        ResourceItem* resource = Session::instance()->resourceModel()->get<ResourceItem*>(guid);
+        ResourceItem* resource = Manager::instance()->resourceModel()->get<ResourceItem*>(guid);
         if (resource)
             res += resource->filePath();
     }

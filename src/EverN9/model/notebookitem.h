@@ -38,5 +38,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(NotebookItem*)
+Q_DECLARE_METATYPE(QList<NotebookItem*>)
 
 #endif // NOTEBOOKITEM_H

@@ -25,5 +25,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(ResourceItem*)
+Q_DECLARE_METATYPE(QList<ResourceItem*>)
 
 #endif // RESOURCEITEM_H

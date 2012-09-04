@@ -4,7 +4,6 @@ TagItem::TagItem(evernote::edam::Tag tag, QObject* parent)
     : QObject(parent), m_tag(tag)
 {
     m_notes = new ItemModel(this);
-    qRegisterMetaType<TagItem*>();
 }
 
 TagItem::~TagItem()

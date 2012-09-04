@@ -31,5 +31,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(TagItem*)
+Q_DECLARE_METATYPE(QList<TagItem*>)
 
 #endif // TAGITEM_H

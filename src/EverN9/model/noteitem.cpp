@@ -7,7 +7,6 @@
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     : QObject(parent), m_note(note)
 {
-    qRegisterMetaType<NoteItem*>();
 }
 
 NoteItem::~NoteItem()

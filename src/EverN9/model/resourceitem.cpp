@@ -25,7 +25,6 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(StringHash, file_extensions, {
 ResourceItem::ResourceItem(evernote::edam::Resource resource, QObject* parent)
     : QObject(parent), m_resource(resource)
 {
-    qRegisterMetaType<ResourceItem*>();
 }
 
 ResourceItem::~ResourceItem()

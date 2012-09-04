@@ -47,5 +47,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(NoteItem*)
+Q_DECLARE_METATYPE(QList<NoteItem*>)
 
 #endif // NOTEITEM_H

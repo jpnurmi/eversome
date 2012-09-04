@@ -4,7 +4,6 @@ NotebookItem::NotebookItem(evernote::edam::Notebook notebook, QObject* parent)
     : QObject(parent), m_notebook(notebook)
 {
     m_notes = new ItemModel(this);
-    qRegisterMetaType<NotebookItem*>();
 }
 
 NotebookItem::~NotebookItem()

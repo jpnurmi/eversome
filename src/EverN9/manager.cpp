@@ -71,6 +71,11 @@ Manager* Manager::instance()
     return &session;
 }
 
+Database* Manager::database() const
+{
+    return m_database;
+}
+
 UserStore* Manager::userStore() const
 {
     return m_user;

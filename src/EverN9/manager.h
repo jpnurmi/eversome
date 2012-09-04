@@ -23,6 +23,7 @@ public:
 
     static Manager* instance();
 
+    Database* database() const;
     UserStore* userStore() const;
     NoteStore* noteStore() const;
 

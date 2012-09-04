@@ -3,6 +3,7 @@
 
 #include "notestore.h"
 #include "userstore.h"
+#include "database.h"
 #include "manager.h"
 
 #include "itemmodel.h"
@@ -26,6 +27,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
     QmlApplicationViewer viewer;
+    viewer.rootContext()->setContextProperty("Database", Manager::instance()->database());
     viewer.rootContext()->setContextProperty("UserStore", Manager::instance()->userStore());
     viewer.rootContext()->setContextProperty("NoteStore", Manager::instance()->noteStore());
     viewer.rootContext()->setContextProperty("Notebooks", Manager::instance()->notebookModel());

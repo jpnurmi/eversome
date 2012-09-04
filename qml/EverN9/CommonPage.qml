@@ -22,7 +22,7 @@ Page {
 
     Header {
         id: header
-        busy: UserStore.active || NoteStore.active
+        busy: Database.active || UserStore.active || NoteStore.active
         width: parent.width
     }
 

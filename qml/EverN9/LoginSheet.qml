@@ -57,7 +57,8 @@ Sheet {
             TextField {
                 id: username
                 width: parent.width
-                placeholderText: qsTr("Username");
+                placeholderText: qsTr("Username")
+                errorHighlight: !text || sheet.error
                 inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
             }
 
@@ -65,6 +66,7 @@ Sheet {
                 id: password
                 width: parent.width
                 placeholderText: qsTr("Password")
+                errorHighlight: !text || sheet.error
                 echoMode: TextInput.Password
             }
 
@@ -76,5 +78,10 @@ Sheet {
                 onLinkActivated: Qt.openUrlExternally(link)
             }
         }
+    }
+
+    onStatusChanged: {
+        if (status == DialogStatus.Open)
+            username.forceActiveFocus();
     }
 }

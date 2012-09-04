@@ -27,36 +27,6 @@ QVariant ItemModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-QObjectList ItemModel::items() const
-{
-    return m_items;
-}
-
-QObject* ItemModel::get(const QString& guid) const
-{
-    return m_guids.value(guid);
-}
-
-void ItemModel::add(const QObjectList& items)
-{
-    QObjectList unique;
-    foreach (QObject* item, items) {
-        QString guid = item->property("guid").toString();
-        if (m_guids.contains(guid))
-            continue;
-        unique += item;
-        m_guids.insert(guid, item);
-    }
-
-    if (!unique.isEmpty()) {
-        const int row = rowCount();
-        const int count = unique.count();
-        beginInsertRows(QModelIndex(), row, row + count - 1);
-        m_items += unique;
-        endInsertRows();
-    }
-}
-
 void ItemModel::clear()
 {
     qDeleteAll(m_items);

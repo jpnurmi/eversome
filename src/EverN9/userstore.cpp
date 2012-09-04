@@ -83,8 +83,6 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
         err = Manager::errorString(e.errorCode);
     } catch (evernote::edam::EDAMSystemException& e) {
         err = Manager::errorString(e.errorCode);
-    } catch (evernote::edam::EDAMNotFoundException& e) {
-        err = Manager::errorString(-1);
     } catch (TException& e) {
         err = QString::fromUtf8(e.what());
     }
@@ -113,12 +111,6 @@ void UserStore::logoutImpl()
         if (transport->isOpen())
             transport->close();
         emit loggedOut();
-    } catch (evernote::edam::EDAMUserException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (evernote::edam::EDAMSystemException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (evernote::edam::EDAMNotFoundException& e) {
-        err = Manager::errorString(-1);
     } catch (TException& e) {
         err = QString::fromUtf8(e.what());
     }

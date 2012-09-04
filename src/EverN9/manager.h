@@ -10,6 +10,7 @@ class NoteStore;
 class ItemModel;
 class NotebookItem;
 class ResourceItem;
+class SearchItem;
 class NoteItem;
 class TagItem;
 
@@ -29,6 +30,7 @@ public:
 
     ItemModel* notebookModel() const;
     ItemModel* resourceModel() const;
+    ItemModel* searchModel() const;
     ItemModel* noteModel() const;
     ItemModel* tagModel() const;
 
@@ -40,11 +42,13 @@ private slots:
 
     void onLoaded(const QList<NotebookItem*>& notebooks,
                   const QList<ResourceItem*>& resources,
+                  const QList<SearchItem*>& searches,
                   const QList<NoteItem*>& notes,
                   const QList<TagItem*>& tags);
 
     void onSynced(const QVector<evernote::edam::Notebook>& notebooks,
                   const QVector<evernote::edam::Resource>& resources,
+                  const QVector<evernote::edam::SavedSearch>& searches,
                   const QVector<evernote::edam::Note>& notes,
                   const QVector<evernote::edam::Tag>& tags);
 
@@ -59,6 +63,7 @@ private:
     NoteStore* m_note;
     ItemModel* m_notebooks;
     ItemModel* m_resources;
+    ItemModel* m_searches;
     ItemModel* m_notes;
     ItemModel* m_tags;
 };

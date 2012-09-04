@@ -5,6 +5,7 @@
 #include "notestore.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
+#include "searchitem.h"
 #include "itemmodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
@@ -24,10 +25,12 @@ Manager::Manager(QObject *parent) : QObject(parent)
 
     connect(m_note, SIGNAL(synced(QVector<evernote::edam::Notebook>,
                                   QVector<evernote::edam::Resource>,
+                                  QVector<evernote::edam::SavedSearch>,
                                   QVector<evernote::edam::Note>,
                                   QVector<evernote::edam::Tag>)),
               this, SLOT(onSynced(QVector<evernote::edam::Notebook>,
                                   QVector<evernote::edam::Resource>,
+                                  QVector<evernote::edam::SavedSearch>,
                                   QVector<evernote::edam::Note>,
                                   QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
 
@@ -38,25 +41,30 @@ Manager::Manager(QObject *parent) : QObject(parent)
 
     qRegisterMetaType<TagItem*>();
     qRegisterMetaType<NoteItem*>();
+    qRegisterMetaType<SearchItem*>();
     qRegisterMetaType<ResourceItem*>();
     qRegisterMetaType<NotebookItem*>();
     qRegisterMetaType<QList<TagItem*> >();
     qRegisterMetaType<QList<NoteItem*> >();
+    qRegisterMetaType<QList<SearchItem*> >();
     qRegisterMetaType<QList<ResourceItem*> >();
     qRegisterMetaType<QList<NotebookItem*> >();
 
     m_database = new Database(this);
     connect(m_database, SIGNAL(loaded(QList<NotebookItem*>,
                                       QList<ResourceItem*>,
+                                      QList<SearchItem*>,
                                       QList<NoteItem*>,
                                       QList<TagItem*>)),
                   this, SLOT(onLoaded(QList<NotebookItem*>,
                                       QList<ResourceItem*>,
+                                      QList<SearchItem*>,
                                       QList<NoteItem*>,
                                       QList<TagItem*>)), Qt::QueuedConnection);
 
     m_notebooks = new ItemModel(this);
     m_resources = new ItemModel(this);
+    m_searches = new ItemModel(this);
     m_notes = new ItemModel(this);
     m_tags = new ItemModel(this);
 }
@@ -94,6 +102,11 @@ ItemModel* Manager::notebookModel() const
 ItemModel* Manager::resourceModel() const
 {
     return m_resources;
+}
+
+ItemModel* Manager::searchModel() const
+{
+    return m_searches;
 }
 
 ItemModel* Manager::noteModel() const
@@ -144,17 +157,20 @@ void Manager::onLoggedOut()
 
     m_notebooks->clear();
     m_resources->clear();
+    m_searches->clear();
     m_notes->clear();
     m_tags->clear();
 }
 
 void Manager::onLoaded(const QList<NotebookItem*>& notebooks,
                        const QList<ResourceItem*>& resources,
+                       const QList<SearchItem*>& searches,
                        const QList<NoteItem*>& notes,
                        const QList<TagItem*>& tags)
 {
     m_notebooks->add(notebooks);
     m_resources->add(resources);
+    m_searches->add(searches);
     m_notes->add(notes);
     m_tags->add(tags);
 
@@ -163,6 +179,7 @@ void Manager::onLoaded(const QList<NotebookItem*>& notebooks,
 
 void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
                        const QVector<evernote::edam::Resource>& resources,
+                       const QVector<evernote::edam::SavedSearch>& searches,
                        const QVector<evernote::edam::Note>& notes,
                        const QVector<evernote::edam::Tag>& tags)
 {
@@ -176,6 +193,11 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
         resourceItems += new ResourceItem(resource, this);
     m_resources->add(resourceItems);
 
+    QList<SearchItem*> searchItems;
+    foreach (const evernote::edam::SavedSearch& search, searches)
+        searchItems += new SearchItem(search, this);
+    m_searches->add(searchItems);
+
     QList<NoteItem*> noteItems;
     foreach (const evernote::edam::Note& note, notes)
         noteItems += new NoteItem(note, this);
@@ -188,6 +210,7 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
 
     m_database->save(m_notebooks->items<NotebookItem*>(),
                      m_resources->items<ResourceItem*>(),
+                     m_searches->items<SearchItem*>(),
                      m_notes->items<NoteItem*>(),
                      m_tags->items<TagItem*>());
 

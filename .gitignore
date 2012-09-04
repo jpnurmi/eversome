@@ -41,3 +41,4 @@ moc_*.cpp
 build-stamp
 configure-stamp
 /debian
+.directory

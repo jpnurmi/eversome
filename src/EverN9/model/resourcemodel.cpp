@@ -15,12 +15,6 @@ ResourceModel::~ResourceModel()
 {
 }
 
-ResourceModel* ResourceModel::instance()
-{
-    static ResourceModel model;
-    return &model;
-}
-
 int ResourceModel::rowCount(const QModelIndex& parent) const
 {
     return !parent.isValid() ? m_resources.count() : 0;

@@ -15,8 +15,6 @@ public:
     explicit NotebookModel(QObject* parent = 0);
     virtual ~NotebookModel();
 
-    static NotebookModel* instance();
-
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 

@@ -15,12 +15,6 @@ TagModel::~TagModel()
 {
 }
 
-TagModel* TagModel::instance()
-{
-    static TagModel model;
-    return &model;
-}
-
 int TagModel::rowCount(const QModelIndex& parent) const
 {
     return !parent.isValid() ? m_tags.count() : 0;

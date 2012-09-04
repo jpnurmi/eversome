@@ -26,12 +26,11 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     qmlRegisterType<ResourceItem>("com.evernote.types", 1,0, "Resource");
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
-    Session session;
     QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("UserStore", session.userStore());
-    viewer.rootContext()->setContextProperty("NoteStore", session.noteStore());
-    viewer.rootContext()->setContextProperty("Tags", TagModel::instance());
-    viewer.rootContext()->setContextProperty("Notebooks", NotebookModel::instance());
+    viewer.rootContext()->setContextProperty("UserStore", Session::instance()->userStore());
+    viewer.rootContext()->setContextProperty("NoteStore", Session::instance()->noteStore());
+    viewer.rootContext()->setContextProperty("Tags", Session::instance()->tagModel());
+    viewer.rootContext()->setContextProperty("Notebooks", Session::instance()->notebookModel());
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
     viewer.showExpanded();

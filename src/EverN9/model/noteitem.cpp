@@ -1,9 +1,9 @@
 #include "noteitem.h"
 #include "resourcemodel.h"
 #include "resourceitem.h"
-#include "notemodel.h"
 #include "tagmodel.h"
 #include "tagitem.h"
+#include "session.h"
 
 QHash<QString, NoteItem*> NoteItem::allNotes;
 
@@ -69,7 +69,7 @@ QStringList NoteItem::tags() const
     QStringList res;
     for (uint i = 0; i < m_note.tagGuids.size(); ++i) {
         QString guid = QString::fromStdString(m_note.tagGuids.at(i));
-        TagItem* tag = TagModel::instance()->get(guid);
+        TagItem* tag = Session::instance()->tagModel()->get(guid);
         if (tag)
             res += tag->name();
     }
@@ -81,7 +81,7 @@ QStringList NoteItem::resources() const
     QStringList res;
     for (uint i = 0; i < m_note.resources.size(); ++i) {
         QString guid = QString::fromStdString(m_note.resources.at(i).guid);
-        ResourceItem* resource = ResourceModel::instance()->get(guid);
+        ResourceItem* resource = Session::instance()->resourceModel()->get(guid);
         if (resource)
             res += resource->filePath();
     }

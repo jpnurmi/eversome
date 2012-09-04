@@ -15,8 +15,6 @@ public:
     explicit TagModel(QObject* parent = 0);
     virtual ~TagModel();
 
-    static TagModel* instance();
-
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 

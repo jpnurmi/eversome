@@ -15,12 +15,6 @@ NotebookModel::~NotebookModel()
 {
 }
 
-NotebookModel* NotebookModel::instance()
-{
-    static NotebookModel model;
-    return &model;
-}
-
 int NotebookModel::rowCount(const QModelIndex& parent) const
 {
     return !parent.isValid() ? m_notebooks.count() : 0;

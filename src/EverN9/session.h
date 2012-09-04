@@ -6,10 +6,7 @@
 
 class UserStore;
 class NoteStore;
-class NotebookModel;
-class ResourceModel;
-class TagModel;
-class ResourceItem;
+class ItemModel;
 class NoteItem;
 
 class Session : public QObject
@@ -25,9 +22,9 @@ public:
     UserStore* userStore() const;
     NoteStore* noteStore() const;
 
-    NotebookModel* notebookModel() const;
-    ResourceModel* resourceModel() const;
-    TagModel* tagModel() const;
+    ItemModel* notebookModel() const;
+    ItemModel* resourceModel() const;
+    ItemModel* tagModel() const;
 
 private slots:
     void onLoggedIn();
@@ -44,9 +41,9 @@ private:
 
     UserStore* m_user;
     NoteStore* m_note;
-    NotebookModel* m_notebooks;
-    ResourceModel* m_resources;
-    TagModel* m_tags;
+    ItemModel* m_notebooks;
+    ItemModel* m_resources;
+    ItemModel* m_tags;
 };
 
 #endif // SESSION_H

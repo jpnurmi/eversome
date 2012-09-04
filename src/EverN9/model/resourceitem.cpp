@@ -1,5 +1,4 @@
 #include "resourceitem.h"
-#include "resourcemodel.h"
 #include <QDesktopServices>
 #include <QHash>
 #include <QDir>

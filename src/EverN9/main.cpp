@@ -5,11 +5,10 @@
 #include "userstore.h"
 #include "session.h"
 
-#include "notebookmodel.h"
+#include "itemmodel.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "noteitem.h"
-#include "tagmodel.h"
 #include "tagitem.h"
 
 Q_DECL_EXPORT int main(int argc, char *argv[])

@@ -6,6 +6,7 @@ HEADERS += \
     notebookitem.h \
     noteitem.h \
     resourceitem.h \
+    searchitem.h \
     tagitem.h
 
 SOURCES += \
@@ -13,4 +14,5 @@ SOURCES += \
     notebookitem.cpp \
     noteitem.cpp \
     resourceitem.cpp \
+    searchitem.cpp \
     tagitem.cpp

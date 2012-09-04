@@ -116,8 +116,6 @@ void NoteStore::syncImpl()
         err = Manager::errorString(e.errorCode);
     } catch (evernote::edam::EDAMSystemException& e) {
         err = Manager::errorString(e.errorCode);
-    } catch (evernote::edam::EDAMNotFoundException& e) {
-        err = Manager::errorString(-1);
     } catch (TException& e) {
         err = QString::fromUtf8(e.what());
     }

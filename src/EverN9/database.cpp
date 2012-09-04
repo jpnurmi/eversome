@@ -3,6 +3,7 @@
 #include "database.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
+#include "searchitem.h"
 #include "noteitem.h"
 #include "tagitem.h"
 #include "edam/Types_types.h"
@@ -25,8 +26,9 @@ Database::Database(QObject* parent) : QObject(parent),
         QStringList queries;
         queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER)";
         queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, filePath TEXT)";
-        queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT)";
+        queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT)";
         queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT)";
+        queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT)";
         foreach (const QString& query, queries)
             db.exec(query);
     }
@@ -58,10 +60,11 @@ void Database::load(QObject* parent)
 
 void Database::save(const QList<NotebookItem*>& notebooks,
                     const QList<ResourceItem*>& resources,
+                    const QList<SearchItem*>& searches,
                     const QList<NoteItem*>& notes,
                     const QList<TagItem*>& tags)
 {
-    QtConcurrent::run(this, &Database::saveImpl, notebooks, resources, notes, tags);
+    QtConcurrent::run(this, &Database::saveImpl, notebooks, resources, searches, notes, tags);
 }
 
 void Database::resetImpl()
@@ -69,8 +72,9 @@ void Database::resetImpl()
     QStringList queries;
     queries += "DELETE FROM Notebooks";
     queries += "DELETE FROM Resources";
-    queries += "DELETE FROM Tags";
+    queries += "DELETE FROM Searches";
     queries += "DELETE FROM Notes";
+    queries += "DELETE FROM Tags";
 
     QSqlDatabase db = QSqlDatabase::database();
     foreach (const QString& query, queries)
@@ -88,10 +92,11 @@ void Database::loadImpl(QObject* parent)
 
     QList<NotebookItem*> notebooks = loadNotebooksImpl(parent);
     QList<ResourceItem*> resources = loadResourcesImpl(parent);
+    QList<SearchItem*> searches = loadSearchesImpl(parent);
     QList<NoteItem*> notes = loadNotesImpl(parent);
     QList<TagItem*> tags = loadTagsImpl(parent);
 
-    emit loaded(notebooks, resources, notes, tags);
+    emit loaded(notebooks, resources, searches, notes, tags);
 
     loading = false;
     emit activeChanged();
@@ -99,6 +104,7 @@ void Database::loadImpl(QObject* parent)
 
 void Database::saveImpl(const QList<NotebookItem*>& notebooks,
                         const QList<ResourceItem*>& resources,
+                        const QList<SearchItem*>& searches,
                         const QList<NoteItem*>& notes,
                         const QList<TagItem*>& tags)
 {
@@ -110,6 +116,7 @@ void Database::saveImpl(const QList<NotebookItem*>& notebooks,
 
     saveNotebooksImpl(notebooks);
     saveResourcesImpl(resources);
+    saveSearchesImpl(searches);
     saveNotesImpl(notes);
     saveTagsImpl(tags);
 
@@ -199,6 +206,45 @@ void Database::saveResourcesImpl(const QList<ResourceItem*>& resources)
     query.addBindValue(filePaths);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << resources.count() << res;
+}
+
+QList<SearchItem*> Database::loadSearchesImpl(QObject* parent)
+{
+    QList<SearchItem*> res;
+    QSqlQuery query("SELECT * FROM Searches ORDER BY name ASC");
+    if (query.exec()) {
+        while (query.next()) {
+            evernote::edam::SavedSearch search;
+            QSqlRecord record = query.record();
+            search.guid = record.value("guid").toString().toStdString();
+            search.name = record.value("name").toString().toStdString();
+            search.query = record.value("query").toString().toStdString();
+
+            SearchItem* item = new SearchItem(search);
+            item->moveToThread(thread());
+            item->setParent(parent);
+            res += item;
+        }
+    }
+    qDebug() << Q_FUNC_INFO << res.count();
+    return res;
+}
+
+void Database::saveSearchesImpl(const QList<SearchItem*>& searches)
+{
+    QVariantList guids, names, queries;
+    foreach (SearchItem* search, searches) {
+        guids += search->guid();
+        names += search->name();
+        queries += search->query();
+    }
+
+    QSqlQuery query("INSERT OR REPLACE INTO Searches VALUES(?,?,?)");
+    query.addBindValue(guids);
+    query.addBindValue(names);
+    query.addBindValue(queries);
+    bool res = query.execBatch();
+    qDebug() << Q_FUNC_INFO << searches.count() << res;
 }
 
 QList<NoteItem*> Database::loadNotesImpl(QObject* parent)

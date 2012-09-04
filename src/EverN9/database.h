@@ -6,6 +6,7 @@
 
 class TagItem;
 class NoteItem;
+class SearchItem;
 class ResourceItem;
 class NotebookItem;
 
@@ -25,6 +26,7 @@ public:
     void load(QObject* parent = 0);
     void save(const QList<NotebookItem*>& notebooks,
               const QList<ResourceItem*>& resources,
+              const QList<SearchItem*>& searches,
               const QList<NoteItem*>& notes,
               const QList<TagItem*>& tags);
 
@@ -32,6 +34,7 @@ signals:
     void activeChanged();
     void loaded(const QList<NotebookItem*>& notebooks,
                 const QList<ResourceItem*>& resources,
+                const QList<SearchItem*>& searches,
                 const QList<NoteItem*>& notes,
                 const QList<TagItem*>& tags);
 
@@ -40,6 +43,7 @@ private slots:
     void loadImpl(QObject* parent);
     void saveImpl(const QList<NotebookItem*>& notebooks,
                   const QList<ResourceItem*>& resources,
+                  const QList<SearchItem*>& searches,
                   const QList<NoteItem*>& notes,
                   const QList<TagItem*>& tags);
 
@@ -48,6 +52,9 @@ private slots:
 
     QList<ResourceItem*> loadResourcesImpl(QObject* parent);
     void saveResourcesImpl(const QList<ResourceItem*>& resources);
+
+    QList<SearchItem*> loadSearchesImpl(QObject* parent);
+    void saveSearchesImpl(const QList<SearchItem*>& searches);
 
     QList<NoteItem*> loadNotesImpl(QObject* parent);
     void saveNotesImpl(const QList<NoteItem*>& notes);

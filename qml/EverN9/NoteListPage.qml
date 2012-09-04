@@ -21,8 +21,6 @@ CommonPage {
 
     property ItemModel notes
 
-    title: notebook ? notebook.name : ""
-
     flickable: ListView {
         model: notes
         delegate: NoteDelegate {

@@ -17,7 +17,7 @@ public:
     Q_INVOKABLE bool hasCredentials() const;
 
 public slots:
-    void login(const QString& username = QString(), const QString& password = QString());
+    void login(const QString& username = QString(), const QString& password = QString(), bool remember = true);
     void logout();
 
 signals:
@@ -27,7 +27,7 @@ signals:
     void activeChanged();
 
 private slots:
-    void loginImpl(const QString& username, const QString& password);
+    void loginImpl(const QString& username, const QString& password, bool remember);
     void logoutImpl();
 
 private:

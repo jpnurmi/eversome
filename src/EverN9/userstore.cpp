@@ -41,12 +41,12 @@ bool UserStore::hasCredentials() const
            !Settings::value(Settings::Password).isEmpty();
 }
 
-void UserStore::login(const QString& username, const QString& password)
+void UserStore::login(const QString& username, const QString& password, bool remember)
 {
     QString un = username.isEmpty() ? Settings::value(Settings::Username) : username;
     QString pw = password.isEmpty() ? Settings::value(Settings::Password) : password;
     qDebug() << Q_FUNC_INFO << un << pw;
-    QtConcurrent::run(this, &UserStore::loginImpl, un, pw);
+    QtConcurrent::run(this, &UserStore::loginImpl, un, pw, remember);
 }
 
 void UserStore::logout()
@@ -56,7 +56,7 @@ void UserStore::logout()
     QtConcurrent::run(this, &UserStore::logoutImpl);
 }
 
-void UserStore::loginImpl(const QString& username, const QString& password)
+void UserStore::loginImpl(const QString& username, const QString& password, bool remember)
 {
     if (loggingIn)
         return;
@@ -72,8 +72,10 @@ void UserStore::loginImpl(const QString& username, const QString& password)
             transport->open();
         evernote::edam::AuthenticationResult result;
         client->authenticate(result, username.toStdString(), password.toStdString(), CONSUMER_KEY, CONSUMER_SECRET);
-        Settings::setValue(Settings::Username, username);
-        Settings::setValue(Settings::Password, password);
+        if (remember) {
+            Settings::setValue(Settings::Username, username);
+            Settings::setValue(Settings::Password, password);
+        }
         Settings::setValue(Settings::AuthToken, QString::fromStdString(result.authenticationToken));
         Settings::setValue(Settings::UserShardID, QString::fromStdString(result.user.shardId));
         emit loggedIn();

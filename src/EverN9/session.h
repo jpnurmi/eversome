@@ -35,22 +35,21 @@ private slots:
     void onLoggedIn();
     void onLoggedOut();
 
-    void onNotebooksLoaded(const QList<NotebookItem*>& notebooks);
-    void onResourcesLoaded(const QList<ResourceItem*>& resources);
-    void onNotesLoaded(const QList<NoteItem*>& notes);
-    void onTagsLoaded(const QList<TagItem*>& tags);
+    void onLoaded(const QList<NotebookItem*>& notebooks,
+                  const QList<ResourceItem*>& resources,
+                  const QList<NoteItem*>& notes,
+                  const QList<TagItem*>& tags);
 
-    void onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks);
-    void onResourcesSynced(const QVector<evernote::edam::Resource>& resources);
-    void onNotesSynced(const QVector<evernote::edam::Note>& notes);
-    void onTagsSynced(const QVector<evernote::edam::Tag>& tags);
+    void onSynced(const QVector<evernote::edam::Notebook>& notebooks,
+                  const QVector<evernote::edam::Resource>& resources,
+                  const QVector<evernote::edam::Note>& notes,
+                  const QVector<evernote::edam::Tag>& tags);
 
     void onResourceFetched(const evernote::edam::Resource& resource);
     void onNoteFetched(const evernote::edam::Note& note);
 
 private:
-    void setupNotebooks(const QList<NoteItem*>& notes);
-    void setupTags(const QList<NoteItem*>& notes);
+    void setupNotes(const QList<NoteItem*>& notes);
 
     Database* m_database;
     UserStore* m_user;

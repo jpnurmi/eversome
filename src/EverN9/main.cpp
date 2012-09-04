@@ -9,6 +9,7 @@
 #include "itemmodel.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
+#include "searchitem.h"
 #include "noteitem.h"
 #include "tagitem.h"
 
@@ -23,6 +24,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     qmlRegisterType<TagItem>("com.evernote.types", 1,0, "Tag");
     qmlRegisterType<NoteItem>("com.evernote.types", 1,0, "Note");
     qmlRegisterType<ItemModel>("com.evernote.types", 1,0, "ItemModel");
+    qmlRegisterType<SearchItem>("com.evernote.types", 1,0, "Search");
     qmlRegisterType<ResourceItem>("com.evernote.types", 1,0, "Resource");
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
@@ -31,6 +33,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("UserStore", Manager::instance()->userStore());
     viewer.rootContext()->setContextProperty("NoteStore", Manager::instance()->noteStore());
     viewer.rootContext()->setContextProperty("Notebooks", Manager::instance()->notebookModel());
+    viewer.rootContext()->setContextProperty("Searches", Manager::instance()->searchModel());
     viewer.rootContext()->setContextProperty("Tags", Manager::instance()->tagModel());
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));

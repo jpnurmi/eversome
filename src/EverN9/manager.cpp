@@ -38,6 +38,8 @@ Manager::Manager(QObject *parent) : QObject(parent)
               this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
     connect(m_note, SIGNAL(noteFetched(evernote::edam::Note)),
               this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_note, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
+              this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)), Qt::QueuedConnection);
 
     qRegisterMetaType<TagItem*>();
     qRegisterMetaType<NoteItem*>();
@@ -222,6 +224,20 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item)
         item->setContent(note.content);
+}
+
+void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes)
+{
+    SearchItem* searchItem = m_searches->get<SearchItem*>(QString::fromStdString(search.guid));
+    if (searchItem) {
+        QList<NoteItem*> noteItems;
+        foreach (const evernote::edam::Note& note, notes) {
+            NoteItem* noteItem = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
+            if (noteItem)
+                noteItems += noteItem;
+        }
+        searchItem->notes()->add(noteItems);
+    }
 }
 
 void Manager::onResourceFetched(const evernote::edam::Resource& resource)

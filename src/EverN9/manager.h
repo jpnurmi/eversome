@@ -55,6 +55,8 @@ private slots:
     void onResourceFetched(const evernote::edam::Resource& resource);
     void onNoteFetched(const evernote::edam::Note& note);
 
+    void onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
+
 private:
     void setupNotes(const QList<NoteItem*>& notes);
 

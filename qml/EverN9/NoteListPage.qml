@@ -24,8 +24,6 @@ CommonPage {
     title: notebook ? notebook.name : ""
 
     flickable: ListView {
-        anchors.fill: parent
-
         model: notes
         delegate: NoteDelegate {
             highlighted: index % 2

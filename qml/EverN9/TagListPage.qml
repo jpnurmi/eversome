@@ -21,8 +21,6 @@ CommonPage {
     title: qsTr("Tags")
 
     flickable: ListView {
-        anchors.fill: parent
-
         model: Tags
         delegate: TagDelegate {
             highlighted: index % 2

@@ -21,8 +21,6 @@ CommonPage {
     title: qsTr("Notebooks")
 
     flickable: ListView {
-        anchors.fill: parent
-
         model: Notebooks
         delegate: NotebookDelegate {
             highlighted: index % 2

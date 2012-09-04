@@ -25,38 +25,48 @@ CommonPage {
     busy: NoteStore.active || contentLabel.openingLink
 
     flickable: Flickable {
-        anchors.fill: parent
-        anchors.margins: UI.LARGE_SPACING
-        anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
         contentHeight: column.height
 
         Column {
             id: column
 
-            width: parent.width
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
+            anchors.rightMargin: UI.LARGE_SPACING
+
             spacing: UI.LARGE_SPACING
 
-            Row {
+            Column {
                 width: parent.width
-                spacing: UI.MEDIUM_SPACING
 
-                Label {
-                    id: dateLabel
-                    text: note ? Qt.formatDateTime(note.updated, qsTr("yyyy-MM-dd hh:mm")) : ""
-                    font.pixelSize: UI.SMALL_FONT
-                    font.weight: Font.Light
-                    wrapMode: Text.NoWrap
+                Item {
+                    width: parent.width
+                    height: UI.LARGE_SPACING
                 }
 
-                Flow {
-                    width: parent.width - dateLabel.width - parent.spacing
-                    layoutDirection: Qt.RightToLeft
-                    spacing: UI.SMALL_SPACING
+                Row {
+                    width: parent.width
+                    spacing: UI.MEDIUM_SPACING
 
-                    Repeater {
-                        model: note ? note.tags : null
-                        Badge {
-                            value: modelData
+                    Label {
+                        id: dateLabel
+                        text: note ? Qt.formatDateTime(note.updated, qsTr("yyyy-MM-dd hh:mm")) : ""
+                        font.pixelSize: UI.SMALL_FONT
+                        font.weight: Font.Light
+                        wrapMode: Text.NoWrap
+                    }
+
+                    Flow {
+                        width: parent.width - dateLabel.width - parent.spacing
+                        layoutDirection: Qt.RightToLeft
+                        spacing: UI.SMALL_SPACING
+
+                        Repeater {
+                            model: note ? note.tags : null
+                            Badge {
+                                value: modelData
+                            }
                         }
                     }
                 }

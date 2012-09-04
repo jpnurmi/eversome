@@ -10,7 +10,6 @@ Page {
 
     Item {
         id: flickableParent
-        property bool __isPage: true
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right

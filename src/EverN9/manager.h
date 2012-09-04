@@ -32,6 +32,8 @@ public:
     ItemModel* noteModel() const;
     ItemModel* tagModel() const;
 
+    static QString errorString(int code);
+
 private slots:
     void onLoggedIn();
     void onLoggedOut();

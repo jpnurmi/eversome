@@ -21,6 +21,8 @@ public:
     NoteStore* noteStore() const;
 
 private slots:
+    void onLoggedIn();
+    void onLoggedOut();
     void onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks);
     void onResourcesSynced(const QVector<evernote::edam::Resource>& resources);
     void onNotesSynced(const QVector<evernote::edam::Note>& notes);

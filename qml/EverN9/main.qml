@@ -5,17 +5,22 @@ import "UIConstants.js" as UI
 PageStackWindow {
     id: window
 
-    initialPage: MainPage { }
+    initialPage: MainPage {
+        onLoggedOut: {
+            UserStore.logout();
+            loginSheet.open();
+        }
+    }
 
     LoginSheet {
         id: loginSheet
-        onAccepted: UserStore.authenticate(username, password)
+        onAccepted: UserStore.login(username, password)
     }
 
     Component.onCompleted: {
         theme.colorScheme = 2
         if (UserStore.hasCredentials())
-            UserStore.authenticate();
+            UserStore.login();
         else
             loginSheet.open();
     }

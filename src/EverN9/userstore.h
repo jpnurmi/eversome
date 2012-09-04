@@ -15,14 +15,17 @@ public:
     Q_INVOKABLE bool hasCredentials() const;
 
 public slots:
-    void authenticate(const QString& username = QString(), const QString& password = QString());
+    void login(const QString& username = QString(), const QString& password = QString());
+    void logout();
 
 signals:
-    void succeed();
-    void failed(const QString& error);
+    void loggedIn();
+    void loggedOut();
+    void error(const QString& error);
 
 private slots:
-    void authImpl(const QString& username, const QString& password);
+    void loginImpl(const QString& username, const QString& password);
+    void logoutImpl();
 
 private:
     evernote::edam::UserStoreClient* client;

@@ -5,6 +5,8 @@ import "UIConstants.js" as UI
 Page {
     id: root
 
+    signal loggedOut()
+
     TabGroup {
         id: tabGroup
         PageStack {
@@ -62,8 +64,17 @@ Page {
         }
         ToolIcon {
             iconId: "toolbar-view-menu"
-            opacity: enabled ? 1.0 : UI.DISABLED_OPACITY
-            enabled: false
+            onClicked: menu.open()
+        }
+    }
+
+    Menu {
+        id: menu
+        MenuLayout {
+            MenuItem {
+                text: qsTr("Logout")
+                onClicked: root.loggedOut()
+            }
         }
     }
 

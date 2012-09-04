@@ -1,5 +1,6 @@
 #include "session.h"
 #include "database.h"
+#include "settings.h"
 #include "userstore.h"
 #include "notestore.h"
 #include "notebookmodel.h"
@@ -42,7 +43,8 @@ Session::Session(QObject *parent) : QObject(parent)
     m_user = new UserStore(this);
     m_note = new NoteStore(this);
 
-    connect(m_user, SIGNAL(succeed()), m_note, SLOT(sync()), Qt::QueuedConnection);
+    connect(m_user, SIGNAL(loggedIn()), this, SLOT(onLoggedIn()), Qt::QueuedConnection);
+    connect(m_user, SIGNAL(loggedOut()), this, SLOT(onLoggedOut()), Qt::QueuedConnection);
 
     connect(m_note, SIGNAL(notebooksSynced(QVector<evernote::edam::Notebook>)),
               this, SLOT(onNotebooksSynced(QVector<evernote::edam::Notebook>)), Qt::QueuedConnection);
@@ -58,10 +60,6 @@ Session::Session(QObject *parent) : QObject(parent)
               this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
 
     Database::initialize();
-    TagModel::instance()->add(Database::loadTags(this));
-    ResourceModel::instance()->add(Database::loadResources(this));
-    NotebookModel::instance()->add(Database::loadNotebooks(this));
-    setupNotes(Database::loadNotes(this));
 }
 
 Session::~Session()
@@ -77,6 +75,27 @@ UserStore* Session::userStore() const
 NoteStore* Session::noteStore() const
 {
     return m_note;
+}
+
+void Session::onLoggedIn()
+{
+    TagModel::instance()->add(Database::loadTags(this));
+    ResourceModel::instance()->add(Database::loadResources(this));
+    NotebookModel::instance()->add(Database::loadNotebooks(this));
+    setupNotes(Database::loadNotes(this));
+
+    m_note->sync();
+}
+
+void Session::onLoggedOut()
+{
+    m_note->cancel();
+    Settings::reset();
+    Database::reset();
+
+    NotebookModel::instance()->clear();
+    ResourceModel::instance()->clear();
+    TagModel::instance()->clear();
 }
 
 void Session::onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks)

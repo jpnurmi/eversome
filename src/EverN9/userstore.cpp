@@ -34,13 +34,21 @@ bool UserStore::hasCredentials() const
            !Settings::value(Settings::Password).isEmpty();
 }
 
-void UserStore::authenticate(const QString& username, const QString& password)
+void UserStore::login(const QString& username, const QString& password)
 {
-    qDebug() << Q_FUNC_INFO << username << password;
-    QtConcurrent::run(this, &UserStore::authImpl, username, password);
+    QString un = username.isEmpty() ? Settings::value(Settings::Username) : username;
+    QString pw = password.isEmpty() ? Settings::value(Settings::Password) : password;
+    qDebug() << Q_FUNC_INFO << un << pw;
+    QtConcurrent::run(this, &UserStore::loginImpl, un, pw);
 }
 
-void UserStore::authImpl(const QString& username, const QString& password)
+void UserStore::logout()
+{
+    qDebug() << Q_FUNC_INFO;
+    QtConcurrent::run(this, &UserStore::logoutImpl);
+}
+
+void UserStore::loginImpl(const QString& username, const QString& password)
 {
     qDebug() << Q_FUNC_INFO << username << password;
     try {
@@ -52,9 +60,22 @@ void UserStore::authImpl(const QString& username, const QString& password)
         Settings::setValue(Settings::Password, password);
         Settings::setValue(Settings::AuthToken, QString::fromStdString(result.authenticationToken));
         Settings::setValue(Settings::UserShardID, QString::fromStdString(result.user.shardId));
-        emit succeed();
+        emit loggedIn();
     } catch (TException& e) {
         qDebug() << Q_FUNC_INFO << e.what();
-        emit failed(e.what());
+        emit error(e.what());
+    }
+}
+
+void UserStore::logoutImpl()
+{
+    qDebug() << Q_FUNC_INFO;
+    try {
+        if (transport->isOpen())
+            transport->close();
+        emit loggedOut();
+    } catch (TException& e) {
+        qDebug() << Q_FUNC_INFO << e.what();
+        emit error(e.what());
     }
 }

@@ -96,40 +96,19 @@ void NoteStore::syncImpl()
                     percent = (int)((double)(100*(double)usn/(double)chunk.updateCount));
                     emit progress(percent);
 
-                    if (!chunk.notes.empty())
-                        emit notesSynced(QVector<evernote::edam::Note>::fromStdVector(chunk.notes));
-
-                    emit progress(percent);
-                    if (cancelled)
-                        break;
-
-                    if (!chunk.notebooks.empty())
-                        emit notebooksSynced(QVector<evernote::edam::Notebook>::fromStdVector(chunk.notebooks));
-
-                    emit progress(percent);
-                    if (cancelled)
-                        break;
-
-                    if (!chunk.tags.empty())
-                        emit tagsSynced(QVector<evernote::edam::Tag>::fromStdVector(chunk.tags));
-
-                    emit progress(percent);
-                    if (cancelled)
-                        break;
-
-                    if (!chunk.resources.empty())
-                        emit resourcesSynced(QVector<evernote::edam::Resource>::fromStdVector(chunk.resources));
-
-                    emit progress(percent);
-                    if (cancelled)
-                        break;
+                    QVector<evernote::edam::Notebook> notebooks = QVector<evernote::edam::Notebook>::fromStdVector(chunk.notebooks);
+                    QVector<evernote::edam::Resource> resources = QVector<evernote::edam::Resource>::fromStdVector(chunk.resources);
+                    QVector<evernote::edam::Note> notes = QVector<evernote::edam::Note>::fromStdVector(chunk.notes);
+                    QVector<evernote::edam::Tag> tags = QVector<evernote::edam::Tag>::fromStdVector(chunk.tags);
 
                     qDebug() << Q_FUNC_INFO
-                             << "NB:" << chunk.notebooks.size()
-                             << "T:" << chunk.tags.size()
-                             << "R:" << chunk.resources.size()
-                             << "N:" << chunk.notes.size()
+                             << "NB:" << notebooks.size()
+                             << "R:" << resources.size()
+                             << "N:" << notes.size()
+                             << "T:" << tags.size()
                              << "USN:" << chunk.chunkHighUSN;
+
+                    emit synced(notebooks, resources, notes, tags);
 
                     usn = chunk.chunkHighUSN;
                     Settings::setValue(Settings::ServerUSN, QString::number(usn));

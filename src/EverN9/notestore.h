@@ -28,10 +28,11 @@ signals:
     void finished();
     void activeChanged();
 
-    void notebooksSynced(const QVector<evernote::edam::Notebook>& notebooks);
-    void resourcesSynced(const QVector<evernote::edam::Resource>& resources);
-    void notesSynced(const QVector<evernote::edam::Note>& notes);
-    void tagsSynced(const QVector<evernote::edam::Tag>& tags);
+    void synced(const QVector<evernote::edam::Notebook>& notebooks,
+                const QVector<evernote::edam::Resource>& resources,
+                const QVector<evernote::edam::Note>& notes,
+                const QVector<evernote::edam::Tag>& tags);
+
     void resourceFetched(const evernote::edam::Resource& resource);
     void noteFetched(const evernote::edam::Note& note);
 

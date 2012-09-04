@@ -25,6 +25,15 @@ CommonPage {
         delegate: SearchDelegate {
             highlighted: index % 2
             search: modelData
+            onClicked: {
+                NoteStore.search(search.search());
+                pageStack.push(noteListPage, {title: search.name, notes: search.notes})
+            }
         }
+    }
+
+    Component {
+        id: noteListPage
+        NoteListPage { }
     }
 }

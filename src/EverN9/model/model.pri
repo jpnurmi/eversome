@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
+    itemmodel.h \
     notebookitem.h \
     notebookmodel.h \
     noteitem.h \
@@ -12,6 +13,7 @@ HEADERS += \
     tagmodel.h
 
 SOURCES += \
+    itemmodel.cpp \
     notebookitem.cpp \
     notebookmodel.cpp \
     noteitem.cpp \

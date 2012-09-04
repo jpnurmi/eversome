@@ -12,41 +12,52 @@ class NotebookItem;
 class Database : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool active READ isActive NOTIFY activeChanged)
 
 public:
     explicit Database(QObject* parent = 0);
     virtual ~Database();
 
+    bool isActive() const;
+
     void reset();
 
     void load(QObject* parent = 0);
-
-    void saveNotebooks(const QList<NotebookItem*>& notebooks);
-    void saveResources(const QList<ResourceItem*>& resources);
-    void saveNotes(const QList<NoteItem*>& notes);
-    void saveTags(const QList<TagItem*>& tags);
+    void save(const QList<NotebookItem*>& notebooks,
+              const QList<ResourceItem*>& resources,
+              const QList<NoteItem*>& notes,
+              const QList<TagItem*>& tags);
 
 signals:
-    void notebooksLoaded(const QList<NotebookItem*>& notebooks);
-    void resourcesLoaded(const QList<ResourceItem*>& resources);
-    void notesLoaded(const QList<NoteItem*>& notes);
-    void tagsLoaded(const QList<TagItem*>& tags);
+    void activeChanged();
+    void loaded(const QList<NotebookItem*>& notebooks,
+                const QList<ResourceItem*>& resources,
+                const QList<NoteItem*>& notes,
+                const QList<TagItem*>& tags);
 
 private slots:
     void resetImpl();
     void loadImpl(QObject* parent);
+    void saveImpl(const QList<NotebookItem*>& notebooks,
+                  const QList<ResourceItem*>& resources,
+                  const QList<NoteItem*>& notes,
+                  const QList<TagItem*>& tags);
 
-    void loadNotebooksImpl(QObject* parent);
+    QList<NotebookItem*> loadNotebooksImpl(QObject* parent);
     void saveNotebooksImpl(const QList<NotebookItem*>& notebooks);
 
-    void loadResourcesImpl(QObject* parent);
+    QList<ResourceItem*> loadResourcesImpl(QObject* parent);
     void saveResourcesImpl(const QList<ResourceItem*>& resources);
 
-    void loadNotesImpl(QObject* parent);
+    QList<NoteItem*> loadNotesImpl(QObject* parent);
     void saveNotesImpl(const QList<NoteItem*>& notes);
 
-    void loadTagsImpl(QObject* parent);
+    QList<TagItem*> loadTagsImpl(QObject* parent);
     void saveTagsImpl(const QList<TagItem*>& tags);
+
+private:
+    volatile bool loading;
+    volatile bool saving;
 };
 
 #endif // DATABASE_H

@@ -16,7 +16,8 @@
 #include <QVariant>
 #include <QDebug>
 
-Database::Database(QObject* parent) : QObject(parent)
+Database::Database(QObject* parent) : QObject(parent),
+    loading(false), saving(false)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("EverN9");
@@ -40,6 +41,11 @@ Database::~Database()
     QSqlDatabase::removeDatabase("EverN9");
 }
 
+bool Database::isActive() const
+{
+    return loading || saving;
+}
+
 void Database::reset()
 {
     QtConcurrent::run(this, &Database::resetImpl);
@@ -50,24 +56,12 @@ void Database::load(QObject* parent)
     QtConcurrent::run(this, &Database::loadImpl, parent);
 }
 
-void Database::saveNotebooks(const QList<NotebookItem*>& notebooks)
+void Database::save(const QList<NotebookItem*>& notebooks,
+                    const QList<ResourceItem*>& resources,
+                    const QList<NoteItem*>& notes,
+                    const QList<TagItem*>& tags)
 {
-    QtConcurrent::run(this, &Database::saveNotebooksImpl, notebooks);
-}
-
-void Database::saveResources(const QList<ResourceItem*>& resources)
-{
-    QtConcurrent::run(this, &Database::saveResourcesImpl, resources);
-}
-
-void Database::saveNotes(const QList<NoteItem*>& notes)
-{
-    QtConcurrent::run(this, &Database::saveNotesImpl, notes);
-}
-
-void Database::saveTags(const QList<TagItem*>& tags)
-{
-    QtConcurrent::run(this, &Database::saveTagsImpl, tags);
+    QtConcurrent::run(this, &Database::saveImpl, notebooks, resources, notes, tags);
 }
 
 void Database::resetImpl()
@@ -86,13 +80,44 @@ void Database::resetImpl()
 
 void Database::loadImpl(QObject* parent)
 {
-    loadNotesImpl(parent);
-    loadTagsImpl(parent);
-    loadResourcesImpl(parent);
-    loadNotebooksImpl(parent);
+    if (loading)
+        return;
+
+    loading = true;
+    emit activeChanged();
+
+    QList<NotebookItem*> notebooks = loadNotebooksImpl(parent);
+    QList<ResourceItem*> resources = loadResourcesImpl(parent);
+    QList<NoteItem*> notes = loadNotesImpl(parent);
+    QList<TagItem*> tags = loadTagsImpl(parent);
+
+    emit loaded(notebooks, resources, notes, tags);
+
+    loading = false;
+    emit activeChanged();
 }
 
-void Database::loadNotebooksImpl(QObject* parent)
+void Database::saveImpl(const QList<NotebookItem*>& notebooks,
+                        const QList<ResourceItem*>& resources,
+                        const QList<NoteItem*>& notes,
+                        const QList<TagItem*>& tags)
+{
+    if (saving)
+        return;
+
+    saving = true;
+    emit activeChanged();
+
+    saveNotebooksImpl(notebooks);
+    saveResourcesImpl(resources);
+    saveNotesImpl(notes);
+    saveTagsImpl(tags);
+
+    saving = false;
+    emit activeChanged();
+}
+
+QList<NotebookItem*> Database::loadNotebooksImpl(QObject* parent)
 {
     QList<NotebookItem*> res;
     QSqlQuery query("SELECT * FROM Notebooks ORDER BY name ASC");
@@ -114,7 +139,7 @@ void Database::loadNotebooksImpl(QObject* parent)
         }
     }
     qDebug() << Q_FUNC_INFO << res.count();
-    emit notebooksLoaded(res);
+    return res;
 }
 
 void Database::saveNotebooksImpl(const QList<NotebookItem*>& notebooks)
@@ -140,7 +165,7 @@ void Database::saveNotebooksImpl(const QList<NotebookItem*>& notebooks)
     qDebug() << Q_FUNC_INFO << notebooks.count() << res;
 }
 
-void Database::loadResourcesImpl(QObject* parent)
+QList<ResourceItem*> Database::loadResourcesImpl(QObject* parent)
 {
     QList<ResourceItem*> res;
     QSqlQuery query("SELECT * FROM Resources");
@@ -158,7 +183,7 @@ void Database::loadResourcesImpl(QObject* parent)
         }
     }
     qDebug() << Q_FUNC_INFO << res.count();
-    emit resourcesLoaded(res);
+    return res;
 }
 
 void Database::saveResourcesImpl(const QList<ResourceItem*>& resources)
@@ -176,7 +201,7 @@ void Database::saveResourcesImpl(const QList<ResourceItem*>& resources)
     qDebug() << Q_FUNC_INFO << resources.count() << res;
 }
 
-void Database::loadNotesImpl(QObject* parent)
+QList<NoteItem*> Database::loadNotesImpl(QObject* parent)
 {
     QList<NoteItem*> res;
     QSqlQuery query("SELECT * FROM Notes");
@@ -209,7 +234,7 @@ void Database::loadNotesImpl(QObject* parent)
         }
     }
     qDebug() << Q_FUNC_INFO << res.count();
-    emit notesLoaded(res);
+    return res;
 }
 
 void Database::saveNotesImpl(const QList<NoteItem*>& notes)
@@ -250,7 +275,7 @@ void Database::saveNotesImpl(const QList<NoteItem*>& notes)
     qDebug() << Q_FUNC_INFO << notes.count() << res;
 }
 
-void Database::loadTagsImpl(QObject* parent)
+QList<TagItem*> Database::loadTagsImpl(QObject* parent)
 {
     QList<TagItem*> res;
     QSqlQuery query("SELECT * FROM Tags ORDER BY name ASC");
@@ -269,7 +294,7 @@ void Database::loadTagsImpl(QObject* parent)
         }
     }
     qDebug() << Q_FUNC_INFO << res.count();
-    emit tagsLoaded(res);
+    return res;
 }
 
 void Database::saveTagsImpl(const QList<TagItem*>& tags)

@@ -35,17 +35,33 @@ Session::Session(QObject *parent) : QObject(parent)
     connect(m_note, SIGNAL(noteFetched(evernote::edam::Note)),
               this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
 
+    qRegisterMetaType<TagItem*>();
+    qRegisterMetaType<NoteItem*>();
+    qRegisterMetaType<ResourceItem*>();
+    qRegisterMetaType<NotebookItem*>();
+    qRegisterMetaType<QList<TagItem*> >();
+    qRegisterMetaType<QList<NoteItem*> >();
+    qRegisterMetaType<QList<ResourceItem*> >();
+    qRegisterMetaType<QList<NotebookItem*> >();
+
+    m_database = new Database(this);
+    connect(m_database, SIGNAL(notebooksLoaded(QList<NotebookItem*>)),
+                  this, SLOT(onNotebooksLoaded(QList<NotebookItem*>)), Qt::QueuedConnection);
+    connect(m_database, SIGNAL(resourcesLoaded(QList<ResourceItem*>)),
+                  this, SLOT(onResourcesLoaded(QList<ResourceItem*>)), Qt::QueuedConnection);
+    connect(m_database, SIGNAL(notesLoaded(QList<NoteItem*>)),
+                  this, SLOT(onNotesLoaded(QList<NoteItem*>)), Qt::QueuedConnection);
+    connect(m_database, SIGNAL(tagsLoaded(QList<TagItem*>)),
+                  this, SLOT(onTagsLoaded(QList<TagItem*>)), Qt::QueuedConnection);
+
     m_notebooks = new ItemModel(this);
     m_resources = new ItemModel(this);
     m_notes = new ItemModel(this);
     m_tags = new ItemModel(this);
-
-    Database::initialize();
 }
 
 Session::~Session()
 {
-    Database::uninitialize();
 }
 
 Session* Session::instance()
@@ -86,13 +102,7 @@ ItemModel* Session::tagModel() const
 
 void Session::onLoggedIn()
 {
-    m_tags->add(Database::loadTags(this));
-    m_notes->add(Database::loadNotes(this));
-    m_resources->add(Database::loadResources(this));
-    m_notebooks->add(Database::loadNotebooks(this));
-
-    setupNotes(m_notes->items<NoteItem*>());
-
+    m_database->load(this);
     m_note->sync();
 }
 
@@ -100,12 +110,34 @@ void Session::onLoggedOut()
 {
     m_note->cancel();
     Settings::reset();
-    Database::reset();
+    m_database->reset();
 
     m_notebooks->clear();
     m_resources->clear();
     m_notes->clear();
     m_tags->clear();
+}
+
+void Session::onNotebooksLoaded(const QList<NotebookItem*>& notebooks)
+{
+    m_notebooks->add(notebooks);
+    setupNotebooks(m_notes->items<NoteItem*>());
+}
+
+void Session::onResourcesLoaded(const QList<ResourceItem*>& resources)
+{
+    m_resources->add(resources);
+}
+
+void Session::onNotesLoaded(const QList<NoteItem*>& notes)
+{
+    m_notes->add(notes);
+}
+
+void Session::onTagsLoaded(const QList<TagItem*>& tags)
+{
+    m_tags->add(tags);
+    setupTags(m_notes->items<NoteItem*>());
 }
 
 void Session::onNotebooksSynced(const QVector<evernote::edam::Notebook>& notebooks)
@@ -114,7 +146,8 @@ void Session::onNotebooksSynced(const QVector<evernote::edam::Notebook>& noteboo
     foreach (const evernote::edam::Notebook& notebook, notebooks)
         items += new NotebookItem(notebook, this);
     m_notebooks->add(items);
-    Database::saveNotebooks(m_notebooks->items<NotebookItem*>());
+    m_database->saveNotebooks(m_notebooks->items<NotebookItem*>());
+    setupNotebooks(m_notes->items<NoteItem*>());
 }
 
 void Session::onResourcesSynced(const QVector<evernote::edam::Resource>& resources)
@@ -123,7 +156,7 @@ void Session::onResourcesSynced(const QVector<evernote::edam::Resource>& resourc
     foreach (const evernote::edam::Resource& resource, resources)
         items += new ResourceItem(resource, this);
     m_resources->add(items);
-    Database::saveResources(m_resources->items<ResourceItem*>());
+    m_database->saveResources(m_resources->items<ResourceItem*>());
 }
 
 void Session::onNotesSynced(const QVector<evernote::edam::Note>& notes)
@@ -132,8 +165,7 @@ void Session::onNotesSynced(const QVector<evernote::edam::Note>& notes)
     foreach (const evernote::edam::Note& note, notes)
         items += new NoteItem(note, this);
     m_notes->add(items);
-    Database::saveNotes(m_notes->items<NoteItem*>());
-    setupNotes(items);
+    m_database->saveNotes(m_notes->items<NoteItem*>());
 }
 
 void Session::onTagsSynced(const QVector<evernote::edam::Tag>& tags)
@@ -142,7 +174,8 @@ void Session::onTagsSynced(const QVector<evernote::edam::Tag>& tags)
     foreach (const evernote::edam::Tag& tag, tags)
         items += new TagItem(tag, this);
     m_tags->add(items);
-    Database::saveTags(m_tags->items<TagItem*>());
+    m_database->saveTags(m_tags->items<TagItem*>());
+    setupTags(m_notes->items<NoteItem*>());
 }
 
 void Session::onNoteFetched(const evernote::edam::Note& note)
@@ -165,7 +198,7 @@ void Session::onResourceFetched(const evernote::edam::Resource& resource)
     }
 }
 
-void Session::setupNotes(const QList<NoteItem*>& notes)
+void Session::setupNotebooks(const QList<NoteItem*>& notes)
 {
     foreach (NoteItem* note, notes) {
         QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
@@ -174,7 +207,12 @@ void Session::setupNotes(const QList<NoteItem*>& notes)
             notebook->notes()->add(QList<NoteItem*>() << note);
         else
             qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
+    }
+}
 
+void Session::setupTags(const QList<NoteItem*>& notes)
+{
+    foreach (NoteItem* note, notes) {
         for (uint i = 0; i < note->note().tagGuids.size(); ++i) {
             QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);

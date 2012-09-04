@@ -96,6 +96,13 @@ void NoteStore::syncImpl()
                     percent = (int)((double)(100*(double)usn/(double)chunk.updateCount));
                     emit progress(percent);
 
+                    if (!chunk.notes.empty())
+                        emit notesSynced(QVector<evernote::edam::Note>::fromStdVector(chunk.notes));
+
+                    emit progress(percent);
+                    if (cancelled)
+                        break;
+
                     if (!chunk.notebooks.empty())
                         emit notebooksSynced(QVector<evernote::edam::Notebook>::fromStdVector(chunk.notebooks));
 
@@ -112,13 +119,6 @@ void NoteStore::syncImpl()
 
                     if (!chunk.resources.empty())
                         emit resourcesSynced(QVector<evernote::edam::Resource>::fromStdVector(chunk.resources));
-
-                    emit progress(percent);
-                    if (cancelled)
-                        break;
-
-                    if (!chunk.notes.empty())
-                        emit notesSynced(QVector<evernote::edam::Note>::fromStdVector(chunk.notes));
 
                     emit progress(percent);
                     if (cancelled)

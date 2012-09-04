@@ -6,6 +6,7 @@
 #include "noteitem.h"
 #include "tagitem.h"
 #include "edam/Types_types.h"
+#include <QtConcurrentRun>
 #include <QSqlDatabase>
 #include <QStringList>
 #include <QSqlRecord>
@@ -15,7 +16,7 @@
 #include <QVariant>
 #include <QDebug>
 
-bool Database::initialize()
+Database::Database(QObject* parent) : QObject(parent)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("EverN9");
@@ -30,17 +31,46 @@ bool Database::initialize()
     }
     bool res = db.isOpen() && !db.lastError().isValid();
     qDebug() << Q_FUNC_INFO << res;
-    return res;
 }
 
-void Database::uninitialize()
+Database::~Database()
 {
     qDebug() << Q_FUNC_INFO;
     QSqlDatabase::database().close();
     QSqlDatabase::removeDatabase("EverN9");
 }
 
-bool Database::reset()
+void Database::reset()
+{
+    QtConcurrent::run(this, &Database::resetImpl);
+}
+
+void Database::load(QObject* parent)
+{
+    QtConcurrent::run(this, &Database::loadImpl, parent);
+}
+
+void Database::saveNotebooks(const QList<NotebookItem*>& notebooks)
+{
+    QtConcurrent::run(this, &Database::saveNotebooksImpl, notebooks);
+}
+
+void Database::saveResources(const QList<ResourceItem*>& resources)
+{
+    QtConcurrent::run(this, &Database::saveResourcesImpl, resources);
+}
+
+void Database::saveNotes(const QList<NoteItem*>& notes)
+{
+    QtConcurrent::run(this, &Database::saveNotesImpl, notes);
+}
+
+void Database::saveTags(const QList<TagItem*>& tags)
+{
+    QtConcurrent::run(this, &Database::saveTagsImpl, tags);
+}
+
+void Database::resetImpl()
 {
     QStringList queries;
     queries += "DELETE FROM Notebooks";
@@ -52,10 +82,17 @@ bool Database::reset()
     foreach (const QString& query, queries)
         db.exec(query);
     qDebug() << Q_FUNC_INFO << !db.lastError().isValid();
-    return !db.lastError().isValid();
 }
 
-QList<NotebookItem*> Database::loadNotebooks(QObject* parent)
+void Database::loadImpl(QObject* parent)
+{
+    loadNotesImpl(parent);
+    loadTagsImpl(parent);
+    loadResourcesImpl(parent);
+    loadNotebooksImpl(parent);
+}
+
+void Database::loadNotebooksImpl(QObject* parent)
 {
     QList<NotebookItem*> res;
     QSqlQuery query("SELECT * FROM Notebooks ORDER BY name ASC");
@@ -69,14 +106,18 @@ QList<NotebookItem*> Database::loadNotebooks(QObject* parent)
             notebook.published = record.value("isPublished").toBool();
             notebook.serviceCreated = record.value("created").toLongLong();
             notebook.serviceUpdated = record.value("updated").toLongLong();
-            res += new NotebookItem(notebook, parent);
+
+            NotebookItem* item = new NotebookItem(notebook);
+            item->moveToThread(thread());
+            item->setParent(parent);
+            res += item;
         }
     }
     qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    emit notebooksLoaded(res);
 }
 
-bool Database::saveNotebooks(const QList<NotebookItem*>& notebooks)
+void Database::saveNotebooksImpl(const QList<NotebookItem*>& notebooks)
 {
     QVariantList guids, names, defs, pubs, creates, updates;
     foreach (NotebookItem* notebook, notebooks) {
@@ -97,10 +138,9 @@ bool Database::saveNotebooks(const QList<NotebookItem*>& notebooks)
     query.addBindValue(updates);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << notebooks.count() << res;
-    return res;
 }
 
-QList<ResourceItem*> Database::loadResources(QObject* parent)
+void Database::loadResourcesImpl(QObject* parent)
 {
     QList<ResourceItem*> res;
     QSqlQuery query("SELECT * FROM Resources");
@@ -110,14 +150,18 @@ QList<ResourceItem*> Database::loadResources(QObject* parent)
             QSqlRecord record = query.record();
             resource.guid = record.value("guid").toString().toStdString();
             resource.mime = QFileInfo(record.value("filePath").toString()).suffix().toStdString();
-            res += new ResourceItem(resource, parent);
+
+            ResourceItem* item = new ResourceItem(resource);
+            item->moveToThread(thread());
+            item->setParent(parent);
+            res += item;
         }
     }
     qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    emit resourcesLoaded(res);
 }
 
-bool Database::saveResources(const QList<ResourceItem*>& resources)
+void Database::saveResourcesImpl(const QList<ResourceItem*>& resources)
 {
     QVariantList guids, filePaths;
     foreach (ResourceItem* resource, resources) {
@@ -130,46 +174,9 @@ bool Database::saveResources(const QList<ResourceItem*>& resources)
     query.addBindValue(filePaths);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << resources.count() << res;
-    return res;
 }
 
-QList<TagItem*> Database::loadTags(QObject* parent)
-{
-    QList<TagItem*> res;
-    QSqlQuery query("SELECT * FROM Tags ORDER BY name ASC");
-    if (query.exec()) {
-        while (query.next()) {
-            evernote::edam::Tag tag;
-            QSqlRecord record = query.record();
-            tag.guid = record.value("guid").toString().toStdString();
-            tag.name = record.value("name").toString().toStdString();
-            tag.parentGuid = record.value("parentGuid").toString().toStdString();
-            res += new TagItem(tag, parent);
-        }
-    }
-    qDebug() << Q_FUNC_INFO << res.count();
-    return res;
-}
-
-bool Database::saveTags(const QList<TagItem*>& tags)
-{
-    QVariantList guids, names, parents;
-    foreach (TagItem* tag, tags) {
-        guids += tag->guid();
-        names += tag->name();
-        parents += tag->parentGuid();
-    }
-
-    QSqlQuery query("INSERT OR REPLACE INTO Tags VALUES(?,?,?)");
-    query.addBindValue(guids);
-    query.addBindValue(names);
-    query.addBindValue(parents);
-    bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << tags.count() << res;
-    return res;
-}
-
-QList<NoteItem*> Database::loadNotes(QObject* parent)
+void Database::loadNotesImpl(QObject* parent)
 {
     QList<NoteItem*> res;
     QSqlQuery query("SELECT * FROM Notes");
@@ -194,14 +201,18 @@ QList<NoteItem*> Database::loadNotes(QObject* parent)
                 r.guid = resource.toStdString();
                 note.resources.push_back(r);
             }
-            res += new NoteItem(note, parent);
+
+            NoteItem* item = new NoteItem(note);
+            item->moveToThread(thread());
+            item->setParent(parent);
+            res += item;
         }
     }
     qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    emit notesLoaded(res);
 }
 
-bool Database::saveNotes(const QList<NoteItem*>& notes)
+void Database::saveNotesImpl(const QList<NoteItem*>& notes)
 {
     QVariantList guids, titles, contents, creates, updates,
                  deletes, actives, notebooks, tags, resources;
@@ -237,5 +248,43 @@ bool Database::saveNotes(const QList<NoteItem*>& notes)
     query.addBindValue(resources);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << notes.count() << res;
-    return res;
+}
+
+void Database::loadTagsImpl(QObject* parent)
+{
+    QList<TagItem*> res;
+    QSqlQuery query("SELECT * FROM Tags ORDER BY name ASC");
+    if (query.exec()) {
+        while (query.next()) {
+            evernote::edam::Tag tag;
+            QSqlRecord record = query.record();
+            tag.guid = record.value("guid").toString().toStdString();
+            tag.name = record.value("name").toString().toStdString();
+            tag.parentGuid = record.value("parentGuid").toString().toStdString();
+
+            TagItem* item = new TagItem(tag);
+            item->moveToThread(thread());
+            item->setParent(parent);
+            res += item;
+        }
+    }
+    qDebug() << Q_FUNC_INFO << res.count();
+    emit tagsLoaded(res);
+}
+
+void Database::saveTagsImpl(const QList<TagItem*>& tags)
+{
+    QVariantList guids, names, parents;
+    foreach (TagItem* tag, tags) {
+        guids += tag->guid();
+        names += tag->name();
+        parents += tag->parentGuid();
+    }
+
+    QSqlQuery query("INSERT OR REPLACE INTO Tags VALUES(?,?,?)");
+    query.addBindValue(guids);
+    query.addBindValue(names);
+    query.addBindValue(parents);
+    bool res = query.execBatch();
+    qDebug() << Q_FUNC_INFO << tags.count() << res;
 }

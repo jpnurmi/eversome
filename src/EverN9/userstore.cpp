@@ -17,7 +17,8 @@ static const std::string EDAM_HOST = "www.evernote.com";
 static const std::string EDAM_ROOT = "/edam/user";
 static const int EDAM_PORT = 80;
 
-UserStore::UserStore(QObject *parent) : QObject(parent), client(0)
+UserStore::UserStore(QObject *parent) : QObject(parent),
+    loggingIn(false), loggingOut(false), client(0)
 {
     transport = boost::shared_ptr<TTransport>(new THttpClient(EDAM_HOST, EDAM_PORT, EDAM_ROOT));
     client = new evernote::edam::UserStoreClient(boost::shared_ptr<TProtocol>(new TBinaryProtocol(transport)));
@@ -26,6 +27,11 @@ UserStore::UserStore(QObject *parent) : QObject(parent), client(0)
 UserStore::~UserStore()
 {
     delete client;
+}
+
+bool UserStore::isActive() const
+{
+    return loggingIn || loggingOut;
 }
 
 bool UserStore::hasCredentials() const
@@ -50,7 +56,14 @@ void UserStore::logout()
 
 void UserStore::loginImpl(const QString& username, const QString& password)
 {
+    if (loggingIn)
+        return;
+
     qDebug() << Q_FUNC_INFO << username << password;
+
+    loggingIn = true;
+    emit activeChanged();
+
     try {
         if (!transport->isOpen())
             transport->open();
@@ -65,11 +78,21 @@ void UserStore::loginImpl(const QString& username, const QString& password)
         qDebug() << Q_FUNC_INFO << e.what();
         emit error(e.what());
     }
+
+    loggingIn = false;
+    emit activeChanged();
 }
 
 void UserStore::logoutImpl()
 {
+    if (loggingOut)
+        return;
+
     qDebug() << Q_FUNC_INFO;
+
+    loggingOut = true;
+    emit activeChanged();
+
     try {
         if (transport->isOpen())
             transport->close();
@@ -78,4 +101,7 @@ void UserStore::logoutImpl()
         qDebug() << Q_FUNC_INFO << e.what();
         emit error(e.what());
     }
+
+    loggingOut = false;
+    emit activeChanged();
 }

@@ -22,7 +22,7 @@ CommonPage {
     property Note note
 
     title: note ? note.title : ""
-    busy: NoteStore.active || contentLabel.openingLink
+    busy: UserStore.active || NoteStore.active || contentLabel.openingLink
 
     flickable: Flickable {
         contentHeight: column.height

@@ -2,6 +2,7 @@
 
 #include "userstore.h"
 #include "settings.h"
+#include "manager.h"
 #include <QtConcurrentRun>
 #include <QtDebug>
 #include "thrift/transport/THttpClient.h"
@@ -64,6 +65,7 @@ void UserStore::loginImpl(const QString& username, const QString& password)
     loggingIn = true;
     emit activeChanged();
 
+    QString err;
     try {
         if (!transport->isOpen())
             transport->open();
@@ -74,9 +76,19 @@ void UserStore::loginImpl(const QString& username, const QString& password)
         Settings::setValue(Settings::AuthToken, QString::fromStdString(result.authenticationToken));
         Settings::setValue(Settings::UserShardID, QString::fromStdString(result.user.shardId));
         emit loggedIn();
+    } catch (evernote::edam::EDAMUserException& e) {
+        err = Manager::errorString(e.errorCode);
+    } catch (evernote::edam::EDAMSystemException& e) {
+        err = Manager::errorString(e.errorCode);
+    } catch (evernote::edam::EDAMNotFoundException& e) {
+        err = Manager::errorString(-1);
     } catch (TException& e) {
-        qDebug() << Q_FUNC_INFO << e.what();
-        emit error(QString::fromUtf8(e.what()));
+        err = QString::fromUtf8(e.what());
+    }
+
+    if (!err.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << err;
+        emit error(err);
     }
 
     loggingIn = false;
@@ -93,13 +105,24 @@ void UserStore::logoutImpl()
     loggingOut = true;
     emit activeChanged();
 
+    QString err;
     try {
         if (transport->isOpen())
             transport->close();
         emit loggedOut();
+    } catch (evernote::edam::EDAMUserException& e) {
+        err = Manager::errorString(e.errorCode);
+    } catch (evernote::edam::EDAMSystemException& e) {
+        err = Manager::errorString(e.errorCode);
+    } catch (evernote::edam::EDAMNotFoundException& e) {
+        err = Manager::errorString(-1);
     } catch (TException& e) {
-        qDebug() << Q_FUNC_INFO << e.what();
-        emit error(QString::fromUtf8(e.what()));
+        err = QString::fromUtf8(e.what());
+    }
+
+    if (!err.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << err;
+        emit error(err);
     }
 
     loggingOut = false;

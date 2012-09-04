@@ -36,3 +36,10 @@ void NoteModel::add(NoteItem* note)
     endInsertRows();
     emit countChanged();
 }
+
+void NoteModel::clear()
+{
+    qDeleteAll(m_notes);
+    m_notes.clear();
+    reset();
+}

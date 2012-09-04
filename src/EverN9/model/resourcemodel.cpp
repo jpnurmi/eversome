@@ -65,6 +65,8 @@ void ResourceModel::add(const QList<ResourceItem*>& resources)
 
 void ResourceModel::clear()
 {
+    qDeleteAll(m_resources);
     m_resources.clear();
+    m_guids.clear();
     reset();
 }

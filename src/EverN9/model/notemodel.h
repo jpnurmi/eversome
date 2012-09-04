@@ -21,6 +21,7 @@ public:
 
 public slots:
     void add(NoteItem* note);
+    void clear();
 
 signals:
     void countChanged();

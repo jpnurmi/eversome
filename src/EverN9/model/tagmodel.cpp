@@ -65,6 +65,8 @@ void TagModel::add(const QList<TagItem*>& tags)
 
 void TagModel::clear()
 {
+    qDeleteAll(m_tags);
     m_tags.clear();
+    m_guids.clear();
     reset();
 }

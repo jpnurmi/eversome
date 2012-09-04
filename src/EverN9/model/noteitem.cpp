@@ -16,6 +16,7 @@ NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
 
 NoteItem::~NoteItem()
 {
+    allNotes.remove(guid());
 }
 
 NoteItem* NoteItem::get(const QString& guid)

@@ -65,6 +65,8 @@ void NotebookModel::add(const QList<NotebookItem*>& notebooks)
 
 void NotebookModel::clear()
 {
+    qDeleteAll(m_notebooks);
     m_notebooks.clear();
+    m_guids.clear();
     reset();
 }

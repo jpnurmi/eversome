@@ -52,6 +52,7 @@ void UserStore::login(const QString& username, const QString& password)
 void UserStore::logout()
 {
     qDebug() << Q_FUNC_INFO;
+    Settings::reset();
     QtConcurrent::run(this, &UserStore::logoutImpl);
 }
 

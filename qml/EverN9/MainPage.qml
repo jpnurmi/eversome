@@ -5,7 +5,7 @@ import "UIConstants.js" as UI
 Page {
     id: root
 
-    signal loggedOut()
+    signal menuRequested()
 
     TabGroup {
         id: tabGroup
@@ -64,17 +64,7 @@ Page {
         }
         ToolIcon {
             iconId: "toolbar-view-menu"
-            onClicked: menu.open()
-        }
-    }
-
-    Menu {
-        id: menu
-        MenuLayout {
-            MenuItem {
-                text: qsTr("Logout")
-                onClicked: root.loggedOut()
-            }
+            onClicked: root.menuRequested()
         }
     }
 

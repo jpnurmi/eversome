@@ -9,10 +9,20 @@ PageStackWindow {
     Component {
         id: mainPage
         MainPage {
-            onLoggedOut: {
-                UserStore.logout();
-                loginSheet.open();
-                window.pageStack.replace(mainPage, {}, true);
+            onMenuRequested: menu.open()
+
+            Menu {
+                id: menu
+                MenuLayout {
+                    MenuItem {
+                        text: qsTr("Sign out")
+                        onClicked: {
+                            UserStore.logout();
+                            loginSheet.open();
+                            window.pageStack.replace(mainPage, {}, true);
+                        }
+                    }
+                }
             }
 
             InfoBanner {
@@ -26,29 +36,32 @@ PageStackWindow {
                     }
                 }
             }
-        }
-    }
 
-    LoginSheet {
-        id: loginSheet
-        onAccepted: UserStore.login(username, password)
+            LoginSheet {
+                id: loginSheet
+                onAccepted: UserStore.login(username, password)
 
-        Connections {
-            target: UserStore
-            onError: {
-                loginSheet.error = error;
-                loginSheet.open();
+                Connections {
+                    target: UserStore
+                    onError: {
+                        loginSheet.error = error;
+                        loginSheet.open();
+                    }
+                    onLoggedIn: loginSheet.error = ""
+                }
             }
-            onLoggedIn: loginSheet.error = ""
+
+            Component.onCompleted: {
+                if (UserStore.hasCredentials())
+                    UserStore.login();
+                else
+                    loginSheet.open();
+            }
         }
     }
 
     Component.onCompleted: {
-        theme.colorScheme = 2
+        theme.colorScheme = 2;
         pageStack.push(mainPage);
-        if (UserStore.hasCredentials())
-            UserStore.login();
-        else
-            loginSheet.open();
     }
 }

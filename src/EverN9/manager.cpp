@@ -140,7 +140,6 @@ void Manager::onLoggedIn()
 void Manager::onLoggedOut()
 {
     m_note->cancel();
-    Settings::reset();
     m_database->reset();
 
     m_notebooks->clear();

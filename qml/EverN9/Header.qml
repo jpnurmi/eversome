@@ -2,14 +2,13 @@ import QtQuick 1.1
 import com.nokia.meego 1.0
 import "UIConstants.js" as UI
 
-BorderImage {
+Image {
     id: root
 
     property alias title: label.text
     property alias busy: indicator.running
 
-    source: "image://theme/meegotouch-pin-input-background"
-    border { left: 12; right: 12 }
+    source: "images/header.png"
 
     Text {
         id: label

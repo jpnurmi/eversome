@@ -13,7 +13,7 @@ Sheet {
     rejectButtonText: qsTr("Cancel")
 
     style: SheetStyle {
-        headerBackground: "image://theme/meegotouch-pin-input-background"
+        headerBackground: "images/header.png"
     }
 
     content: Flickable {

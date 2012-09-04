@@ -30,6 +30,7 @@ signals:
 
     void synced(const QVector<evernote::edam::Notebook>& notebooks,
                 const QVector<evernote::edam::Resource>& resources,
+                const QVector<evernote::edam::SavedSearch>& searches,
                 const QVector<evernote::edam::Note>& notes,
                 const QVector<evernote::edam::Tag>& tags);
 

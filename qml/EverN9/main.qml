@@ -5,10 +5,14 @@ import "UIConstants.js" as UI
 PageStackWindow {
     id: window
 
-    initialPage: MainPage {
-        onLoggedOut: {
-            UserStore.logout();
-            loginSheet.open();
+    Component {
+        id: mainPage
+        MainPage {
+            onLoggedOut: {
+                UserStore.logout();
+                loginSheet.open();
+                window.pageStack.replace(mainPage, {}, true);
+            }
         }
     }
 
@@ -19,6 +23,7 @@ PageStackWindow {
 
     Component.onCompleted: {
         theme.colorScheme = 2
+        pageStack.push(mainPage);
         if (UserStore.hasCredentials())
             UserStore.login();
         else

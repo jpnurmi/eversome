@@ -3,7 +3,7 @@
 NotebookItem::NotebookItem(evernote::edam::Notebook notebook, QObject* parent)
     : QObject(parent), m_notebook(notebook)
 {
-    m_notes = new NoteModel(this);
+    m_notes = new ItemModel(this);
     qRegisterMetaType<NotebookItem*>();
 }
 
@@ -12,7 +12,7 @@ NotebookItem::~NotebookItem()
     m_notes->clear();
 }
 
-NoteModel* NotebookItem::notes() const
+ItemModel* NotebookItem::notes() const
 {
     return m_notes;
 }

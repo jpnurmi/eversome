@@ -21,7 +21,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 
     qmlRegisterType<TagItem>("com.evernote.types", 1,0, "Tag");
     qmlRegisterType<NoteItem>("com.evernote.types", 1,0, "Note");
-    qmlRegisterType<NoteModel>("com.evernote.types", 1,0, "NoteModel");
+    qmlRegisterType<ItemModel>("com.evernote.types", 1,0, "ItemModel");
     qmlRegisterType<ResourceItem>("com.evernote.types", 1,0, "Resource");
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 

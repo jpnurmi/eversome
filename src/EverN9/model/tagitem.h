@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMetaType>
 #include "edam/Types_types.h"
-#include "notemodel.h"
+#include "itemmodel.h"
 
 class TagItem : public QObject
 {
@@ -12,7 +12,7 @@ class TagItem : public QObject
     Q_PROPERTY(QString guid READ guid CONSTANT)
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(QString parentGuid READ parentGuid CONSTANT)
-    Q_PROPERTY(NoteModel* notes READ notes CONSTANT)
+    Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
 
 public:
     explicit TagItem(evernote::edam::Tag tag = evernote::edam::Tag(), QObject* parent = 0);
@@ -23,10 +23,10 @@ public:
     QString guid() const;
     QString name() const;
     QString parentGuid() const;
-    NoteModel* notes() const;
+    ItemModel* notes() const;
 
 private:
-    NoteModel* m_notes;
+    ItemModel* m_notes;
     evernote::edam::Tag m_tag;
 };
 

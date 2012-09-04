@@ -19,7 +19,7 @@ import "UIConstants.js" as UI
 CommonPage {
     id: root
 
-    property NoteModel notes
+    property ItemModel notes
 
     title: notebook ? notebook.name : ""
 

@@ -6,7 +6,6 @@
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "itemmodel.h"
-#include "notemodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
 #include <QFileInfo>
@@ -163,7 +162,7 @@ void Session::setupNotes(const QList<NoteItem*>& notes)
         QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
         NotebookItem* notebook = m_notebooks->get<NotebookItem*>(notebookGuid);
         if (notebook)
-            notebook->notes()->add(note);
+            notebook->notes()->add(QList<NoteItem*>() << note);
         else
             qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
 
@@ -171,7 +170,7 @@ void Session::setupNotes(const QList<NoteItem*>& notes)
             QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);
             if (tag)
-                tag->notes()->add(note);
+                tag->notes()->add(QList<NoteItem*>() << note);
             else
                 qCritical() << Q_FUNC_INFO << "MISSING TAG:" << tagGuid;
         }

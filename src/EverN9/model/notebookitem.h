@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QMetaType>
 #include "edam/Types_types.h"
-#include "notemodel.h"
+#include "itemmodel.h"
 
 class NotebookItem : public QObject
 {
@@ -16,7 +16,7 @@ class NotebookItem : public QObject
     Q_PROPERTY(bool isPublished READ isPublished CONSTANT)
     Q_PROPERTY(QDateTime created READ created CONSTANT)
     Q_PROPERTY(QDateTime updated READ updated CONSTANT)
-    Q_PROPERTY(NoteModel* notes READ notes CONSTANT)
+    Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
 
 public:
     explicit NotebookItem(evernote::edam::Notebook notebook = evernote::edam::Notebook(), QObject* parent = 0);
@@ -30,10 +30,10 @@ public:
     bool isPublished() const;
     QDateTime created() const;
     QDateTime updated() const;
-    NoteModel* notes() const;
+    ItemModel* notes() const;
 
 private:
-    NoteModel* m_notes;
+    ItemModel* m_notes;
     evernote::edam::Notebook m_notebook;
 };
 

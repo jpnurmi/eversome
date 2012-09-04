@@ -76,7 +76,6 @@ void ItemModel::add(const QList<T>& items)
     }
 }
 
-
 Q_DECLARE_METATYPE(ItemModel*)
 
 #endif // ITEMMODEL_H

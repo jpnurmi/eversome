@@ -79,44 +79,38 @@ void NoteStore::syncImpl()
     QString err;
     try {
         init(true);
-        int i = 0;
-        while (!cancelled && ++i <= 5) {
-            int percent = 0;
-            int usn = Settings::value(Settings::ServerUSN).toInt();
+        int percent = 0;
+        int usn = Settings::value(Settings::ServerUSN).toInt();
 
-            init(false);
+        evernote::edam::SyncChunk chunk;
+        while (!cancelled) {
+            emit progress(percent);
+            client->getSyncChunk(chunk, Settings::value(Settings::AuthToken).toStdString(), usn, 1024, false);
 
-            evernote::edam::SyncChunk chunk;
-            while (!cancelled) {
-                emit progress(percent);
-                client->getSyncChunk(chunk, Settings::value(Settings::AuthToken).toStdString(), usn, 1024, false);
+            if (usn >= chunk.updateCount)
+                break;
 
-                if (usn >= chunk.updateCount)
-                    break;
+            percent = (int)((double)(100*(double)usn/(double)chunk.updateCount));
+            emit progress(percent);
 
-                percent = (int)((double)(100*(double)usn/(double)chunk.updateCount));
-                emit progress(percent);
+            QVector<evernote::edam::Notebook> notebooks = QVector<evernote::edam::Notebook>::fromStdVector(chunk.notebooks);
+            QVector<evernote::edam::Resource> resources = QVector<evernote::edam::Resource>::fromStdVector(chunk.resources);
+            QVector<evernote::edam::Note> notes = QVector<evernote::edam::Note>::fromStdVector(chunk.notes);
+            QVector<evernote::edam::Tag> tags = QVector<evernote::edam::Tag>::fromStdVector(chunk.tags);
 
-                QVector<evernote::edam::Notebook> notebooks = QVector<evernote::edam::Notebook>::fromStdVector(chunk.notebooks);
-                QVector<evernote::edam::Resource> resources = QVector<evernote::edam::Resource>::fromStdVector(chunk.resources);
-                QVector<evernote::edam::Note> notes = QVector<evernote::edam::Note>::fromStdVector(chunk.notes);
-                QVector<evernote::edam::Tag> tags = QVector<evernote::edam::Tag>::fromStdVector(chunk.tags);
+            qDebug() << Q_FUNC_INFO
+                     << "NB:" << notebooks.size()
+                     << "R:" << resources.size()
+                     << "N:" << notes.size()
+                     << "T:" << tags.size()
+                     << "USN:" << chunk.chunkHighUSN;
 
-                qDebug() << Q_FUNC_INFO
-                         << "NB:" << notebooks.size()
-                         << "R:" << resources.size()
-                         << "N:" << notes.size()
-                         << "T:" << tags.size()
-                         << "USN:" << chunk.chunkHighUSN;
+            emit synced(notebooks, resources, notes, tags);
 
-                emit synced(notebooks, resources, notes, tags);
-
-                usn = chunk.chunkHighUSN;
-                Settings::setValue(Settings::ServerUSN, QString::number(usn));
-                if (usn >= chunk.updateCount)
-                    break;
-            }
-            break;
+            usn = chunk.chunkHighUSN;
+            Settings::setValue(Settings::ServerUSN, QString::number(usn));
+            if (usn >= chunk.updateCount)
+                break;
         }
     } catch (evernote::edam::EDAMUserException& e) {
         err = Manager::errorString(e.errorCode);

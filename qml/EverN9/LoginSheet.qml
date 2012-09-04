@@ -8,6 +8,7 @@ Sheet {
     property bool acceptable: username.text && password.text
     property alias username: username.text
     property alias password: password.text
+    property alias error: errorLabel.text
 
     acceptButtonText: acceptable ? qsTr("Ok") : ""
 
@@ -38,6 +39,12 @@ Sheet {
             id: column
             width: parent.width
             spacing: UI.LARGE_SPACING
+
+            Text {
+                id: errorLabel
+                color: "red"
+                font.pixelSize: UI.MEDIUM_FONT
+            }
 
             Text {
                 id: accountLabel

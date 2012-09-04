@@ -76,7 +76,7 @@ void UserStore::loginImpl(const QString& username, const QString& password)
         emit loggedIn();
     } catch (TException& e) {
         qDebug() << Q_FUNC_INFO << e.what();
-        emit error(e.what());
+        emit error(QString::fromUtf8(e.what()));
     }
 
     loggingIn = false;
@@ -99,7 +99,7 @@ void UserStore::logoutImpl()
         emit loggedOut();
     } catch (TException& e) {
         qDebug() << Q_FUNC_INFO << e.what();
-        emit error(e.what());
+        emit error(QString::fromUtf8(e.what()));
     }
 
     loggingOut = false;

@@ -24,7 +24,7 @@ public slots:
 signals:
     void started();
     void progress(int percent);
-    void failed(const QString& error);
+    void error(const QString& error);
     void finished();
     void activeChanged();
 

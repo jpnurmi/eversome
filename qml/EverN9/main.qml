@@ -1,5 +1,6 @@
 import QtQuick 1.1
 import com.nokia.meego 1.1
+import com.nokia.extras 1.0
 import "UIConstants.js" as UI
 
 PageStackWindow {
@@ -12,6 +13,26 @@ PageStackWindow {
                 UserStore.logout();
                 loginSheet.open();
                 window.pageStack.replace(mainPage, {}, true);
+            }
+
+            InfoBanner {
+                id: banner
+
+                Connections {
+                    target: UserStore
+                    onError: {
+                        banner.text = error;
+                        banner.show();
+                    }
+                }
+
+                Connections {
+                    target: NoteStore
+                    onError: {
+                        banner.text = error;
+                        banner.show();
+                    }
+                }
             }
         }
     }

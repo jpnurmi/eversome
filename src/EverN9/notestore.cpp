@@ -119,12 +119,12 @@ void NoteStore::syncImpl()
             } catch (evernote::edam::EDAMUserException& e) {
                 if (e.errorCode == 9)
                     qDebug() << "### TODO: REAUTH NEEDED";
-                emit failed(e.what());
+                emit error(QString::fromUtf8(e.what()));
             }
         }
     } catch(TException& e) {
         qDebug() << Q_FUNC_INFO << "?" << e.what();
-        emit failed(QString::fromStdString(e.what()));
+        emit error(QString::fromUtf8(e.what()));
     }
 
     syncing = false;
@@ -161,7 +161,7 @@ void NoteStore::fetchImpl(const evernote::edam::Note& note)
 
     } catch (TException& e) {
         qDebug() << Q_FUNC_INFO << "?" << e.what();
-        emit failed(QString::fromStdString(e.what()));
+        emit error(QString::fromUtf8(e.what()));
     }
 
     fetching = false;

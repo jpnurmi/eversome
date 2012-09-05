@@ -65,7 +65,7 @@ CommonPage {
                         Repeater {
                             model: note ? note.tags : null
                             Badge {
-                                value: modelData
+                                value: modelData.name
                             }
                         }
                     }
@@ -100,7 +100,10 @@ CommonPage {
             Repeater {
                 model: note ? note.resources : null
                 Image {
-                    source: modelData
+                    source: modelData.isEmpty ? "" : modelData.filePath
+                    sourceSize { width: root.width }
+                    fillMode: Image.PreserveAspectFit
+                    width: parent.width
                 }
             }
         }
@@ -108,7 +111,7 @@ CommonPage {
 
     onStatusChanged: {
         if (status == PageStatus.Activating) {
-            if (note && !note.content)
+            if (note && note.isEmpty)
                 NoteStore.fetch(note.note());
         }
     }

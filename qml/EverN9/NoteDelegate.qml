@@ -52,7 +52,7 @@ CommonDelegate {
             id: repeater
             model: note ? note.tags : null
             Badge {
-                value: modelData
+                value: modelData.name
             }
         }
     }

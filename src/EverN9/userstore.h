@@ -7,7 +7,7 @@
 class UserStore : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool active READ isActive NOTIFY activeChanged)
+    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit UserStore(QObject* parent = 0);
@@ -24,7 +24,7 @@ signals:
     void loggedIn();
     void loggedOut();
     void error(const QString& error);
-    void activeChanged();
+    void isActiveChanged();
 
 private slots:
     void loginImpl(const QString& username, const QString& password, bool remember);

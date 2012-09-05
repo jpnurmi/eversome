@@ -8,7 +8,7 @@
 class NoteStore : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool active READ isActive NOTIFY activeChanged)
+    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit NoteStore(QObject *parent = 0);
@@ -27,7 +27,7 @@ signals:
     void progress(int percent);
     void error(const QString& error);
     void finished();
-    void activeChanged();
+    void isActiveChanged();
 
     void synced(const QVector<evernote::edam::Notebook>& notebooks,
                 const QVector<evernote::edam::Resource>& resources,

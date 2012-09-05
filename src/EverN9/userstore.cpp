@@ -60,7 +60,7 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
     qDebug() << Q_FUNC_INFO << username << password;
 
     loggingIn = true;
-    emit activeChanged();
+    emit isActiveChanged();
 
     QString err;
     try {
@@ -91,7 +91,7 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
     }
 
     loggingIn = false;
-    emit activeChanged();
+    emit isActiveChanged();
 }
 
 void UserStore::logoutImpl()
@@ -102,7 +102,7 @@ void UserStore::logoutImpl()
     qDebug() << Q_FUNC_INFO;
 
     loggingOut = true;
-    emit activeChanged();
+    emit isActiveChanged();
 
     QString err;
     try {
@@ -119,5 +119,5 @@ void UserStore::logoutImpl()
     }
 
     loggingOut = false;
-    emit activeChanged();
+    emit isActiveChanged();
 }

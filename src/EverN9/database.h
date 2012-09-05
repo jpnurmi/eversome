@@ -13,7 +13,7 @@ class NotebookItem;
 class Database : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool active READ isActive NOTIFY activeChanged)
+    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit Database(QObject* parent = 0);
@@ -31,7 +31,7 @@ public:
               const QList<TagItem*>& tags);
 
 signals:
-    void activeChanged();
+    void isActiveChanged();
     void loaded(const QList<NotebookItem*>& notebooks,
                 const QList<ResourceItem*>& resources,
                 const QList<SearchItem*>& searches,

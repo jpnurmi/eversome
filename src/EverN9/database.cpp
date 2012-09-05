@@ -96,7 +96,7 @@ void Database::loadImpl(QObject* parent)
         return;
 
     loading = true;
-    emit activeChanged();
+    emit isActiveChanged();
 
     QList<NotebookItem*> notebooks = loadNotebooksImpl(parent);
     QList<ResourceItem*> resources = loadResourcesImpl(parent);
@@ -107,7 +107,7 @@ void Database::loadImpl(QObject* parent)
     emit loaded(notebooks, resources, searches, notes, tags);
 
     loading = false;
-    emit activeChanged();
+    emit isActiveChanged();
 }
 
 void Database::saveImpl(const QList<NotebookItem*>& notebooks,
@@ -120,7 +120,7 @@ void Database::saveImpl(const QList<NotebookItem*>& notebooks,
         return;
 
     saving = true;
-    emit activeChanged();
+    emit isActiveChanged();
 
     saveNotebooksImpl(notebooks);
     saveResourcesImpl(resources);
@@ -129,7 +129,7 @@ void Database::saveImpl(const QList<NotebookItem*>& notebooks,
     saveTagsImpl(tags);
 
     saving = false;
-    emit activeChanged();
+    emit isActiveChanged();
 }
 
 QList<NotebookItem*> Database::loadNotebooksImpl(QObject* parent)

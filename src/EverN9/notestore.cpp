@@ -81,7 +81,7 @@ void NoteStore::syncImpl()
     syncing = true;
     cancelled = false;
     emit started();
-    emit activeChanged();
+    emit isActiveChanged();
 
     QString err;
     try {
@@ -136,7 +136,7 @@ void NoteStore::syncImpl()
     }
 
     syncing = false;
-    emit activeChanged();
+    emit isActiveChanged();
     if (!cancelled)
         emit finished();
 }
@@ -151,7 +151,7 @@ void NoteStore::fetchImpl(const evernote::edam::Note& note)
     fetching = true;
     cancelled = false;
     emit started();
-    emit activeChanged();
+    emit isActiveChanged();
 
     QString err;
     try {
@@ -184,7 +184,7 @@ void NoteStore::fetchImpl(const evernote::edam::Note& note)
     }
 
     fetching = false;
-    emit activeChanged();
+    emit isActiveChanged();
     if (!cancelled)
         emit finished();
 }
@@ -197,7 +197,7 @@ void NoteStore::searchImpl(const evernote::edam::SavedSearch& search)
     qDebug() << Q_FUNC_INFO << QString::fromStdString(search.name);
 
     searching = true;
-    emit activeChanged();
+    emit isActiveChanged();
 
     QString err;
     try {
@@ -227,7 +227,7 @@ void NoteStore::searchImpl(const evernote::edam::SavedSearch& search)
     }
 
     searching = false;
-    emit activeChanged();
+    emit isActiveChanged();
 }
 
 void NoteStore::init(bool force)

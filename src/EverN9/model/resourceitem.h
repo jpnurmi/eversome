@@ -10,8 +10,8 @@ class ResourceItem : public QObject
     Q_OBJECT
     Q_PROPERTY(QString guid READ guid CONSTANT)
     Q_PROPERTY(QString mime READ mime CONSTANT)
-    Q_PROPERTY(QString filePath READ filePath CONSTANT)
-    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
+    Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
+    Q_PROPERTY(QString thumbnail READ thumbnail NOTIFY thumbnailChanged)
     Q_PROPERTY(Type type READ type CONSTANT)
     Q_ENUMS(Type)
 
@@ -27,14 +27,17 @@ public:
     QString guid() const;
     QString mime() const;
     QString filePath() const;
+    QString thumbnail() const;
     bool isEmpty() const;
 
-    void setData(const evernote::edam::Data& data);
+    void update();
 
 signals:
-    void isEmptyChanged();
+    void filePathChanged();
+    void thumbnailChanged();
 
 private:
+    bool m_empty;
     evernote::edam::Resource m_resource;
 };
 

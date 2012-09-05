@@ -33,7 +33,7 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(TypeHash, file_types, {
 })
 
 ResourceItem::ResourceItem(evernote::edam::Resource resource, QObject* parent)
-    : QObject(parent), m_resource(resource)
+    : QObject(parent), m_empty(false), m_resource(resource)
 {
 }
 
@@ -62,27 +62,36 @@ QString ResourceItem::mime() const
     return QString::fromStdString(m_resource.mime);
 }
 
+static QString dataFilePath(const QString& fileName)
+{
+    QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
+    return dir.absoluteFilePath(fileName);
+}
+
 QString ResourceItem::filePath() const
 {
     QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
-    QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
-    return dir.absoluteFilePath(guid() + "." + ext);
+    QFileInfo file(dataFilePath(guid() + "." + ext));
+    if (m_empty || !file.exists() || file.size() == 0)
+        return QString();
+    return file.filePath();
 }
 
-bool ResourceItem::isEmpty() const
+QString ResourceItem::thumbnail() const
 {
-    QFileInfo file(filePath());
-    return !file.exists() || file.size() == 0;
+    QFileInfo file(dataFilePath(guid() + "-thumb.png"));
+    if (m_empty || !file.exists() || file.size() == 0)
+        return QString();
+    return file.filePath();
 }
 
-void ResourceItem::setData(const evernote::edam::Data& data)
+void ResourceItem::update()
 {
-    QFileInfo info(filePath());
-    if (QDir().mkpath(info.absolutePath())) {
-        QFile file(info.filePath());
-        if (file.exists() && file.remove())
-            emit isEmptyChanged();
-        if (file.open(QFile::WriteOnly) && file.write(data.body.c_str(), data.size) != -1 && file.flush())
-            emit isEmptyChanged();
-    }
+    m_empty = true;
+    emit filePathChanged();
+    emit thumbnailChanged();
+
+    m_empty = false;
+    emit filePathChanged();
+    emit thumbnailChanged();
 }

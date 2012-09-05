@@ -12,16 +12,12 @@ using namespace apache::thrift;
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
 
-static const std::string CONSUMER_KEY = "everel";
-static const std::string CONSUMER_SECRET = "201d20eb3ee1f74d";
-static const std::string EDAM_HOST = "www.evernote.com";
-static const std::string EDAM_ROOT = "/edam/user";
-static const int EDAM_PORT = 80;
-
 UserStore::UserStore(QObject *parent) : QObject(parent),
     loggingIn(false), loggingOut(false), client(0)
 {
-    transport = boost::shared_ptr<TTransport>(new THttpClient(EDAM_HOST, EDAM_PORT, EDAM_ROOT));
+    QString host = Settings::value(Settings::Hostname);
+    int port = Settings::value(Settings::ServerPort).toInt();
+    transport = boost::shared_ptr<TTransport>(new THttpClient(host.toStdString(), port, "/edam/user"));
     client = new evernote::edam::UserStoreClient(boost::shared_ptr<TProtocol>(new TBinaryProtocol(transport)));
 }
 
@@ -71,7 +67,9 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
         if (!transport->isOpen())
             transport->open();
         evernote::edam::AuthenticationResult result;
-        client->authenticate(result, username.toStdString(), password.toStdString(), CONSUMER_KEY, CONSUMER_SECRET);
+        QString key = Settings::value(Settings::ConsumerKey);
+        QString secret = Settings::value(Settings::ConsumerSecret);
+        client->authenticate(result, username.toStdString(), password.toStdString(), key.toStdString(), secret.toStdString());
         if (remember) {
             Settings::setValue(Settings::Username, username);
             Settings::setValue(Settings::Password, password);

@@ -25,6 +25,8 @@ Submodule path 'src/3rdparty/thrift': checked out [...]
 
 ## Boost installation
 
+Building EverN9 requires Boost installed in the development environment:
+
 <pre>
 $ ~/QtSDK/Madde/bin/mad-admin list
 

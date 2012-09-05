@@ -5,13 +5,15 @@
 #include "edam/NoteStore.h"
 #include "edam/Types_types.h"
 
+class UserStore;
+
 class NoteStore : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
-    explicit NoteStore(QObject *parent = 0);
+    explicit NoteStore(UserStore *userStore);
     virtual ~NoteStore();
 
     bool isActive() const;
@@ -51,6 +53,7 @@ private:
     volatile bool fetching;
     volatile bool searching;
     volatile bool cancelled;
+    UserStore* userStore;
     evernote::edam::NoteStoreClient* client;
     boost::shared_ptr<apache::thrift::transport::TTransport> transport;
 };

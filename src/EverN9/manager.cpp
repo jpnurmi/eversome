@@ -17,7 +17,7 @@
 Manager::Manager(QObject *parent) : QObject(parent)
 {
     m_user = new UserStore(this);
-    m_note = new NoteStore(this);
+    m_note = new NoteStore(m_user);
 
     connect(m_user, SIGNAL(loggedIn()), this, SLOT(onLoggedIn()), Qt::QueuedConnection);
     connect(m_user, SIGNAL(loggedOut()), this, SLOT(onLoggedOut()), Qt::QueuedConnection);

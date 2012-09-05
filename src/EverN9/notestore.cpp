@@ -1,6 +1,7 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "notestore.h"
+#include "userstore.h"
 #include "settings.h"
 #include "noteitem.h"
 #include "manager.h"
@@ -24,8 +25,8 @@ Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
-NoteStore::NoteStore(QObject *parent) : QObject(parent),
-    syncing(false), fetching(false), searching(false), cancelled(false), client(0)
+NoteStore::NoteStore(UserStore *userStore) : QObject(userStore),
+    syncing(false), fetching(false), searching(false), cancelled(false), userStore(userStore), client(0)
 {
     qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
@@ -92,8 +93,8 @@ void NoteStore::syncImpl()
         evernote::edam::SyncChunk chunk;
         while (!cancelled) {
             emit progress(percent);
-            QString token = Settings::value(Settings::AuthToken);
-            client->getSyncChunk(chunk, token.toStdString(), usn, 1024, false);
+            std::string token = userStore->authToken().toStdString();
+            client->getSyncChunk(chunk, token, usn, 1024, false);
 
             if (usn >= chunk.updateCount)
                 break;
@@ -157,15 +158,15 @@ void NoteStore::fetchImpl(const evernote::edam::Note& note)
     try {
         init(false);
         evernote::edam::Note copy(note);
-        QString token = Settings::value(Settings::AuthToken);
-        client->getNoteContent(copy.content, token.toStdString(), copy.guid);
+        std::string token = userStore->authToken().toStdString();
+        client->getNoteContent(copy.content, token, copy.guid);
 
         if (!copy.content.empty())
             emit noteFetched(copy);
 
         for (uint i = 0; !cancelled && i < copy.resources.size(); ++i) {
             evernote::edam::Resource res = copy.resources.at(i);
-            client->getResource(res, token.toStdString(), res.guid, true, false, false, false);
+            client->getResource(res, token, res.guid, true, false, false, false);
             emit resourceFetched(res);
         }
     } catch (evernote::edam::EDAMUserException& e) {
@@ -205,8 +206,8 @@ void NoteStore::searchImpl(const evernote::edam::SavedSearch& search)
         evernote::edam::NoteList list;
         evernote::edam::NoteFilter filter;
         filter.words = search.query;
-        QString token = Settings::value(Settings::AuthToken);
-        client->findNotes(list, token.toStdString(), filter, 0, evernote::limits::g_Limits_constants.EDAM_USER_NOTES_MAX);
+        std::string token = userStore->authToken().toStdString();
+        client->findNotes(list, token, filter, 0, evernote::limits::g_Limits_constants.EDAM_USER_NOTES_MAX);
 
         if (list.notes.size())
             emit searched(search, QVector<evernote::edam::Note>::fromStdVector(list.notes));
@@ -241,10 +242,10 @@ void NoteStore::init(bool force)
     }
 
     if (!client) {
-        QString shardId = Settings::value(Settings::UserShardID);
-        QString host = Settings::value(Settings::Hostname);
+        std::string host = Settings::value(Settings::Hostname).toStdString();
         int port = Settings::value(Settings::ServerPort).toInt();
-        transport = boost::shared_ptr<TTransport>(new THttpClient(host.toStdString(), port, "/edam/note/" + shardId.toStdString()));
+        std::string url = userStore->notesUrl().toStdString();
+        transport = boost::shared_ptr<TTransport>(new THttpClient(host, port, url));
         client = new evernote::edam::NoteStoreClient(boost::shared_ptr<TProtocol>(new TBinaryProtocol(transport)));
     }
 

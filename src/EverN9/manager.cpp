@@ -147,7 +147,8 @@ QString Manager::errorString(int code)
         case evernote::edam::TOO_FEW:               return tr("Operation denied due to data model limit (too few)");
         case evernote::edam::TOO_MANY:              return tr("Operation denied due to data model limit (too many)");
         case evernote::edam::UNSUPPORTED_OPERATION: return tr("Operation denied because it is currently unsupported");
-        case -1:                                    return tr("Unknown operation");
+        case Manager::UnknownOperation:             return tr("Unknown operation");
+        case Manager::TooOldProtocol:               return tr("The application uses too old protocol version: %1.%2");
         case evernote::edam::UNKNOWN:
         default:                                    return tr("Unknown error occurred");
     }

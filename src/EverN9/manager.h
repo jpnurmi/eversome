@@ -38,6 +38,8 @@ public:
     ItemModel* noteModel() const;
     ItemModel* tagModel() const;
 
+    enum { UnknownOperation = 0x1234, TooOldProtocol };
+
     static QString errorString(int code);
 
 signals:

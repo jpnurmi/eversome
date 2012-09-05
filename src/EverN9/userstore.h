@@ -23,18 +23,14 @@ public slots:
 signals:
     void loggedIn();
     void loggedOut();
-    void error(const QString& error);
     void isActiveChanged();
+    void error(const QString& error);
 
 private slots:
     void loginImpl(const QString& username, const QString& password, bool remember);
-    void logoutImpl();
 
 private:
-    volatile bool loggingIn;
-    volatile bool loggingOut;
-    evernote::edam::UserStoreClient* client;
-    boost::shared_ptr<apache::thrift::transport::TTransport> transport;
+    volatile bool active;
 };
 
 #endif // USERSTORE_H

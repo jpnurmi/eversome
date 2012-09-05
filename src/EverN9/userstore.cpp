@@ -8,27 +8,21 @@
 #include "thrift/transport/THttpClient.h"
 #include "thrift/protocol/TBinaryProtocol.h"
 
-using namespace apache::thrift;
-using namespace apache::thrift::protocol;
-using namespace apache::thrift::transport;
+using namespace boost;
+using namespace apache;
+using namespace evernote;
 
-UserStore::UserStore(QObject *parent) : QObject(parent),
-    loggingIn(false), loggingOut(false), client(0)
+UserStore::UserStore(QObject *parent) : QObject(parent), active(false)
 {
-    QString host = Settings::value(Settings::Hostname);
-    int port = Settings::value(Settings::ServerPort).toInt();
-    transport = boost::shared_ptr<TTransport>(new THttpClient(host.toStdString(), port, "/edam/user"));
-    client = new evernote::edam::UserStoreClient(boost::shared_ptr<TProtocol>(new TBinaryProtocol(transport)));
 }
 
 UserStore::~UserStore()
 {
-    delete client;
 }
 
 bool UserStore::isActive() const
 {
-    return loggingIn || loggingOut;
+    return active;
 }
 
 bool UserStore::hasCredentials() const
@@ -41,7 +35,7 @@ void UserStore::login(const QString& username, const QString& password, bool rem
 {
     QString un = username.isEmpty() ? Settings::value(Settings::Username) : username;
     QString pw = password.isEmpty() ? Settings::value(Settings::Password) : password;
-    qDebug() << Q_FUNC_INFO << un << pw;
+    qDebug() << Q_FUNC_INFO << un << QString(pw.length(), 'x');
     QtConcurrent::run(this, &UserStore::loginImpl, un, pw, remember);
 }
 
@@ -49,39 +43,47 @@ void UserStore::logout()
 {
     qDebug() << Q_FUNC_INFO;
     Settings::reset();
-    QtConcurrent::run(this, &UserStore::logoutImpl);
+    emit loggedOut();
 }
 
 void UserStore::loginImpl(const QString& username, const QString& password, bool remember)
 {
-    if (loggingIn)
-        return;
+    qDebug() << Q_FUNC_INFO << username << QString(password.length(), 'x');
 
-    qDebug() << Q_FUNC_INFO << username << password;
-
-    loggingIn = true;
+    active = true;
     emit isActiveChanged();
 
     QString err;
     try {
-        if (!transport->isOpen())
-            transport->open();
-        evernote::edam::AuthenticationResult result;
+        QString host = Settings::value(Settings::Hostname);
+        int port = Settings::value(Settings::ServerPort).toInt();
+
+        shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(host.toStdString(), port, "/edam/user"));
+        shared_ptr<thrift::protocol::TProtocol> protocol(new thrift::protocol::TBinaryProtocol(transport));
+        transport->open();
+
+        edam::AuthenticationResult result;
         QString key = Settings::value(Settings::ConsumerKey);
         QString secret = Settings::value(Settings::ConsumerSecret);
-        client->authenticate(result, username.toStdString(), password.toStdString(), key.toStdString(), secret.toStdString());
+
+        edam::UserStoreClient client(protocol);
+        client.authenticate(result, username.toStdString(), password.toStdString(), key.toStdString(), secret.toStdString());
+
         if (remember) {
             Settings::setValue(Settings::Username, username);
             Settings::setValue(Settings::Password, password);
         }
+
         Settings::setValue(Settings::AuthToken, QString::fromStdString(result.authenticationToken));
         Settings::setValue(Settings::UserShardID, QString::fromStdString(result.user.shardId));
+
         emit loggedIn();
-    } catch (evernote::edam::EDAMUserException& e) {
+
+    } catch (edam::EDAMUserException& e) {
         err = Manager::errorString(e.errorCode);
-    } catch (evernote::edam::EDAMSystemException& e) {
+    } catch (edam::EDAMSystemException& e) {
         err = Manager::errorString(e.errorCode);
-    } catch (TException& e) {
+    } catch (thrift::TException& e) {
         err = QString::fromUtf8(e.what());
     }
 
@@ -90,34 +92,6 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
         emit error(err);
     }
 
-    loggingIn = false;
-    emit isActiveChanged();
-}
-
-void UserStore::logoutImpl()
-{
-    if (loggingOut)
-        return;
-
-    qDebug() << Q_FUNC_INFO;
-
-    loggingOut = true;
-    emit isActiveChanged();
-
-    QString err;
-    try {
-        if (transport->isOpen())
-            transport->close();
-        emit loggedOut();
-    } catch (TException& e) {
-        err = QString::fromUtf8(e.what());
-    }
-
-    if (!err.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << err;
-        emit error(err);
-    }
-
-    loggingOut = false;
+    active = false;
     emit isActiveChanged();
 }

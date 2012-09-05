@@ -1,12 +1,10 @@
 #include "noteitem.h"
-#include "itemmodel.h"
-#include "resourceitem.h"
-#include "tagitem.h"
-#include "manager.h"
 
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     : QObject(parent), m_note(note)
 {
+    m_tags = new ItemModel(this);
+    m_resources = new ItemModel(this);
 }
 
 NoteItem::~NoteItem()
@@ -53,34 +51,26 @@ bool NoteItem::isActive() const
     return m_note.active;
 }
 
-QStringList NoteItem::tags() const
+bool NoteItem::isEmpty() const
 {
-    QStringList res;
-    for (uint i = 0; i < m_note.tagGuids.size(); ++i) {
-        QString guid = QString::fromStdString(m_note.tagGuids.at(i));
-        TagItem* tag = Manager::instance()->tagModel()->get<TagItem*>(guid);
-        if (tag)
-            res += tag->name();
-    }
-    return res;
+    return m_note.content.empty();
 }
 
-QStringList NoteItem::resources() const
+ItemModel* NoteItem::tags() const
 {
-    QStringList res;
-    for (uint i = 0; i < m_note.resources.size(); ++i) {
-        QString guid = QString::fromStdString(m_note.resources.at(i).guid);
-        ResourceItem* resource = Manager::instance()->resourceModel()->get<ResourceItem*>(guid);
-        if (resource)
-            res += resource->filePath();
-    }
-    return res;
+    return m_tags;
+}
+
+ItemModel* NoteItem::resources() const
+{
+    return m_resources;
 }
 
 void NoteItem::setContent(const std::string& content)
 {
     if (m_note.content != content) {
         m_note.content = content;
+        emit isEmptyChanged();
         emit contentChanged();
     }
 }

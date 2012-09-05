@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QDateTime>
 #include <QMetaType>
-#include <QStringList>
 #include "edam/Types_types.h"
+#include "itemmodel.h"
 
 class NoteItem : public QObject
 {
@@ -17,8 +17,9 @@ class NoteItem : public QObject
     Q_PROPERTY(QDateTime updated READ updated CONSTANT)
     Q_PROPERTY(QDateTime deleted READ deleted CONSTANT)
     Q_PROPERTY(bool isActive READ isActive CONSTANT)
-    Q_PROPERTY(QStringList tags READ tags CONSTANT)
-    Q_PROPERTY(QStringList resources READ resources CONSTANT)
+    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
+    Q_PROPERTY(ItemModel* tags READ tags CONSTANT)
+    Q_PROPERTY(ItemModel* resources READ resources CONSTANT)
 
 public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
@@ -33,15 +34,19 @@ public:
     QDateTime updated() const;
     QDateTime deleted() const;
     bool isActive() const;
-    QStringList tags() const;
-    QStringList resources() const;
+    bool isEmpty() const;
+    ItemModel* tags() const;
+    ItemModel* resources() const;
 
     void setContent(const std::string& content);
 
 signals:
+    void isEmptyChanged();
     void contentChanged();
 
 private:
+    ItemModel* m_tags;
+    ItemModel* m_resources;
     evernote::edam::Note m_note;
 };
 

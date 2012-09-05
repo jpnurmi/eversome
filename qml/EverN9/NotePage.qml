@@ -22,103 +22,42 @@ CommonPage {
     property Note note
 
     title: note ? note.title : ""
-    busy: Manager.isBusy || contentLabel.openingLink
+    busy: Manager.isBusy || openingLink
 
-    flickable: Flickable {
-        contentHeight: column.height
+    property bool openingLink: false
 
-        Column {
-            id: column
+    flickable: ListView {
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
-            anchors.rightMargin: UI.LARGE_SPACING
+        header: NoteHeader {
+            id: header
 
-            spacing: UI.LARGE_SPACING
+            note: root.note
 
-            Column {
-                width: parent.width
-
-                Item {
-                    width: parent.width
-                    height: UI.LARGE_SPACING
-                }
-
-                Row {
-                    width: parent.width
-                    spacing: UI.MEDIUM_SPACING
-
-                    Label {
-                        id: dateLabel
-                        text: note ? Qt.formatDateTime(note.updated, qsTr("yyyy-MM-dd hh:mm")) : ""
-                        font.pixelSize: UI.SMALL_FONT
-                        font.weight: Font.Light
-                        wrapMode: Text.NoWrap
-                    }
-
-                    Flow {
-                        width: parent.width - dateLabel.width - parent.spacing
-                        layoutDirection: Qt.RightToLeft
-                        spacing: UI.SMALL_SPACING
-
-                        Repeater {
-                            model: note ? note.tags : null
-                            Badge {
-                                value: modelData.name
-                            }
-                        }
-                    }
-                }
+            onLinkActivated: {
+                root.openingLink = true;
+                Qt.openUrlExternally(link);
             }
 
-            Separator { }
-
-            Label {
-                id: contentLabel
-
-                property bool openingLink: false
-
-                text: note ? note.content : ""
-                font.pixelSize: UI.MEDIUM_FONT
-                width: parent.width
-
-                onLinkActivated: {
-                    openingLink = true;
-                    Qt.openUrlExternally(link);
-                }
-
-                Connections {
-                    target: Qt.application
-                    onActiveChanged: {
-                        if (!Qt.application.active)
-                            contentLabel.openingLink = false;
-                    }
+            Connections {
+                target: Qt.application
+                onActiveChanged: {
+                    if (!Qt.application.active)
+                        root.openingLink = false;
                 }
             }
+        }
 
-            Repeater {
-                model: note ? note.resources : null
-                Column {
-                    width: parent.width
-                    Text {
-                        text: modelData.type == Resource.Image ? "image" :
-                              modelData.type == Resource.Audio ? "audio" :
-                              modelData.type == Resource.Document ? "doc" :
-                              modelData.type == Resource.Text ? "text" : "unknown"
-                    }
-                    Image {
-                        source: modelData.thumbnail
-                        fillMode: Image.PreserveAspectFit
-                        width: parent.width
-                        opacity: mouseArea.pressed && mouseArea.containsMouse ? UI.DISABLED_OPACITY : 1.0
-                        MouseArea {
-                            id: mouseArea
-                            anchors.fill: parent
-                            onClicked: Qt.openUrlExternally(modelData.filePath)
-                        }
-                    }
-                }
+        model: note ? note.resources : null
+
+        delegate: Item {
+            width: parent.width / 2
+            height: parent.width / 2
+
+            Thumbnail {
+                anchors.fill: parent
+                anchors.margins: UI.PAGE_MARGIN + UI.LARGE_SPACING
+                source: modelData.thumbnail
+                link: modelData.filePath
             }
         }
     }

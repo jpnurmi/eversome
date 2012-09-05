@@ -4,6 +4,7 @@
 #include "notestore.h"
 #include "userstore.h"
 #include "database.h"
+#include "settings.h"
 #include "manager.h"
 
 #include "itemmodel.h"
@@ -12,6 +13,11 @@
 #include "searchitem.h"
 #include "noteitem.h"
 #include "tagitem.h"
+
+static const QLatin1String CONSUMER_KEY("everel");
+static const QLatin1String CONSUMER_SECRET("201d20eb3ee1f74d");
+static const QLatin1String DEFAULT_HOST("www.evernote.com");
+static const int DEFAULT_PORT = 80;
 
 static bool removeDir(const QDir& dir)
 {
@@ -43,7 +49,8 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     QString cachePath = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
     QString configPath = QFileInfo(QSettings().fileName()).absolutePath();
 
-    if (app->arguments().contains("-reset")) {
+    QStringList args = app->arguments();
+    if (args.contains("-reset")) {
         qDebug() << "EverN9 reset...";
         qDebug() << "  -> Data:" << (removeDir(dataPath) ? "OK" : "FAIL!") << qPrintable("("+dataPath+")");
         qDebug() << "  -> Cache:" << (removeDir(cachePath) ? "OK" : "FAIL!") << qPrintable("("+cachePath+")");
@@ -53,6 +60,30 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     QDir().mkpath(configPath);
     QDir().mkpath(cachePath);
     QDir().mkpath(dataPath);
+
+    QString key = CONSUMER_KEY;
+    int index = args.indexOf("-key");
+    if (index != -1)
+        key = args.value(index + 1);
+    Settings::setValue(Settings::ConsumerKey, key);
+
+    QString secret = CONSUMER_SECRET;
+    index = args.indexOf("-secret");
+    if (index != -1)
+        secret = args.value(index + 1);
+    Settings::setValue(Settings::ConsumerSecret, secret);
+
+    QString host = DEFAULT_HOST;
+    index = args.indexOf("-host");
+    if (index != -1)
+        host = args.value(index + 1);
+    Settings::setValue(Settings::Hostname, host);
+
+    int port = DEFAULT_PORT;
+    index = args.indexOf("-port");
+    if (index != -1)
+        port = args.value(index + 1).toInt();
+    Settings::setValue(Settings::ServerPort, QString::number(port));
 
     qmlRegisterType<TagItem>("com.evernote.types", 1,0, "Tag");
     qmlRegisterType<NoteItem>("com.evernote.types", 1,0, "Note");

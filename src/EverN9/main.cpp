@@ -3,7 +3,6 @@
 
 #include "notestore.h"
 #include "userstore.h"
-#include "database.h"
 #include "settings.h"
 #include "manager.h"
 
@@ -94,7 +93,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 
     Manager manager;
     QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("Database", manager.database());
+    viewer.rootContext()->setContextProperty("Manager", &manager);
     viewer.rootContext()->setContextProperty("UserStore", manager.userStore());
     viewer.rootContext()->setContextProperty("NoteStore", manager.noteStore());
     viewer.rootContext()->setContextProperty("Notebooks", manager.notebookModel());

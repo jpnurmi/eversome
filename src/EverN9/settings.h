@@ -10,9 +10,7 @@ public:
     {
         Username,
         Password,
-        AuthToken,
         ServerUSN,
-        UserShardID,
         ConsumerKey,
         ConsumerSecret,
         Hostname,

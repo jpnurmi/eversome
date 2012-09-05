@@ -9,9 +9,7 @@ static QString keyToString(Settings::Key key)
     {
         case Settings::Username: return QLatin1String("username");
         case Settings::Password: return QLatin1String("password");
-        case Settings::AuthToken: return QLatin1String("auth_token");
         case Settings::ServerUSN: return QLatin1String("server_usn");
-        case Settings::UserShardID: return QLatin1String("user_shardid");
         case Settings::ConsumerKey: return QLatin1String("consumer_key");
         case Settings::ConsumerSecret: return QLatin1String("consumer_secret");
         case Settings::Hostname: return QLatin1String("host_name");
@@ -35,7 +33,5 @@ void Settings::reset()
     QSettings settings;
     settings.remove(keyToString(Username));
     settings.remove(keyToString(Password));
-    settings.remove(keyToString(AuthToken));
     settings.remove(keyToString(ServerUSN));
-    settings.remove(keyToString(UserShardID));
 }

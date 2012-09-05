@@ -92,13 +92,14 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     qmlRegisterType<ResourceItem>("com.evernote.types", 1,0, "Resource");
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
+    Manager manager;
     QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("Database", Manager::instance()->database());
-    viewer.rootContext()->setContextProperty("UserStore", Manager::instance()->userStore());
-    viewer.rootContext()->setContextProperty("NoteStore", Manager::instance()->noteStore());
-    viewer.rootContext()->setContextProperty("Notebooks", Manager::instance()->notebookModel());
-    viewer.rootContext()->setContextProperty("Searches", Manager::instance()->searchModel());
-    viewer.rootContext()->setContextProperty("Tags", Manager::instance()->tagModel());
+    viewer.rootContext()->setContextProperty("Database", manager.database());
+    viewer.rootContext()->setContextProperty("UserStore", manager.userStore());
+    viewer.rootContext()->setContextProperty("NoteStore", manager.noteStore());
+    viewer.rootContext()->setContextProperty("Notebooks", manager.notebookModel());
+    viewer.rootContext()->setContextProperty("Searches", manager.searchModel());
+    viewer.rootContext()->setContextProperty("Tags", manager.tagModel());
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
 

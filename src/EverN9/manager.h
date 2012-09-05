@@ -22,8 +22,6 @@ public:
     explicit Manager(QObject* parent = 0);
     virtual ~Manager();
 
-    static Manager* instance();
-
     Database* database() const;
     UserStore* userStore() const;
     NoteStore* noteStore() const;

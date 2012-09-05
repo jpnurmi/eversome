@@ -72,12 +72,6 @@ Manager::~Manager()
 {
 }
 
-Manager* Manager::instance()
-{
-    static Manager session;
-    return &session;
-}
-
 Database* Manager::database() const
 {
     return m_database;

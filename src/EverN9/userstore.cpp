@@ -4,10 +4,15 @@
 #include "settings.h"
 #include "manager.h"
 #include <QtConcurrentRun>
+#include <QReadWriteLock>
+#include <QWriteLocker>
+#include <QReadLocker>
 #include <QtDebug>
 #include "edam/UserStore_constants.h"
 #include "thrift/transport/THttpClient.h"
 #include "thrift/protocol/TBinaryProtocol.h"
+
+static QReadWriteLock lock;
 
 using namespace boost;
 using namespace apache;
@@ -19,6 +24,30 @@ UserStore::UserStore(QObject *parent) : QObject(parent), active(false)
 
 UserStore::~UserStore()
 {
+}
+
+QString UserStore::authToken() const
+{
+    QReadLocker locker(&lock);
+    return token;
+}
+
+QString UserStore::notesUrl() const
+{
+    QReadLocker locker(&lock);
+    return notes;
+}
+
+QDateTime UserStore::currentTime() const
+{
+    QReadLocker locker(&lock);
+    return time;
+}
+
+QDateTime UserStore::expiration() const
+{
+    QReadLocker locker(&lock);
+    return expires;
 }
 
 bool UserStore::isActive() const
@@ -83,8 +112,12 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
             Settings::setValue(Settings::Password, password);
         }
 
-        Settings::setValue(Settings::AuthToken, QString::fromStdString(result.authenticationToken));
-        Settings::setValue(Settings::UserShardID, QString::fromStdString(result.user.shardId));
+        QWriteLocker locker(&lock);
+        token = QString::fromStdString(result.authenticationToken);
+        notes = QString::fromStdString(result.noteStoreUrl);
+        time = QDateTime::fromMSecsSinceEpoch(result.currentTime);
+        expires = QDateTime::fromMSecsSinceEpoch(result.expiration);
+        locker.unlock();
 
         emit loggedIn();
 

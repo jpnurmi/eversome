@@ -9,6 +9,7 @@ class ResourceItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString guid READ guid CONSTANT)
+    Q_PROPERTY(QString mime READ mime CONSTANT)
     Q_PROPERTY(QString filePath READ filePath CONSTANT)
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
 
@@ -19,6 +20,7 @@ public:
     evernote::edam::Resource resource() const;
 
     QString guid() const;
+    QString mime() const;
     QString filePath() const;
     bool isEmpty() const;
 

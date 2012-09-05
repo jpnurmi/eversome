@@ -43,6 +43,11 @@ QString ResourceItem::guid() const
     return QString::fromStdString(m_resource.guid);
 }
 
+QString ResourceItem::mime() const
+{
+    return QString::fromStdString(m_resource.mime);
+}
+
 QString ResourceItem::filePath() const
 {
     QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
@@ -52,7 +57,8 @@ QString ResourceItem::filePath() const
 
 bool ResourceItem::isEmpty() const
 {
-    return QFileInfo(filePath()).size() == 0;
+    QFileInfo file(filePath());
+    return !file.exists() || file.size() == 0;
 }
 
 void ResourceItem::setData(const evernote::edam::Data& data)
@@ -60,7 +66,9 @@ void ResourceItem::setData(const evernote::edam::Data& data)
     QFileInfo info(filePath());
     if (QDir().mkpath(info.absolutePath())) {
         QFile file(info.filePath());
-        if (file.open(QFile::WriteOnly) && file.write(data.body.c_str(), data.size) != -1)
+        if (file.exists() && file.remove())
+            emit isEmptyChanged();
+        if (file.open(QFile::WriteOnly) && file.write(data.body.c_str(), data.size) != -1 && file.flush())
             emit isEmptyChanged();
     }
 }

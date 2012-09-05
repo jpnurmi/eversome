@@ -32,7 +32,7 @@ QString UserStore::authToken() const
     return token;
 }
 
-QString UserStore::notesUrl() const
+QUrl UserStore::notesUrl() const
 {
     QReadLocker locker(&lock);
     return notes;
@@ -114,7 +114,7 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
 
         QWriteLocker locker(&lock);
         token = QString::fromStdString(result.authenticationToken);
-        notes = QString::fromStdString(result.noteStoreUrl);
+        notes = QUrl(QString::fromStdString(result.noteStoreUrl));
         time = QDateTime::fromMSecsSinceEpoch(result.currentTime);
         expires = QDateTime::fromMSecsSinceEpoch(result.expiration);
         locker.unlock();

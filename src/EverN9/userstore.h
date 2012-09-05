@@ -1,6 +1,7 @@
 #ifndef USERSTORE_H
 #define USERSTORE_H
 
+#include <QUrl>
 #include <QObject>
 #include <QDateTime>
 #include "edam/UserStore.h"
@@ -9,7 +10,7 @@ class UserStore : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString authToken READ authToken NOTIFY loggedIn)
-    Q_PROPERTY(QString notesUrl READ notesUrl NOTIFY loggedIn)
+    Q_PROPERTY(QUrl notesUrl READ notesUrl NOTIFY loggedIn)
     Q_PROPERTY(QDateTime currentTime READ currentTime NOTIFY loggedIn)
     Q_PROPERTY(QDateTime expiration READ expiration NOTIFY loggedIn)
     Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
@@ -19,7 +20,7 @@ public:
     virtual ~UserStore();
 
     QString authToken() const;
-    QString notesUrl() const;
+    QUrl notesUrl() const;
 
     QDateTime currentTime() const;
     QDateTime expiration() const;
@@ -42,7 +43,7 @@ private slots:
 
 private:
     QString token;
-    QString notes;
+    QUrl notes;
     QDateTime time;
     QDateTime expires;
     volatile bool active;

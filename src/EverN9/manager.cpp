@@ -216,6 +216,13 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
     setupNotes(m_notes->items<NoteItem*>());
 }
 
+void Manager::onResourceFetched(const evernote::edam::Resource& resource)
+{
+    ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
+    if (item)
+        item->setData(resource.data);
+}
+
 void Manager::onNoteFetched(const evernote::edam::Note& note)
 {
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
@@ -235,13 +242,6 @@ void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVecto
         }
         searchItem->notes()->add(noteItems);
     }
-}
-
-void Manager::onResourceFetched(const evernote::edam::Resource& resource)
-{
-    ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
-    if (item)
-        item->setData(resource.data);
 }
 
 void Manager::setupNotes(const QList<NoteItem*>& notes)

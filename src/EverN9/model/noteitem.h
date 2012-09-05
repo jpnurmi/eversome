@@ -17,7 +17,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QMetaType>
-#include "edam/Types_types.h"
+#include <Types_types.h>
 #include "itemmodel.h"
 
 class NoteItem : public QObject

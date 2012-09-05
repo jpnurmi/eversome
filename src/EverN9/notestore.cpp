@@ -21,9 +21,9 @@
 #include <QtConcurrentRun>
 #include <QMetaType>
 #include <QtDebug>
-#include "edam/Limits_constants.h"
-#include "thrift/transport/THttpClient.h"
-#include "thrift/protocol/TBinaryProtocol.h"
+#include <Limits_constants.h>
+#include <thrift/transport/THttpClient.h>
+#include <thrift/protocol/TBinaryProtocol.h>
 
 using namespace boost;
 using namespace apache;

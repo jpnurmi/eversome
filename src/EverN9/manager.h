@@ -15,7 +15,7 @@
 #define MANAGER_H
 
 #include <QObject>
-#include "edam/Types_types.h"
+#include <Types_types.h>
 
 class Database;
 class ResourceWriter;

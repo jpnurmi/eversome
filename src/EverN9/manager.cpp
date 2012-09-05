@@ -23,6 +23,7 @@
 #include "itemmodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
+#include <Errors_types.h>
 #include <QFileInfo>
 #include <QVector>
 #include <QDebug>

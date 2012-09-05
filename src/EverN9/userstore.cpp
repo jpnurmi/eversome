@@ -21,9 +21,9 @@
 #include <QWriteLocker>
 #include <QReadLocker>
 #include <QtDebug>
-#include "edam/UserStore_constants.h"
-#include "thrift/transport/THttpClient.h"
-#include "thrift/protocol/TBinaryProtocol.h"
+#include <UserStore_constants.h>
+#include <thrift/transport/THttpClient.h>
+#include <thrift/protocol/TBinaryProtocol.h>
 
 static QReadWriteLock lock;
 

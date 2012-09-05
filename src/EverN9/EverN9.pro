@@ -12,7 +12,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 LIBDIR = $$OUT_PWD/../../lib
-include(../3rdparty/edam.pri)
+include(../3rdparty/evernote.pri)
 include(../3rdparty/thrift.pri)
 
 HEADERS += \

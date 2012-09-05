@@ -16,7 +16,7 @@
 
 #include <QObject>
 #include <QMetaType>
-#include "edam/Types_types.h"
+#include <Types_types.h>
 
 class ResourceItem : public QObject
 {

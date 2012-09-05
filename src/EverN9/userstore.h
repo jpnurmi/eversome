@@ -17,7 +17,7 @@
 #include <QUrl>
 #include <QObject>
 #include <QDateTime>
-#include "edam/UserStore.h"
+#include <evernote/src/UserStore.h> // TODO
 
 class UserStore : public QObject
 {

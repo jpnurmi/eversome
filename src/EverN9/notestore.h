@@ -15,8 +15,8 @@
 #define NOTESTORE_H
 
 #include <QObject>
-#include "edam/NoteStore.h"
-#include "edam/Types_types.h"
+#include <evernote/src/NoteStore.h> // TODO
+#include <Types_types.h>
 
 class UserStore;
 

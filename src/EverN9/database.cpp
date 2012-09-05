@@ -19,7 +19,7 @@
 #include "searchitem.h"
 #include "noteitem.h"
 #include "tagitem.h"
-#include "edam/Types_types.h"
+#include <Types_types.h>
 #include <QDesktopServices>
 #include <QtConcurrentRun>
 #include <QApplication>

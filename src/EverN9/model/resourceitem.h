@@ -12,12 +12,17 @@ class ResourceItem : public QObject
     Q_PROPERTY(QString mime READ mime CONSTANT)
     Q_PROPERTY(QString filePath READ filePath CONSTANT)
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
+    Q_PROPERTY(Type type READ type CONSTANT)
+    Q_ENUMS(Type)
 
 public:
     explicit ResourceItem(evernote::edam::Resource resource = evernote::edam::Resource(), QObject* parent = 0);
     virtual ~ResourceItem();
 
     evernote::edam::Resource resource() const;
+
+    enum Type { Unknown, Image, Audio, Document, Text };
+    Type type() const;
 
     QString guid() const;
     QString mime() const;

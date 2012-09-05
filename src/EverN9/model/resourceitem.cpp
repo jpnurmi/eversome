@@ -24,6 +24,14 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(StringHash, file_extensions, {
     x->insert("text/html", "html");
 })
 
+typedef QHash<QString, ResourceItem::Type> TypeHash;
+Q_GLOBAL_STATIC_WITH_INITIALIZER(TypeHash, file_types, {
+    x->insert("application", ResourceItem::Document);
+    x->insert("audio", ResourceItem::Audio);
+    x->insert("image", ResourceItem::Image);
+    x->insert("text", ResourceItem::Text);
+})
+
 ResourceItem::ResourceItem(evernote::edam::Resource resource, QObject* parent)
     : QObject(parent), m_resource(resource)
 {
@@ -36,6 +44,12 @@ ResourceItem::~ResourceItem()
 evernote::edam::Resource ResourceItem::resource() const
 {
     return m_resource;
+}
+
+ResourceItem::Type ResourceItem::type() const
+{
+    QString type = QString::fromStdString(m_resource.mime).section('/', 0, 0);
+    return file_types()->value(type, Unknown);
 }
 
 QString ResourceItem::guid() const

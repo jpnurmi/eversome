@@ -46,16 +46,15 @@ private slots:
     void syncImpl();
     void fetchImpl(const evernote::edam::Note& note);
     void searchImpl(const evernote::edam::SavedSearch& search);
-    void init(bool force);
 
 private:
+    boost::shared_ptr<apache::thrift::protocol::TProtocol> createProtocol() const;
+
     volatile bool syncing;
     volatile bool fetching;
     volatile bool searching;
     volatile bool cancelled;
     UserStore* userStore;
-    evernote::edam::NoteStoreClient* client;
-    boost::shared_ptr<apache::thrift::transport::TTransport> transport;
 };
 
 #endif // NOTESTORE_H

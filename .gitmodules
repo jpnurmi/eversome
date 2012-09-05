@@ -1,3 +1,6 @@
 [submodule "src/3rdparty/thrift"]
 	path = src/3rdparty/thrift
 	url = git://github.com/apache/thrift.git
+[submodule "src/3rdparty/evernote"]
+	path = src/3rdparty/evernote
+	url = git://github.com/evernote/evernote-sdk-cpp.git

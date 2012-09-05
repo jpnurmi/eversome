@@ -9,11 +9,8 @@
 #include "itemmodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
-#include <QFileInfo>
 #include <QVector>
 #include <QDebug>
-#include <QFile>
-#include <QDir>
 
 Manager::Manager(QObject *parent) : QObject(parent)
 {
@@ -243,14 +240,8 @@ void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVecto
 void Manager::onResourceFetched(const evernote::edam::Resource& resource)
 {
     ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
-    if (item) {
-        QFileInfo info(item->filePath());
-        if (QDir().mkpath(info.absolutePath())) {
-            QFile file(item->filePath());
-            if (file.open(QFile::WriteOnly))
-                file.write(resource.data.body.c_str(), resource.data.size);
-        }
-    }
+    if (item)
+        item->setData(resource.data);
 }
 
 void Manager::setupNotes(const QList<NoteItem*>& notes)
@@ -263,13 +254,24 @@ void Manager::setupNotes(const QList<NoteItem*>& notes)
         else
             qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
 
+        for (uint i = 0; i < note->note().resources.size(); ++i) {
+            QString resourceGuid = QString::fromStdString(note->note().resources.at(i).guid);
+            ResourceItem* resource = m_resources->get<ResourceItem*>(resourceGuid);
+            if (resource)
+                note->resources()->add(QList<ResourceItem*>() << resource);
+            else
+                qCritical() << Q_FUNC_INFO << "MISSING RESOURCE:" << resourceGuid;
+        }
+
         for (uint i = 0; i < note->note().tagGuids.size(); ++i) {
             QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);
-            if (tag)
-                tag->notes()->add(QList<NoteItem*>() << note);
-            else
+            if (!tag) {
                 qCritical() << Q_FUNC_INFO << "MISSING TAG:" << tagGuid;
+                continue;
+            }
+            note->tags()->add(QList<TagItem*>() << tag);
+            tag->notes()->add(QList<NoteItem*>() << note);
         }
     }
 }

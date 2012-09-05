@@ -66,6 +66,11 @@ Manager::Manager(QObject *parent) : QObject(parent)
                                       QList<NoteItem*>,
                                       QList<TagItem*>)), Qt::QueuedConnection);
 
+    connect(m_user, SIGNAL(isActiveChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_note, SIGNAL(isActiveChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_writer, SIGNAL(isWritingChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_database, SIGNAL(isActiveChanged()), this, SIGNAL(isBusyChanged()));
+
     m_notebooks = new ItemModel(this);
     m_resources = new ItemModel(this);
     m_searches = new ItemModel(this);
@@ -75,6 +80,12 @@ Manager::Manager(QObject *parent) : QObject(parent)
 
 Manager::~Manager()
 {
+}
+
+bool Manager::isBusy() const
+{
+    return m_database->isActive() || m_writer->isWriting()
+            || m_user->isActive() || m_note->isActive();
 }
 
 Database* Manager::database() const

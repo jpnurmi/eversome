@@ -18,10 +18,13 @@ class TagItem;
 class Manager : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool isBusy READ isBusy NOTIFY isBusyChanged)
 
 public:
     explicit Manager(QObject* parent = 0);
     virtual ~Manager();
+
+    bool isBusy() const;
 
     Database* database() const;
     ResourceWriter* resourceWriter() const;
@@ -36,6 +39,9 @@ public:
     ItemModel* tagModel() const;
 
     static QString errorString(int code);
+
+signals:
+    void isBusyChanged();
 
 private slots:
     void onLoggedIn();

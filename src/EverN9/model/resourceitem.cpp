@@ -68,19 +68,19 @@ static QString dataFilePath(const QString& fileName)
     return dir.absoluteFilePath(fileName);
 }
 
-QString ResourceItem::filePath() const
+QString ResourceItem::filePath(bool checkExists) const
 {
     QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
     QFileInfo file(dataFilePath(guid() + "." + ext));
-    if (m_empty || !file.exists() || file.size() == 0)
+    if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
 }
 
-QString ResourceItem::thumbnail() const
+QString ResourceItem::thumbnail(bool checkExists) const
 {
     QFileInfo file(dataFilePath(guid() + "-thumb.png"));
-    if (m_empty || !file.exists() || file.size() == 0)
+    if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
 }

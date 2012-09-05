@@ -26,8 +26,8 @@ public:
 
     QString guid() const;
     QString mime() const;
-    QString filePath() const;
-    QString thumbnail() const;
+    QString filePath(bool checkExists = true) const;
+    QString thumbnail(bool checkExists = true) const;
     bool isEmpty() const;
 
     void update();

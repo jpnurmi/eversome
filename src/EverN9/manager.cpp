@@ -230,7 +230,7 @@ void Manager::onResourceFetched(const evernote::edam::Resource& resource)
 {
     ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
     if (item)
-        m_writer->write(item->filePath(), QByteArray(resource.data.body.c_str(), resource.data.size));
+        m_writer->write(item->filePath(false), QByteArray(resource.data.body.c_str(), resource.data.size));
 }
 
 void Manager::onNoteFetched(const evernote::edam::Note& note)

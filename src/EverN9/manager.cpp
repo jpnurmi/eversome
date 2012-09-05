@@ -3,12 +3,14 @@
 #include "settings.h"
 #include "userstore.h"
 #include "notestore.h"
+#include "resourcewriter.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "searchitem.h"
 #include "itemmodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
+#include <QFileInfo>
 #include <QVector>
 #include <QDebug>
 
@@ -48,6 +50,9 @@ Manager::Manager(QObject *parent) : QObject(parent)
     qRegisterMetaType<QList<SearchItem*> >();
     qRegisterMetaType<QList<ResourceItem*> >();
     qRegisterMetaType<QList<NotebookItem*> >();
+
+    m_writer = new ResourceWriter(this);
+    connect(m_writer, SIGNAL(written(QString)), SLOT(onResourceWritten(QString)), Qt::QueuedConnection);
 
     m_database = new Database(this);
     connect(m_database, SIGNAL(loaded(QList<NotebookItem*>,
@@ -214,7 +219,7 @@ void Manager::onResourceFetched(const evernote::edam::Resource& resource)
 {
     ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
     if (item)
-        item->setData(resource.data);
+        m_writer->write(item->filePath(), QByteArray(resource.data.body.c_str(), resource.data.size));
 }
 
 void Manager::onNoteFetched(const evernote::edam::Note& note)
@@ -222,6 +227,14 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item)
         item->setContent(note.content);
+}
+
+void Manager::onResourceWritten(const QString &filePath)
+{
+    QString guid = QFileInfo(filePath).baseName();
+    ResourceItem* item = m_resources->get<ResourceItem*>(guid);
+    if (item)
+        item->update();
 }
 
 void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes)

@@ -5,6 +5,7 @@
 #include "edam/Types_types.h"
 
 class Database;
+class ResourceWriter;
 class UserStore;
 class NoteStore;
 class ItemModel;
@@ -23,6 +24,8 @@ public:
     virtual ~Manager();
 
     Database* database() const;
+    ResourceWriter* resourceWriter() const;
+
     UserStore* userStore() const;
     NoteStore* noteStore() const;
 
@@ -53,12 +56,15 @@ private slots:
     void onResourceFetched(const evernote::edam::Resource& resource);
     void onNoteFetched(const evernote::edam::Note& note);
 
+    void onResourceWritten(const QString& filePath);
+
     void onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
 private:
     void setupNotes(const QList<NoteItem*>& notes);
 
     Database* m_database;
+    ResourceWriter* m_writer;
     UserStore* m_user;
     NoteStore* m_note;
     ItemModel* m_notebooks;

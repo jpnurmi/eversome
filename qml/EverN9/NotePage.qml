@@ -99,11 +99,25 @@ CommonPage {
 
             Repeater {
                 model: note ? note.resources : null
-                Image {
-                    source: modelData.isEmpty ? "" : modelData.filePath
-                    sourceSize { width: root.width }
-                    fillMode: Image.PreserveAspectFit
+                Column {
                     width: parent.width
+                    Text {
+                        text: modelData.type == Resource.Image ? "image" :
+                              modelData.type == Resource.Audio ? "audio" :
+                              modelData.type == Resource.Document ? "doc" :
+                              modelData.type == Resource.Text ? "text" : "unknown"
+                    }
+                    Image {
+                        source: modelData.thumbnail
+                        fillMode: Image.PreserveAspectFit
+                        width: parent.width
+                        opacity: mouseArea.pressed && mouseArea.containsMouse ? UI.DISABLED_OPACITY : 1.0
+                        MouseArea {
+                            id: mouseArea
+                            anchors.fill: parent
+                            onClicked: Qt.openUrlExternally(modelData.filePath)
+                        }
+                    }
                 }
             }
         }

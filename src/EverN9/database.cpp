@@ -7,7 +7,9 @@
 #include "noteitem.h"
 #include "tagitem.h"
 #include "edam/Types_types.h"
+#include <QDesktopServices>
 #include <QtConcurrentRun>
+#include <QApplication>
 #include <QSqlDatabase>
 #include <QStringList>
 #include <QSqlRecord>
@@ -16,12 +18,19 @@
 #include <QFileInfo>
 #include <QVariant>
 #include <QDebug>
+#include <QDir>
+
+static QString databaseName()
+{
+    QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
+    return dir.absoluteFilePath(QApplication::applicationName() + ".db");
+}
 
 Database::Database(QObject* parent) : QObject(parent),
     loading(false), saving(false)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("EverN9");
+    db.setDatabaseName(databaseName());
     if (db.open()) {
         QStringList queries;
         queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER)";
@@ -33,14 +42,14 @@ Database::Database(QObject* parent) : QObject(parent),
             db.exec(query);
     }
     bool res = db.isOpen() && !db.lastError().isValid();
-    qDebug() << Q_FUNC_INFO << res;
+    qDebug() << Q_FUNC_INFO << res << databaseName();
 }
 
 Database::~Database()
 {
     qDebug() << Q_FUNC_INFO;
     QSqlDatabase::database().close();
-    QSqlDatabase::removeDatabase("EverN9");
+    QSqlDatabase::removeDatabase(databaseName());
 }
 
 bool Database::isActive() const

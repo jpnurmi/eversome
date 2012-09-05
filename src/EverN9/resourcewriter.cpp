@@ -2,12 +2,17 @@
 
 #include "resourcewriter.h"
 #include <QtConcurrentRun>
+#include <QReadWriteLock>
+#include <QWriteLocker>
+#include <QReadLocker>
 #include <QFileInfo>
 #include <QVariant>
 #include <QFile>
 #include <QDir>
 
-ResourceWriter::ResourceWriter(QObject* parent) : QObject(parent), writing(false)
+QReadWriteLock filesLock;
+
+ResourceWriter::ResourceWriter(QObject* parent) : QObject(parent)
 {
 }
 
@@ -17,21 +22,25 @@ ResourceWriter::~ResourceWriter()
 
 bool ResourceWriter::isWriting() const
 {
-    return writing;
+    QReadLocker locker(&filesLock);
+    return !m_files.isEmpty();
 }
 
 void ResourceWriter::write(const QString& filePath, const QByteArray& data)
 {
-    qDebug() << Q_FUNC_INFO << filePath << data.length();
-    QtConcurrent::run(this, &ResourceWriter::writeImpl, filePath, data);
+    QWriteLocker locker(&filesLock);
+    if (!m_files.contains(filePath)) {
+        m_files.insert(filePath);
+        locker.unlock();
+        emit isWritingChanged();
+        qDebug() << Q_FUNC_INFO << filePath << data.length();
+        QtConcurrent::run(this, &ResourceWriter::writeImpl, filePath, data);
+    }
 }
 
 void ResourceWriter::writeImpl(const QString& filePath, const QByteArray& data)
 {
     qDebug() << Q_FUNC_INFO << filePath << data.length();
-
-    writing = true;
-    emit isWritingChanged();
 
     bool succeed = false;
     QFileInfo info(filePath);
@@ -61,6 +70,8 @@ void ResourceWriter::writeImpl(const QString& filePath, const QByteArray& data)
             emit written(info.filePath());
     }
 
-    writing = false;
+    QWriteLocker locker(&filesLock);
+    m_files.remove(filePath);
+    locker.unlock();
     emit isWritingChanged();
 }

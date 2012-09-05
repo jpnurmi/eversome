@@ -1,6 +1,7 @@
 #ifndef RESOURCEWRITER_H
 #define RESOURCEWRITER_H
 
+#include <QSet>
 #include <QObject>
 #include <QProcess>
 
@@ -26,7 +27,7 @@ private slots:
     void writeImpl(const QString& filePath, const QByteArray& data);
 
 private:
-    volatile bool writing;
+    QSet<QString> m_files;
 };
 
 #endif // RESOURCEWRITER_H

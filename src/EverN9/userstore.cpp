@@ -5,6 +5,7 @@
 #include "manager.h"
 #include <QtConcurrentRun>
 #include <QtDebug>
+#include "edam/UserStore_constants.h"
 #include "thrift/transport/THttpClient.h"
 #include "thrift/protocol/TBinaryProtocol.h"
 
@@ -62,11 +63,19 @@ void UserStore::loginImpl(const QString& username, const QString& password, bool
         shared_ptr<thrift::protocol::TProtocol> protocol(new thrift::protocol::TBinaryProtocol(transport));
         transport->open();
 
+        edam::UserStoreClient client(protocol);
+        if (!client.checkVersion("EverN9/0.0.3; MeeGo/Harmattan 1.2", // TODO: hardcoded values
+                                 edam::g_UserStore_constants.EDAM_VERSION_MAJOR,
+                                 edam::g_UserStore_constants.EDAM_VERSION_MINOR)) {
+            QString err = Manager::errorString(Manager::TooOldProtocol);
+            err = err.arg(edam::g_UserStore_constants.EDAM_VERSION_MAJOR)
+                     .arg(edam::g_UserStore_constants.EDAM_VERSION_MINOR);
+            throw thrift::TException(err.toStdString());
+        }
+
         edam::AuthenticationResult result;
         QString key = Settings::value(Settings::ConsumerKey);
         QString secret = Settings::value(Settings::ConsumerSecret);
-
-        edam::UserStoreClient client(protocol);
         client.authenticate(result, username.toStdString(), password.toStdString(), key.toStdString(), secret.toStdString());
 
         if (remember) {

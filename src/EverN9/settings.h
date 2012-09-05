@@ -12,7 +12,11 @@ public:
         Password,
         AuthToken,
         ServerUSN,
-        UserShardID
+        UserShardID,
+        ConsumerKey,
+        ConsumerSecret,
+        Hostname,
+        ServerPort
     };
 
     static QString value(Key key);

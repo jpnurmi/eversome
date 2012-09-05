@@ -10,6 +10,7 @@ class ResourceItem : public QObject
     Q_OBJECT
     Q_PROPERTY(QString guid READ guid CONSTANT)
     Q_PROPERTY(QString filePath READ filePath CONSTANT)
+    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
 
 public:
     explicit ResourceItem(evernote::edam::Resource resource = evernote::edam::Resource(), QObject* parent = 0);
@@ -19,6 +20,12 @@ public:
 
     QString guid() const;
     QString filePath() const;
+    bool isEmpty() const;
+
+    void setData(const evernote::edam::Data& data);
+
+signals:
+    void isEmptyChanged();
 
 private:
     evernote::edam::Resource m_resource;

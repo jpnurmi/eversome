@@ -1,5 +1,7 @@
 #include "resourceitem.h"
 #include <QDesktopServices>
+#include <QFileInfo>
+#include <QFile>
 #include <QHash>
 #include <QDir>
 
@@ -46,4 +48,19 @@ QString ResourceItem::filePath() const
     QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
     return dir.absoluteFilePath(guid() + "." + ext);
+}
+
+bool ResourceItem::isEmpty() const
+{
+    return QFileInfo(filePath()).size() == 0;
+}
+
+void ResourceItem::setData(const evernote::edam::Data& data)
+{
+    QFileInfo info(filePath());
+    if (QDir().mkpath(info.absolutePath())) {
+        QFile file(info.filePath());
+        if (file.open(QFile::WriteOnly) && file.write(data.body.c_str(), data.size) != -1)
+            emit isEmptyChanged();
+    }
 }

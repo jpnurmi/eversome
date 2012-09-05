@@ -15,7 +15,6 @@
 #include <QSqlRecord>
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QFileInfo>
 #include <QVariant>
 #include <QDebug>
 #include <QDir>
@@ -34,7 +33,7 @@ Database::Database(QObject* parent) : QObject(parent),
     if (db.open()) {
         QStringList queries;
         queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER)";
-        queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, filePath TEXT)";
+        queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT)";
         queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT)";
         queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT)";
         queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT)";
@@ -190,7 +189,7 @@ QList<ResourceItem*> Database::loadResourcesImpl(QObject* parent)
             evernote::edam::Resource resource;
             QSqlRecord record = query.record();
             resource.guid = record.value("guid").toString().toStdString();
-            resource.mime = QFileInfo(record.value("filePath").toString()).suffix().toStdString();
+            resource.mime = record.value("mime").toString().toStdString();
 
             ResourceItem* item = new ResourceItem(resource);
             item->moveToThread(thread());
@@ -204,15 +203,15 @@ QList<ResourceItem*> Database::loadResourcesImpl(QObject* parent)
 
 void Database::saveResourcesImpl(const QList<ResourceItem*>& resources)
 {
-    QVariantList guids, filePaths;
+    QVariantList guids, mimes;
     foreach (ResourceItem* resource, resources) {
         guids += resource->guid();
-        filePaths += resource->filePath();
+        mimes += resource->mime();
     }
 
     QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?)");
     query.addBindValue(guids);
-    query.addBindValue(filePaths);
+    query.addBindValue(mimes);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << resources.count() << res;
 }

@@ -22,7 +22,7 @@ public:
     static QString value(Key key);
     static void setValue(Key key, const QString& value);
 
-    static bool reset();
+    static void reset();
 };
 
 #endif // SETTINGS_H

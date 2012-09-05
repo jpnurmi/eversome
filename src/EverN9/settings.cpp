@@ -30,7 +30,12 @@ void Settings::setValue(Settings::Key key, const QString& value)
     QSettings().setValue(keyToString(key), value);
 }
 
-bool Settings::reset()
+void Settings::reset()
 {
-    return QFile::remove(QSettings().fileName());
+    QSettings settings;
+    settings.remove(keyToString(Username));
+    settings.remove(keyToString(Password));
+    settings.remove(keyToString(AuthToken));
+    settings.remove(keyToString(ServerUSN));
+    settings.remove(keyToString(UserShardID));
 }

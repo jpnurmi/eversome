@@ -19,6 +19,7 @@ HEADERS += \
     database.h \
     manager.h \
     notestore.h \
+    resourcewriter.h \
     settings.h \
     userstore.h
 
@@ -27,6 +28,7 @@ SOURCES += \
     main.cpp \
     manager.cpp \
     notestore.cpp \
+    resourcewriter.cpp \
     settings.cpp \
     userstore.cpp
 

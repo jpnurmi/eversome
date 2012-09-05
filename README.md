@@ -2,6 +2,27 @@
 
 Evernote client for Nokia N9
 
+## Submodules
+
+After cloning EverN9, you must init and fetch the submodules:
+
+<pre>
+$ git clone git@github.com:jpnurmi/EverN9.git
+Cloning into 'EverN9'...
+[...]
+$ cd EverN9
+$ git submodule init
+Submodule 'src/3rdparty/evernote' (git://github.com/evernote/evernote-sdk-cpp.git) registered for path 'src/3rdparty/evernote'
+Submodule 'src/3rdparty/thrift' (git://github.com/apache/thrift.git) registered for path 'src/3rdparty/thrift'
+$ git submodule update
+Cloning into 'src/3rdparty/evernote'...
+[...]
+Submodule path 'src/3rdparty/evernote': checked out [...]
+Cloning into 'src/3rdparty/thrift'...
+[...]
+Submodule path 'src/3rdparty/thrift': checked out [...]
+</pre>
+
 ## Boost installation
 
 <pre>

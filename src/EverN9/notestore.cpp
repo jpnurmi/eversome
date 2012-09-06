@@ -18,7 +18,6 @@
 #include "settings.h"
 #include "noteitem.h"
 #include "manager.h"
-#include "noteoperation.h"
 #include "syncoperation.h"
 #include "searchoperation.h"
 #include <QThreadPool>
@@ -75,20 +74,47 @@ void NoteStore::cancel()
     cancelled = true;
 }
 
-void NoteStore::fetch(const edam::Note& note)
-{
-    NoteOperation* operation = new NoteOperation(note, NoteOperation::GetNote);
-    setupOperation(operation);
-    qDebug() << Q_FUNC_INFO << operation;
-    QThreadPool::globalInstance()->start(operation);
-}
-
 void NoteStore::search(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search);
     setupOperation(operation);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
+}
+
+void NoteStore::createNote(const edam::Note& note)
+{
+    startNoteOperation(note, NoteOperation::CreateNote);
+}
+
+void NoteStore::deleteNote(const edam::Note& note)
+{
+    startNoteOperation(note, NoteOperation::DeleteNote);
+}
+
+void NoteStore::getNote(const edam::Note& note)
+{
+    startNoteOperation(note, NoteOperation::GetNote);
+}
+
+void NoteStore::expungeNote(const edam::Note& note)
+{
+    startNoteOperation(note, NoteOperation::ExpungeNote);
+}
+
+void NoteStore::shareNote(const edam::Note& note)
+{
+    startNoteOperation(note, NoteOperation::ShareNote);
+}
+
+void NoteStore::unshareNote(const edam::Note& note)
+{
+    startNoteOperation(note, NoteOperation::UnshareNote);
+}
+
+void NoteStore::updateNote(const edam::Note& note)
+{
+    startNoteOperation(note, NoteOperation::UpdateNote);
 }
 
 void NoteStore::onOperationStarted(Operation* operation)
@@ -128,6 +154,14 @@ void NoteStore::onOperationFinished(Operation* operation)
 void NoteStore::onOperationError(Operation* operation, const QString& error)
 {
     qDebug() << Q_FUNC_INFO << operation << error;
+}
+
+void NoteStore::startNoteOperation(const edam::Note& note, NoteOperation::Mode mode)
+{
+    NoteOperation* operation = new NoteOperation(note, mode);
+    setupOperation(operation);
+    qDebug() << Q_FUNC_INFO << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::setupOperation(Operation* operation) const

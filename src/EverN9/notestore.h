@@ -16,6 +16,7 @@
 
 #include <QObject>
 #include <Types_types.h>
+#include "noteoperation.h"
 
 class UserStore;
 class Operation;
@@ -34,8 +35,15 @@ public:
 public slots:
     void sync();
     void cancel();
-    void fetch(const evernote::edam::Note& note);
     void search(const evernote::edam::SavedSearch& search);
+
+    void createNote(const evernote::edam::Note& note);
+    void deleteNote(const evernote::edam::Note& note);
+    void getNote(const evernote::edam::Note& note);
+    void expungeNote(const evernote::edam::Note& note);
+    void shareNote(const evernote::edam::Note& note);
+    void unshareNote(const evernote::edam::Note& note);
+    void updateNote(const evernote::edam::Note& note);
 
 signals:
     void started();
@@ -61,6 +69,7 @@ private slots:
     void onOperationError(Operation* operation, const QString& error);
 
 private:
+    void startNoteOperation(const evernote::edam::Note& note, NoteOperation::Mode mode);
     void setupOperation(Operation* operation) const;
 
     volatile bool syncing;

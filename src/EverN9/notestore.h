@@ -78,10 +78,6 @@ private:
     void startNotebookOperation(const evernote::edam::Notebook& notebook, Operation::Mode mode);
     void setupOperation(Operation* operation) const;
 
-    volatile bool syncing;
-    volatile bool fetching;
-    volatile bool searching;
-    volatile bool cancelled;
     UserStore* userStore;
 };
 

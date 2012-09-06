@@ -39,8 +39,7 @@ Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
-NoteStore::NoteStore(UserStore *userStore) : QObject(userStore),
-    syncing(false), fetching(false), searching(false), cancelled(false), userStore(userStore)
+NoteStore::NoteStore(UserStore *userStore) : QObject(userStore), userStore(userStore)
 {
     qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
@@ -58,7 +57,7 @@ NoteStore::~NoteStore()
 
 bool NoteStore::isActive() const
 {
-    return syncing || fetching;
+    return QThreadPool::globalInstance()->activeThreadCount();
 }
 
 void NoteStore::sync()
@@ -73,7 +72,7 @@ void NoteStore::sync()
 void NoteStore::cancel()
 {
     qDebug() << Q_FUNC_INFO;
-    cancelled = true;
+    // TODO
 }
 
 void NoteStore::search(const edam::SavedSearch& search)
@@ -142,6 +141,7 @@ void NoteStore::updateNotebook(const evernote::edam::Notebook& notebook)
 void NoteStore::onOperationStarted(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
+    emit isActiveChanged();
 }
 
 void NoteStore::onOperationFinished(Operation* operation)
@@ -171,6 +171,8 @@ void NoteStore::onOperationFinished(Operation* operation)
         emit searched(searchOperation->search(), searchOperation->notes());
 
     operation->deleteLater();
+
+    emit isActiveChanged();
 }
 
 void NoteStore::onOperationError(Operation* operation, const QString& error)

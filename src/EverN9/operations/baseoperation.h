@@ -57,6 +57,8 @@ public:
     virtual void run();
 
 signals:
+    void started();
+    void finished();
     void error(const QString& error);
 
 protected:

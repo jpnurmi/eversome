@@ -92,6 +92,8 @@ void BaseOperation::run()
         return;
     }
 
+    emit started();
+
     QString err;
     try {
         shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(m_host.toStdString(), m_port, m_path.toStdString()));
@@ -112,6 +114,8 @@ void BaseOperation::run()
         qDebug() << Q_FUNC_INFO << "ERROR:" << err << this;
         emit error(err);
     }
+
+    emit finished();
 }
 
 QDebug operator<<(QDebug debug, const BaseOperation* operation)

@@ -28,7 +28,6 @@ using namespace evernote;
 BaseOperation::BaseOperation(BaseOperation::Operation operation)
     : m_port(-1), m_operation(operation)
 {
-    setAutoDelete(true);
 }
 
 BaseOperation::~BaseOperation()

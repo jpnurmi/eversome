@@ -20,12 +20,10 @@
 #include "manager.h"
 #include "noteoperation.h"
 #include "syncoperation.h"
-#include <QtConcurrentRun>
+#include "searchoperation.h"
+#include <QThreadPool>
 #include <QMetaType>
 #include <QtDebug>
-#include <Limits_constants.h>
-#include <thrift/transport/THttpClient.h>
-#include <thrift/protocol/TBinaryProtocol.h>
 
 using namespace boost;
 using namespace apache;
@@ -87,50 +85,10 @@ void NoteStore::fetch(const edam::Note& note)
 
 void NoteStore::search(const edam::SavedSearch& search)
 {
-    qDebug() << Q_FUNC_INFO;
-    QtConcurrent::run(this, &NoteStore::searchImpl, search);
-}
-
-void NoteStore::searchImpl(const edam::SavedSearch& search)
-{
-    if (searching)
-        return;
-
-    qDebug() << Q_FUNC_INFO << QString::fromStdString(search.name);
-
-    searching = true;
-    emit isActiveChanged();
-
-    QString err;
-    try {
-        edam::NoteList list;
-        edam::NoteFilter filter;
-        filter.words = search.query;
-        std::string token = userStore->authToken().toStdString();
-
-        edam::NoteStoreClient client(createProtocol());
-        client.findNotes(list, token, filter, 0, limits::g_Limits_constants.EDAM_USER_NOTES_MAX);
-
-        if (list.notes.size())
-            emit searched(search, QVector<edam::Note>::fromStdVector(list.notes));
-
-    } catch (edam::EDAMUserException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (edam::EDAMSystemException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (edam::EDAMNotFoundException& e) {
-        err = Manager::errorString(-1);
-    } catch (thrift::TException& e) {
-        err = QString::fromUtf8(e.what());
-    }
-
-    if (!err.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << err;
-        emit error(err);
-    }
-
-    searching = false;
-    emit isActiveChanged();
+    SearchOperation* operation = new SearchOperation(search);
+    setupOperation(operation);
+    qDebug() << Q_FUNC_INFO << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::onOperationStarted(BaseOperation* operation)
@@ -141,6 +99,7 @@ void NoteStore::onOperationStarted(BaseOperation* operation)
 void NoteStore::onOperationFinished(BaseOperation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
+
     NoteOperation* noteOperation = qobject_cast<NoteOperation*>(operation);
     if (noteOperation && noteOperation->operation() == NoteOperation::GetNote) {
         edam::Note note = noteOperation->note();
@@ -148,6 +107,7 @@ void NoteStore::onOperationFinished(BaseOperation* operation)
         for (uint i = 0; i < note.resources.size(); ++i)
             emit resourceFetched(note.resources.at(i));
     }
+
     SyncOperation* syncOperation = qobject_cast<SyncOperation*>(operation);
     if (syncOperation) {
         Settings::setValue(Settings::ServerUSN, QString::number(syncOperation->usn()));
@@ -157,6 +117,10 @@ void NoteStore::onOperationFinished(BaseOperation* operation)
                     syncOperation->notes(),
                     syncOperation->tags());
     }
+
+    SearchOperation* searchOperation = qobject_cast<SearchOperation*>(operation);
+    if (searchOperation)
+        emit searched(searchOperation->search(), searchOperation->notes());
 
     operation->deleteLater();
 }
@@ -178,16 +142,4 @@ void NoteStore::setupOperation(BaseOperation* operation) const
     operation->setPort(Settings::value(Settings::ServerPort).toInt());
     operation->setPath(userStore->notesUrl().path());
     operation->setAuthToken(userStore->authToken());
-}
-
-shared_ptr<apache::thrift::protocol::TProtocol> NoteStore::createProtocol() const
-{
-    std::string host = Settings::value(Settings::Hostname).toStdString();
-    int port = Settings::value(Settings::ServerPort).toInt();
-    std::string path = userStore->notesUrl().path().toStdString();
-
-    shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(host, port, path));
-    transport->open();
-
-    return shared_ptr<thrift::protocol::TProtocol>(new thrift::protocol::TBinaryProtocol(transport));
 }

@@ -15,7 +15,6 @@
 #define NOTESTORE_H
 
 #include <QObject>
-#include <NoteStore.h>
 #include <Types_types.h>
 
 class UserStore;
@@ -57,15 +56,12 @@ signals:
     void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
 private slots:
-    void searchImpl(const evernote::edam::SavedSearch& search);
-
     void onOperationStarted(BaseOperation* operation);
     void onOperationFinished(BaseOperation* operation);
     void onOperationError(BaseOperation* operation, const QString& error);
 
 private:
     void setupOperation(BaseOperation* operation) const;
-    boost::shared_ptr<apache::thrift::protocol::TProtocol> createProtocol() const;
 
     volatile bool syncing;
     volatile bool fetching;

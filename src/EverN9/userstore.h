@@ -17,7 +17,8 @@
 #include <QUrl>
 #include <QObject>
 #include <QDateTime>
-#include <UserStore.h>
+
+class Operation;
 
 class UserStore : public QObject
 {
@@ -52,7 +53,9 @@ signals:
     void error(const QString& error);
 
 private slots:
-    void loginImpl(const QString& username, const QString& password, bool remember);
+    void onOperationStarted(Operation* operation);
+    void onOperationFinished(Operation* operation);
+    void onOperationError(Operation* operation, const QString& error);
 
 private:
     QString token;

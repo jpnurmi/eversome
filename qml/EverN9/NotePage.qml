@@ -65,7 +65,7 @@ CommonPage {
     onStatusChanged: {
         if (status == PageStatus.Activating) {
             if (note && note.isEmpty)
-                NoteStore.fetch(note.note());
+                NoteStore.getNote(note.note());
         }
     }
 }

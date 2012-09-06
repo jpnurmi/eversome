@@ -30,13 +30,19 @@ public:
     {
         Sync,
         Search,
+
         CreateNote,
         DeleteNote,
         GetNote,
         ExpungeNote,
         ShareNote,
         UnshareNote,
-        UpdateNote
+        UpdateNote,
+
+        CreateNotebook,
+        ExpungeNotebook,
+        GetDefaultNotebook,
+        UpdateNotebook
     };
 
     Operation(Mode mode);

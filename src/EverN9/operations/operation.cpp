@@ -42,7 +42,7 @@ Operation::Mode Operation::mode() const
 
 bool Operation::isValid() const
 {
-    return m_port != -1 && !m_host.isEmpty() && !m_path.isEmpty() && !m_token.isEmpty();
+    return m_port != -1 && !m_host.isEmpty() && !m_path.isEmpty();
 }
 
 QString Operation::host() const
@@ -101,10 +101,13 @@ void Operation::run()
         transport->open();
         operate(protocol);
     } catch (edam::EDAMUserException& e) {
+        // TODO: refactor error string handling
         err = Manager::errorString(e.errorCode);
     } catch (edam::EDAMSystemException& e) {
+        // TODO: refactor error string handling
         err = Manager::errorString(e.errorCode);
     } catch (edam::EDAMNotFoundException& e) {
+        // TODO: refactor error string handling
         err = Manager::errorString(-1); // TODO
     } catch (thrift::TException& e) {
         err = QString::fromUtf8(e.what());

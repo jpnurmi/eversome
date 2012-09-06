@@ -69,4 +69,6 @@ private:
     Operation m_operation;
 };
 
+QDebug operator<<(QDebug debug, const BaseOperation* operation);
+
 #endif // BASEOPERATION_H

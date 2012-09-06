@@ -18,6 +18,7 @@
 #include <thrift/transport/THttpClient.h>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <Errors_types.h>
+#include <QMetaEnum>
 #include <QtDebug>
 
 using namespace boost;
@@ -79,6 +80,11 @@ void BaseOperation::setAuthToken(const QString& token)
     m_token = token;
 }
 
+QString BaseOperation::error() const
+{
+    return m_error;
+}
+
 void BaseOperation::run()
 {
     if (m_port == -1 || m_host.isEmpty() || m_path.isEmpty() || m_token.isEmpty()) {
@@ -100,4 +106,29 @@ void BaseOperation::run()
     } catch (thrift::TException& e) {
         m_error = QString::fromUtf8(e.what());
     }
+}
+
+QDebug operator<<(QDebug debug, const BaseOperation* operation)
+{
+    if (!operation)
+        return debug << "BaseOperation(0x0) ";
+
+    const QMetaObject* metaObject = operation->metaObject();
+
+    debug.nospace() << metaObject->className() << '(' << (void*) operation;
+    if (!operation->objectName().isEmpty())
+        debug << ", name = " << operation->objectName();
+
+    QMetaEnum enumerator = metaObject->enumerator(metaObject->indexOfEnumerator("Operation"));
+    debug << ", operation = " << enumerator.valueToKey(operation->operation());
+
+    debug << ", host = " << operation->host()
+          << ", port = " << operation->port()
+          << ", path = " << operation->path()
+          << ", token = " << operation->authToken();
+    if (!operation->error().isEmpty())
+        debug << ", error = " << operation->error();
+
+    debug << ')';
+    return debug.space();
 }

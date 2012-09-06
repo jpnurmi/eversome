@@ -29,6 +29,7 @@ public:
     enum Operation
     {
         Sync,
+        Search,
         CreateNote,
         DeleteNote,
         GetNote,

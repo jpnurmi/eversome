@@ -18,6 +18,7 @@
 #include "settings.h"
 #include "noteitem.h"
 #include "manager.h"
+#include "noteoperation.h"
 #include <QtConcurrentRun>
 #include <QMetaType>
 #include <QtDebug>
@@ -74,7 +75,8 @@ void NoteStore::cancel()
 
 void NoteStore::fetch(const edam::Note& note)
 {
-    NoteOperation* operation = createOperation(note, NoteOperation::GetNote);
+    NoteOperation* operation = new NoteOperation(note, NoteOperation::GetNote);
+    setupOperation(operation);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
 }
@@ -222,9 +224,8 @@ void NoteStore::onOperationError(BaseOperation* operation, const QString& error)
     qDebug() << Q_FUNC_INFO << operation << error;
 }
 
-NoteOperation* NoteStore::createOperation(const evernote::edam::Note& note, const  NoteOperation::Operation type) const
+void NoteStore::setupOperation(BaseOperation* operation) const
 {
-    NoteOperation* operation = new NoteOperation(note, type);
     connect(operation, SIGNAL(started(BaseOperation*)),
                  this, SLOT(onOperationStarted(BaseOperation*)), Qt::DirectConnection);
     connect(operation, SIGNAL(finished(BaseOperation*)),
@@ -235,7 +236,6 @@ NoteOperation* NoteStore::createOperation(const evernote::edam::Note& note, cons
     operation->setPort(Settings::value(Settings::ServerPort).toInt());
     operation->setPath(userStore->notesUrl().path());
     operation->setAuthToken(userStore->authToken());
-    return operation;
 }
 
 shared_ptr<apache::thrift::protocol::TProtocol> NoteStore::createProtocol() const

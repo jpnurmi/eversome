@@ -17,9 +17,9 @@
 #include <QObject>
 #include <NoteStore.h>
 #include <Types_types.h>
-#include "noteoperation.h"
 
 class UserStore;
+class BaseOperation;
 
 class NoteStore : public QObject
 {
@@ -65,7 +65,7 @@ private slots:
     void onOperationError(BaseOperation* operation, const QString& error);
 
 private:
-    NoteOperation* createOperation(const evernote::edam::Note& note, NoteOperation::Operation) const;
+    void setupOperation(BaseOperation* operation) const;
     boost::shared_ptr<apache::thrift::protocol::TProtocol> createProtocol() const;
 
     volatile bool syncing;

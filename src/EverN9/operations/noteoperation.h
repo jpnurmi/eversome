@@ -20,13 +20,10 @@
 class NoteOperation : public BaseOperation
 {
 public:
-    enum Operation { Create, Delete, Get, Expunge, Share, Unshare, Update };
-
     NoteOperation(const evernote::edam::Note& note, Operation operation);
     ~NoteOperation();
 
     evernote::edam::Note note() const;
-    Operation operation() const;
 
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
 

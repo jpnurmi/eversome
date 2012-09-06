@@ -21,8 +21,21 @@
 class BaseOperation : public QRunnable
 {
 public:
-    BaseOperation();
+    enum Operation
+    {
+        CreateNote,
+        DeleteNote,
+        GetNote,
+        ExpungeNote,
+        ShareNote,
+        UnshareNote,
+        UpdateNote
+    };
+
+    BaseOperation(Operation operation);
     ~BaseOperation();
+
+    Operation operation() const;
 
     QString host() const;
     void setHost(const QString& host);
@@ -49,6 +62,7 @@ private:
     QString m_path;
     QString m_token;
     QString m_error;
+    Operation m_operation;
 };
 
 #endif // BASEOPERATION_H

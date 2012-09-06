@@ -24,13 +24,19 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-BaseOperation::BaseOperation() : m_port(-1)
+BaseOperation::BaseOperation(BaseOperation::Operation operation)
+    : m_port(-1), m_operation(operation)
 {
     setAutoDelete(true);
 }
 
 BaseOperation::~BaseOperation()
 {
+}
+
+BaseOperation::Operation BaseOperation::operation() const
+{
+    return m_operation;
 }
 
 QString BaseOperation::host() const

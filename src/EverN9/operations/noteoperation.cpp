@@ -21,8 +21,8 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-NoteOperation::NoteOperation(const evernote::edam::Note& note, Operation operation)
-    : m_note(note), m_operation(operation)
+NoteOperation::NoteOperation(const evernote::edam::Note& note, Operation operation) :
+    BaseOperation(operation), m_note(note), m_operation(operation)
 {
 }
 
@@ -35,45 +35,39 @@ evernote::edam::Note NoteOperation::note() const
     return m_note;
 }
 
-NoteOperation::Operation NoteOperation::operation() const
-{
-    return m_operation;
-}
-
-
 void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
     int usn = 0; // TODO
     std::string key; // TODO
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
-    switch (m_operation)
+    switch (operation())
     {
-        case Create:
+        case CreateNote:
             client.createNote(m_note, token, m_note);
             break;
-        case Delete:
+        case DeleteNote:
             usn = client.deleteNote(token, m_note.guid);
             break;
-        case Get:
+        case GetNote:
             client.getNoteContent(m_note.content, token, m_note.guid);
             for (uint i = 0; i < m_note.resources.size(); ++i)
                 client.getResource(m_note.resources[i], token, m_note.resources.at(i).guid, true, false, false, false);
             break;
-        case Expunge:
+        case ExpungeNote:
             usn = client.expungeNote(token, m_note.guid);
             break;
-        case Share:
+        case ShareNote:
             client.shareNote(key, token, m_note.guid);
             break;
-        case Unshare:
+        case UnshareNote:
             client.stopSharingNote(token, m_note.guid);
             break;
-        case Update:
+        case UpdateNote:
             client.updateNote(m_note, token, m_note);
             break;
         default:
-            qWarning() << Q_FUNC_INFO << "unknown operation" << m_operation;
+            qWarning() << Q_FUNC_INFO << "unknown operation" << operation();
             break;
     }
 }

@@ -19,6 +19,8 @@
 
 class NoteOperation : public BaseOperation
 {
+    Q_OBJECT
+
 public:
     NoteOperation(const evernote::edam::Note& note, Operation operation);
     ~NoteOperation();

@@ -15,11 +15,15 @@
 #define BASEOPERATION_H
 
 #include <QString>
+#include <QObject>
 #include <QRunnable>
 #include <thrift/protocol/TProtocol.h>
 
-class BaseOperation : public QRunnable
+class BaseOperation : public QObject, public QRunnable
 {
+    Q_OBJECT
+    Q_ENUMS(Operation)
+
 public:
     enum Operation
     {

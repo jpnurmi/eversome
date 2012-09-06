@@ -74,8 +74,9 @@ void NoteStore::cancel()
 
 void NoteStore::fetch(const edam::Note& note)
 {
-    qDebug() << Q_FUNC_INFO;
-    QtConcurrent::run(this, &NoteStore::fetchImpl, note);
+    NoteOperation* operation = createOperation(note, NoteOperation::GetNote);
+    qDebug() << Q_FUNC_INFO << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::search(const edam::SavedSearch& search)
@@ -156,56 +157,6 @@ void NoteStore::syncImpl()
         emit finished();
 }
 
-void NoteStore::fetchImpl(const edam::Note& note)
-{
-    if (fetching)
-        return;
-
-    qDebug() << Q_FUNC_INFO << QString::fromStdString(note.title);
-
-    fetching = true;
-    cancelled = false;
-    emit started();
-    emit isActiveChanged();
-
-    QString err;
-    try {
-        edam::Note copy(note);
-        std::string token = userStore->authToken().toStdString();
-
-        edam::NoteStoreClient client(createProtocol());
-        client.getNoteContent(copy.content, token, copy.guid);
-
-        if (!copy.content.empty())
-            emit noteFetched(copy);
-
-        for (uint i = 0; !cancelled && i < copy.resources.size(); ++i) {
-            edam::Resource res = copy.resources.at(i);
-            client.getResource(res, token, res.guid, true, false, false, false);
-            emit resourceFetched(res);
-        }
-
-    } catch (edam::EDAMUserException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (edam::EDAMSystemException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (edam::EDAMNotFoundException& e) {
-        err = Manager::errorString(-1);
-    } catch (thrift::TException& e) {
-        err = QString::fromUtf8(e.what());
-    }
-
-    if (!err.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << err;
-        emit error(err);
-    }
-
-    fetching = false;
-    emit isActiveChanged();
-    if (!cancelled)
-        emit finished();
-}
-
 void NoteStore::searchImpl(const edam::SavedSearch& search)
 {
     if (searching)
@@ -246,6 +197,45 @@ void NoteStore::searchImpl(const edam::SavedSearch& search)
 
     searching = false;
     emit isActiveChanged();
+}
+
+void NoteStore::onOperationStarted(BaseOperation* operation)
+{
+    qDebug() << Q_FUNC_INFO << operation;
+}
+
+void NoteStore::onOperationFinished(BaseOperation* operation)
+{
+    qDebug() << Q_FUNC_INFO << operation;
+    NoteOperation* noteOperation = qobject_cast<NoteOperation*>(operation);
+    if (noteOperation && noteOperation->operation() == NoteOperation::GetNote) {
+        edam::Note note = noteOperation->note();
+        emit noteFetched(note);
+        for (uint i = 0; i < note.resources.size(); ++i)
+            emit resourceFetched(note.resources.at(i));
+    }
+    operation->deleteLater();
+}
+
+void NoteStore::onOperationError(BaseOperation* operation, const QString& error)
+{
+    qDebug() << Q_FUNC_INFO << operation << error;
+}
+
+NoteOperation* NoteStore::createOperation(const evernote::edam::Note& note, const  NoteOperation::Operation type) const
+{
+    NoteOperation* operation = new NoteOperation(note, type);
+    connect(operation, SIGNAL(started(BaseOperation*)),
+                 this, SLOT(onOperationStarted(BaseOperation*)), Qt::DirectConnection);
+    connect(operation, SIGNAL(finished(BaseOperation*)),
+                 this, SLOT(onOperationFinished(BaseOperation*)), Qt::DirectConnection);
+    connect(operation, SIGNAL(error(BaseOperation*,QString)),
+                 this, SLOT(onOperationError(BaseOperation*,QString)), Qt::DirectConnection);
+    operation->setHost(Settings::value(Settings::Hostname));
+    operation->setPort(Settings::value(Settings::ServerPort).toInt());
+    operation->setPath(userStore->notesUrl().path());
+    operation->setAuthToken(userStore->authToken());
+    return operation;
 }
 
 shared_ptr<apache::thrift::protocol::TProtocol> NoteStore::createProtocol() const

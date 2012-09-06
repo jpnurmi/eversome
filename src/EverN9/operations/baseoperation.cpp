@@ -130,14 +130,7 @@ QDebug operator<<(QDebug debug, const BaseOperation* operation)
         debug << ", name = " << operation->objectName();
 
     QMetaEnum enumerator = metaObject->enumerator(metaObject->indexOfEnumerator("Operation"));
-    debug << ", operation = " << enumerator.valueToKey(operation->operation());
-
-    debug << ", valid = " << operation->isValid()
-          << ", host = " << operation->host()
-          << ", port = " << operation->port()
-          << ", path = " << operation->path()
-          << ", token = " << operation->authToken();
-
-    debug << ')';
+    debug << ", operation = " << enumerator.valueToKey(operation->operation())
+          << ", valid = " << operation->isValid() << ')';
     return debug.space();
 }

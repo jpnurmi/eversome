@@ -3,8 +3,10 @@ DEPENDPATH += $$PWD
 
 HEADERS += \
     baseoperation.h \
-    noteoperation.h
+    noteoperation.h \
+    syncoperation.h
 
 SOURCES += \
     baseoperation.cpp \
-    noteoperation.cpp
+    noteoperation.cpp \
+    syncoperation.cpp

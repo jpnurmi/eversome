@@ -28,6 +28,7 @@ class BaseOperation : public QObject, public QRunnable
 public:
     enum Operation
     {
+        Sync,
         CreateNote,
         DeleteNote,
         GetNote,

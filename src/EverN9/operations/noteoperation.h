@@ -31,7 +31,6 @@ public:
 
 private:
     evernote::edam::Note m_note;
-    Operation m_operation;
 };
 
 #endif // NOTEOPERATION_H

@@ -22,7 +22,7 @@ using namespace apache;
 using namespace evernote;
 
 NoteOperation::NoteOperation(const evernote::edam::Note& note, Operation operation) :
-    BaseOperation(operation), m_note(note), m_operation(operation)
+    BaseOperation(operation), m_note(note)
 {
 }
 

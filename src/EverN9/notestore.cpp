@@ -18,8 +18,10 @@
 #include "settings.h"
 #include "noteitem.h"
 #include "manager.h"
+#include "noteoperation.h"
 #include "syncoperation.h"
 #include "searchoperation.h"
+#include "notebookoperation.h"
 #include <QThreadPool>
 #include <QMetaType>
 #include <QtDebug>
@@ -84,37 +86,57 @@ void NoteStore::search(const edam::SavedSearch& search)
 
 void NoteStore::createNote(const edam::Note& note)
 {
-    startNoteOperation(note, NoteOperation::CreateNote);
+    startNoteOperation(note, Operation::CreateNote);
 }
 
 void NoteStore::deleteNote(const edam::Note& note)
 {
-    startNoteOperation(note, NoteOperation::DeleteNote);
+    startNoteOperation(note, Operation::DeleteNote);
 }
 
 void NoteStore::getNote(const edam::Note& note)
 {
-    startNoteOperation(note, NoteOperation::GetNote);
+    startNoteOperation(note, Operation::GetNote);
 }
 
 void NoteStore::expungeNote(const edam::Note& note)
 {
-    startNoteOperation(note, NoteOperation::ExpungeNote);
+    startNoteOperation(note, Operation::ExpungeNote);
 }
 
 void NoteStore::shareNote(const edam::Note& note)
 {
-    startNoteOperation(note, NoteOperation::ShareNote);
+    startNoteOperation(note, Operation::ShareNote);
 }
 
 void NoteStore::unshareNote(const edam::Note& note)
 {
-    startNoteOperation(note, NoteOperation::UnshareNote);
+    startNoteOperation(note, Operation::UnshareNote);
 }
 
 void NoteStore::updateNote(const edam::Note& note)
 {
-    startNoteOperation(note, NoteOperation::UpdateNote);
+    startNoteOperation(note, Operation::UpdateNote);
+}
+
+void NoteStore::createNotebook(const evernote::edam::Notebook& notebook)
+{
+    startNotebookOperation(notebook, Operation::CreateNotebook);
+}
+
+void NoteStore::expungeNotebook(const evernote::edam::Notebook& notebook)
+{
+    startNotebookOperation(notebook, Operation::ExpungeNotebook);
+}
+
+void NoteStore::getDefaultNotebook(const evernote::edam::Notebook& notebook)
+{
+    startNotebookOperation(notebook, Operation::GetDefaultNotebook);
+}
+
+void NoteStore::updateNotebook(const evernote::edam::Notebook& notebook)
+{
+    startNotebookOperation(notebook, Operation::UpdateNotebook);
 }
 
 void NoteStore::onOperationStarted(Operation* operation)
@@ -156,9 +178,17 @@ void NoteStore::onOperationError(Operation* operation, const QString& error)
     qDebug() << Q_FUNC_INFO << operation << error;
 }
 
-void NoteStore::startNoteOperation(const edam::Note& note, NoteOperation::Mode mode)
+void NoteStore::startNoteOperation(const edam::Note& note, Operation::Mode mode)
 {
     NoteOperation* operation = new NoteOperation(note, mode);
+    setupOperation(operation);
+    qDebug() << Q_FUNC_INFO << operation;
+    QThreadPool::globalInstance()->start(operation);
+}
+
+void NoteStore::startNotebookOperation(const edam::Notebook& notebook, Operation::Mode mode)
+{
+    NotebookOperation* operation = new NotebookOperation(notebook, mode);
     setupOperation(operation);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);

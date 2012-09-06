@@ -16,7 +16,7 @@
 
 #include <QObject>
 #include <Types_types.h>
-#include "noteoperation.h"
+#include "operation.h"
 
 class UserStore;
 class Operation;
@@ -45,6 +45,11 @@ public slots:
     void unshareNote(const evernote::edam::Note& note);
     void updateNote(const evernote::edam::Note& note);
 
+    void createNotebook(const evernote::edam::Notebook& notebook);
+    void expungeNotebook(const evernote::edam::Notebook& notebook);
+    void getDefaultNotebook(const evernote::edam::Notebook& notebook);
+    void updateNotebook(const evernote::edam::Notebook& notebook);
+
 signals:
     void started();
     void progress(int percent);
@@ -69,7 +74,8 @@ private slots:
     void onOperationError(Operation* operation, const QString& error);
 
 private:
-    void startNoteOperation(const evernote::edam::Note& note, NoteOperation::Mode mode);
+    void startNoteOperation(const evernote::edam::Note& note, Operation::Mode mode);
+    void startNotebookOperation(const evernote::edam::Notebook& notebook, Operation::Mode mode);
     void setupOperation(Operation* operation) const;
 
     volatile bool syncing;

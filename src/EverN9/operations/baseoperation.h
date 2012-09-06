@@ -40,6 +40,7 @@ public:
     ~BaseOperation();
 
     Operation operation() const;
+    bool isValid() const;
 
     QString host() const;
     void setHost(const QString& host);

@@ -40,6 +40,11 @@ BaseOperation::Operation BaseOperation::operation() const
     return m_operation;
 }
 
+bool BaseOperation::isValid() const
+{
+    return m_port != -1 && !m_host.isEmpty() && !m_path.isEmpty() && !m_token.isEmpty();
+}
+
 QString BaseOperation::host() const
 {
     return m_host;
@@ -87,8 +92,8 @@ QString BaseOperation::error() const
 
 void BaseOperation::run()
 {
-    if (m_port == -1 || m_host.isEmpty() || m_path.isEmpty() || m_token.isEmpty()) {
-        qCritical() << Q_FUNC_INFO << "host, port, path & token must be set!";
+    if (!isValid()) {
+        qCritical() << Q_FUNC_INFO << "INVALID OPERATION" << this;
         return;
     }
 
@@ -122,7 +127,8 @@ QDebug operator<<(QDebug debug, const BaseOperation* operation)
     QMetaEnum enumerator = metaObject->enumerator(metaObject->indexOfEnumerator("Operation"));
     debug << ", operation = " << enumerator.valueToKey(operation->operation());
 
-    debug << ", host = " << operation->host()
+    debug << ", valid = " << operation->isValid()
+          << ", host = " << operation->host()
           << ", port = " << operation->port()
           << ", path = " << operation->path()
           << ", token = " << operation->authToken();

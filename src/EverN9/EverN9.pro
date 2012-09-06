@@ -33,6 +33,7 @@ SOURCES += \
     userstore.cpp
 
 include(model/model.pri)
+include(operations/operations.pri)
 
 OTHER_FILES += \
     EverN9_harmattan.desktop \

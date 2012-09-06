@@ -91,7 +91,7 @@ void BaseOperation::run()
         return;
     }
 
-    emit started();
+    emit started(this);
 
     QString err;
     try {
@@ -111,10 +111,10 @@ void BaseOperation::run()
 
     if (!err.isEmpty()) {
         qDebug() << Q_FUNC_INFO << "ERROR:" << err << this;
-        emit error(err);
+        emit error(this, err);
     }
 
-    emit finished();
+    emit finished(this);
 }
 
 QDebug operator<<(QDebug debug, const BaseOperation* operation)

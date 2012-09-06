@@ -57,9 +57,9 @@ public:
     virtual void run();
 
 signals:
-    void started();
-    void finished();
-    void error(const QString& error);
+    void started(BaseOperation* operation);
+    void finished(BaseOperation* operation);
+    void error(BaseOperation* operation, const QString& error);
 
 protected:
     virtual void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol) = 0;

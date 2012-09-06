@@ -85,31 +85,32 @@ void BaseOperation::setAuthToken(const QString& token)
     m_token = token;
 }
 
-QString BaseOperation::error() const
-{
-    return m_error;
-}
-
 void BaseOperation::run()
 {
     if (!isValid()) {
-        qCritical() << Q_FUNC_INFO << "INVALID OPERATION" << this;
+        qCritical() << Q_FUNC_INFO << "INVALID:" << this;
         return;
     }
 
+    QString err;
     try {
         shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(m_host.toStdString(), m_port, m_path.toStdString()));
         shared_ptr<thrift::protocol::TProtocol> protocol(new thrift::protocol::TBinaryProtocol(transport));
         transport->open();
         operate(protocol);
     } catch (edam::EDAMUserException& e) {
-        m_error = Manager::errorString(e.errorCode);
+        err = Manager::errorString(e.errorCode);
     } catch (edam::EDAMSystemException& e) {
-        m_error = Manager::errorString(e.errorCode);
+        err = Manager::errorString(e.errorCode);
     } catch (edam::EDAMNotFoundException& e) {
-        m_error = Manager::errorString(-1); // TODO
+        err = Manager::errorString(-1); // TODO
     } catch (thrift::TException& e) {
-        m_error = QString::fromUtf8(e.what());
+        err = QString::fromUtf8(e.what());
+    }
+
+    if (!err.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << "ERROR:" << err << this;
+        emit error(err);
     }
 }
 
@@ -132,8 +133,6 @@ QDebug operator<<(QDebug debug, const BaseOperation* operation)
           << ", port = " << operation->port()
           << ", path = " << operation->path()
           << ", token = " << operation->authToken();
-    if (!operation->error().isEmpty())
-        debug << ", error = " << operation->error();
 
     debug << ')';
     return debug.space();

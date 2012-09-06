@@ -54,9 +54,10 @@ public:
     QString authToken() const;
     void setAuthToken(const QString& token);
 
-    QString error() const;
-
     virtual void run();
+
+signals:
+    void error(const QString& error);
 
 protected:
     virtual void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol) = 0;
@@ -66,7 +67,6 @@ private:
     QString m_host;
     QString m_path;
     QString m_token;
-    QString m_error;
     Operation m_operation;
 };
 

@@ -21,7 +21,7 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-NoteOperation::NoteOperation(const evernote::edam::Note& note, Mode mode) :
+NoteOperation::NoteOperation(const edam::Note& note, Mode mode) :
     Operation(mode), m_note(note)
 {
 }
@@ -30,7 +30,7 @@ NoteOperation::~NoteOperation()
 {
 }
 
-evernote::edam::Note NoteOperation::note() const
+edam::Note NoteOperation::note() const
 {
     return m_note;
 }

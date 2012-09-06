@@ -57,7 +57,6 @@ signals:
     void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
 private slots:
-    void syncImpl();
     void searchImpl(const evernote::edam::SavedSearch& search);
 
     void onOperationStarted(BaseOperation* operation);

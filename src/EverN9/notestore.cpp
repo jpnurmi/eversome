@@ -19,6 +19,7 @@
 #include "noteitem.h"
 #include "manager.h"
 #include "noteoperation.h"
+#include "syncoperation.h"
 #include <QtConcurrentRun>
 #include <QMetaType>
 #include <QtDebug>
@@ -63,8 +64,11 @@ bool NoteStore::isActive() const
 
 void NoteStore::sync()
 {
-    qDebug() << Q_FUNC_INFO;
-    QtConcurrent::run(this, &NoteStore::syncImpl);
+    int usn = Settings::value(Settings::ServerUSN).toInt();
+    SyncOperation* operation = new SyncOperation(usn);
+    setupOperation(operation);
+    qDebug() << Q_FUNC_INFO << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::cancel()
@@ -85,78 +89,6 @@ void NoteStore::search(const edam::SavedSearch& search)
 {
     qDebug() << Q_FUNC_INFO;
     QtConcurrent::run(this, &NoteStore::searchImpl, search);
-}
-
-void NoteStore::syncImpl()
-{
-    if (syncing)
-        return;
-
-    qDebug() << Q_FUNC_INFO;
-
-    syncing = true;
-    cancelled = false;
-    emit started();
-    emit isActiveChanged();
-
-    QString err;
-    try {
-        edam::NoteStoreClient client(createProtocol());
-
-        int percent = 0;
-        int usn = Settings::value(Settings::ServerUSN).toInt();
-        std::string token = userStore->authToken().toStdString();
-
-        while (!cancelled) {
-            emit progress(percent);
-
-            edam::SyncChunk chunk;
-            client.getSyncChunk(chunk, token, usn, 256, false);
-
-            if (usn >= chunk.updateCount)
-                break;
-
-            percent = (int)((double)(100*(double)usn/(double)chunk.updateCount));
-            emit progress(percent);
-
-            QVector<edam::Notebook> notebooks = QVector<edam::Notebook>::fromStdVector(chunk.notebooks);
-            QVector<edam::Resource> resources = QVector<edam::Resource>::fromStdVector(chunk.resources);
-            QVector<edam::SavedSearch> searches = QVector<edam::SavedSearch>::fromStdVector(chunk.searches);
-            QVector<edam::Note> notes = QVector<edam::Note>::fromStdVector(chunk.notes);
-            QVector<edam::Tag> tags = QVector<edam::Tag>::fromStdVector(chunk.tags);
-
-            qDebug() << Q_FUNC_INFO
-                     << "NB:" << notebooks.size()
-                     << "R:" << resources.size()
-                     << "S:" << searches.size()
-                     << "N:" << notes.size()
-                     << "T:" << tags.size()
-                     << "USN:" << chunk.chunkHighUSN;
-
-            emit synced(notebooks, resources, searches, notes, tags);
-
-            usn = chunk.chunkHighUSN;
-            Settings::setValue(Settings::ServerUSN, QString::number(usn));
-            if (usn >= chunk.updateCount)
-                break;
-        }
-    } catch (edam::EDAMUserException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (edam::EDAMSystemException& e) {
-        err = Manager::errorString(e.errorCode);
-    } catch (thrift::TException& e) {
-        err = QString::fromUtf8(e.what());
-    }
-
-    if (!err.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << err;
-        emit error(err);
-    }
-
-    syncing = false;
-    emit isActiveChanged();
-    if (!cancelled)
-        emit finished();
 }
 
 void NoteStore::searchImpl(const edam::SavedSearch& search)
@@ -216,6 +148,16 @@ void NoteStore::onOperationFinished(BaseOperation* operation)
         for (uint i = 0; i < note.resources.size(); ++i)
             emit resourceFetched(note.resources.at(i));
     }
+    SyncOperation* syncOperation = qobject_cast<SyncOperation*>(operation);
+    if (syncOperation) {
+        Settings::setValue(Settings::ServerUSN, QString::number(syncOperation->usn()));
+        emit synced(syncOperation->notebooks(),
+                    syncOperation->resources(),
+                    syncOperation->searches(),
+                    syncOperation->notes(),
+                    syncOperation->tags());
+    }
+
     operation->deleteLater();
 }
 

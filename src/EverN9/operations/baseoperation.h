@@ -16,6 +16,7 @@
 
 #include <QString>
 #include <QObject>
+#include <QMetaType>
 #include <QRunnable>
 #include <thrift/protocol/TProtocol.h>
 
@@ -71,6 +72,8 @@ private:
     QString m_token;
     Operation m_operation;
 };
+
+Q_DECLARE_METATYPE(BaseOperation*)
 
 QDebug operator<<(QDebug debug, const BaseOperation* operation);
 

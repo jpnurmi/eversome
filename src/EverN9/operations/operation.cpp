@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "baseoperation.h"
+#include "operation.h"
 #include "manager.h"
 #include <thrift/transport/THttpClient.h>
 #include <thrift/protocol/TBinaryProtocol.h>
@@ -25,67 +25,67 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-BaseOperation::BaseOperation(BaseOperation::Operation operation)
-    : m_port(-1), m_operation(operation)
+Operation::Operation(Operation::Mode mode)
+    : m_port(-1), m_mode(mode)
 {
-    qRegisterMetaType<BaseOperation*>();
+    qRegisterMetaType<Operation*>();
 }
 
-BaseOperation::~BaseOperation()
+Operation::~Operation()
 {
 }
 
-BaseOperation::Operation BaseOperation::operation() const
+Operation::Mode Operation::mode() const
 {
-    return m_operation;
+    return m_mode;
 }
 
-bool BaseOperation::isValid() const
+bool Operation::isValid() const
 {
     return m_port != -1 && !m_host.isEmpty() && !m_path.isEmpty() && !m_token.isEmpty();
 }
 
-QString BaseOperation::host() const
+QString Operation::host() const
 {
     return m_host;
 }
 
-void BaseOperation::setHost(const QString& host)
+void Operation::setHost(const QString& host)
 {
     m_host = host;
 }
 
-int BaseOperation::port() const
+int Operation::port() const
 {
     return m_port;
 }
 
-void BaseOperation::setPort(int port)
+void Operation::setPort(int port)
 {
     m_port = port;
 }
 
-QString BaseOperation::path() const
+QString Operation::path() const
 {
     return m_path;
 }
 
-void BaseOperation::setPath(const QString& path)
+void Operation::setPath(const QString& path)
 {
     m_path = path;
 }
 
-QString BaseOperation::authToken() const
+QString Operation::authToken() const
 {
     return m_token;
 }
 
-void BaseOperation::setAuthToken(const QString& token)
+void Operation::setAuthToken(const QString& token)
 {
     m_token = token;
 }
 
-void BaseOperation::run()
+void Operation::run()
 {
     if (!isValid()) {
         qCritical() << Q_FUNC_INFO << "INVALID:" << this;
@@ -118,10 +118,10 @@ void BaseOperation::run()
     emit finished(this);
 }
 
-QDebug operator<<(QDebug debug, const BaseOperation* operation)
+QDebug operator<<(QDebug debug, const Operation* operation)
 {
     if (!operation)
-        return debug << "BaseOperation(0x0) ";
+        return debug << "Operation(0x0) ";
 
     const QMetaObject* metaObject = operation->metaObject();
 
@@ -129,8 +129,8 @@ QDebug operator<<(QDebug debug, const BaseOperation* operation)
     if (!operation->objectName().isEmpty())
         debug << ", name = " << operation->objectName();
 
-    QMetaEnum enumerator = metaObject->enumerator(metaObject->indexOfEnumerator("Operation"));
-    debug << ", operation = " << enumerator.valueToKey(operation->operation())
+    QMetaEnum enumerator = metaObject->enumerator(metaObject->indexOfEnumerator("Mode"));
+    debug << ", mode = " << enumerator.valueToKey(operation->mode())
           << ", valid = " << operation->isValid() << ')';
     return debug.space();
 }

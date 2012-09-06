@@ -21,8 +21,8 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-NoteOperation::NoteOperation(const evernote::edam::Note& note, Operation operation) :
-    BaseOperation(operation), m_note(note)
+NoteOperation::NoteOperation(const evernote::edam::Note& note, Mode mode) :
+    Operation(mode), m_note(note)
 {
 }
 
@@ -41,7 +41,7 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
     std::string key; // TODO
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
-    switch (operation())
+    switch (mode())
     {
         case CreateNote:
             client.createNote(m_note, token, m_note);
@@ -67,7 +67,7 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
             client.updateNote(m_note, token, m_note);
             break;
         default:
-            qWarning() << Q_FUNC_INFO << "unknown operation" << operation();
+            qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
             break;
     }
 }

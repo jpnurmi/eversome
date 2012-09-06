@@ -14,11 +14,11 @@
 #ifndef SEARCHOPERATION_H
 #define SEARCHOPERATION_H
 
-#include "baseoperation.h"
+#include "operation.h"
 #include <Types_types.h>
 #include <QVector>
 
-class SearchOperation : public BaseOperation
+class SearchOperation : public Operation
 {
     Q_OBJECT
 

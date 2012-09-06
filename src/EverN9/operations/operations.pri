@@ -2,13 +2,13 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
-    baseoperation.h \
     noteoperation.h \
+    operation.h \
     searchoperation.h \
     syncoperation.h
 
 SOURCES += \
-    baseoperation.cpp \
     noteoperation.cpp \
+    operation.cpp \
     searchoperation.cpp \
     syncoperation.cpp

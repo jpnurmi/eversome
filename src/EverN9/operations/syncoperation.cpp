@@ -21,7 +21,7 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-SyncOperation::SyncOperation(int usn) : BaseOperation(Sync), m_usn(usn)
+SyncOperation::SyncOperation(int usn) : Operation(Sync), m_usn(usn)
 {
 }
 
@@ -61,8 +61,8 @@ QVector<edam::Tag> SyncOperation::tags() const
 
 void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
-    if (operation() != Sync) {
-        qWarning() << Q_FUNC_INFO << "unknown operation" << operation();
+    if (mode() != Sync) {
+        qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
         return;
     }
 

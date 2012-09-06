@@ -23,7 +23,7 @@ using namespace apache;
 using namespace evernote;
 
 SearchOperation::SearchOperation(const edam::SavedSearch& search) :
-    BaseOperation(Search), m_search(search)
+    Operation(Search), m_search(search)
 {
 }
 
@@ -43,8 +43,8 @@ QVector<edam::Note> SearchOperation::notes() const
 
 void SearchOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
-    if (operation() != Search) {
-        qWarning() << Q_FUNC_INFO << "unknown operation" << operation();
+    if (mode() != Search) {
+        qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
         return;
     }
 

@@ -18,7 +18,7 @@
 #include <Types_types.h>
 
 class UserStore;
-class BaseOperation;
+class Operation;
 
 class NoteStore : public QObject
 {
@@ -56,12 +56,12 @@ signals:
     void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
 private slots:
-    void onOperationStarted(BaseOperation* operation);
-    void onOperationFinished(BaseOperation* operation);
-    void onOperationError(BaseOperation* operation, const QString& error);
+    void onOperationStarted(Operation* operation);
+    void onOperationFinished(Operation* operation);
+    void onOperationError(Operation* operation, const QString& error);
 
 private:
-    void setupOperation(BaseOperation* operation) const;
+    void setupOperation(Operation* operation) const;
 
     volatile bool syncing;
     volatile bool fetching;

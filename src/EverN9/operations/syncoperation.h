@@ -14,11 +14,11 @@
 #ifndef SYNCOPERATION_H
 #define SYNCOPERATION_H
 
-#include "baseoperation.h"
+#include "operation.h"
 #include <Types_types.h>
 #include <QVector>
 
-class SyncOperation : public BaseOperation
+class SyncOperation : public Operation
 {
     Q_OBJECT
 

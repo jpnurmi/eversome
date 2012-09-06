@@ -14,15 +14,15 @@
 #ifndef NOTEOPERATION_H
 #define NOTEOPERATION_H
 
-#include "baseoperation.h"
+#include "operation.h"
 #include <Types_types.h>
 
-class NoteOperation : public BaseOperation
+class NoteOperation : public Operation
 {
     Q_OBJECT
 
 public:
-    NoteOperation(const evernote::edam::Note& note, Operation operation);
+    NoteOperation(const evernote::edam::Note& note, Mode mode);
     ~NoteOperation();
 
     evernote::edam::Note note() const;

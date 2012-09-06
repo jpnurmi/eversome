@@ -91,17 +91,17 @@ void NoteStore::search(const edam::SavedSearch& search)
     QThreadPool::globalInstance()->start(operation);
 }
 
-void NoteStore::onOperationStarted(BaseOperation* operation)
+void NoteStore::onOperationStarted(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
 }
 
-void NoteStore::onOperationFinished(BaseOperation* operation)
+void NoteStore::onOperationFinished(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
 
     NoteOperation* noteOperation = qobject_cast<NoteOperation*>(operation);
-    if (noteOperation && noteOperation->operation() == NoteOperation::GetNote) {
+    if (noteOperation && noteOperation->mode() == NoteOperation::GetNote) {
         edam::Note note = noteOperation->note();
         emit noteFetched(note);
         for (uint i = 0; i < note.resources.size(); ++i)
@@ -125,19 +125,19 @@ void NoteStore::onOperationFinished(BaseOperation* operation)
     operation->deleteLater();
 }
 
-void NoteStore::onOperationError(BaseOperation* operation, const QString& error)
+void NoteStore::onOperationError(Operation* operation, const QString& error)
 {
     qDebug() << Q_FUNC_INFO << operation << error;
 }
 
-void NoteStore::setupOperation(BaseOperation* operation) const
+void NoteStore::setupOperation(Operation* operation) const
 {
-    connect(operation, SIGNAL(started(BaseOperation*)),
-                 this, SLOT(onOperationStarted(BaseOperation*)), Qt::DirectConnection);
-    connect(operation, SIGNAL(finished(BaseOperation*)),
-                 this, SLOT(onOperationFinished(BaseOperation*)), Qt::DirectConnection);
-    connect(operation, SIGNAL(error(BaseOperation*,QString)),
-                 this, SLOT(onOperationError(BaseOperation*,QString)), Qt::DirectConnection);
+    connect(operation, SIGNAL(started(Operation*)),
+                 this, SLOT(onOperationStarted(Operation*)), Qt::DirectConnection);
+    connect(operation, SIGNAL(finished(Operation*)),
+                 this, SLOT(onOperationFinished(Operation*)), Qt::DirectConnection);
+    connect(operation, SIGNAL(error(Operation*,QString)),
+                 this, SLOT(onOperationError(Operation*,QString)), Qt::DirectConnection);
     operation->setHost(Settings::value(Settings::Hostname));
     operation->setPort(Settings::value(Settings::ServerPort).toInt());
     operation->setPath(userStore->notesUrl().path());

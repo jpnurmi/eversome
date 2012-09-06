@@ -28,6 +28,7 @@ class Operation : public QObject, public QRunnable
 public:
     enum Mode
     {
+        Auth,
         Sync,
         Search,
 

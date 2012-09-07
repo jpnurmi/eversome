@@ -28,6 +28,11 @@ class Operation : public QObject, public QRunnable
 public:
     enum Mode
     {
+        // file operations
+        ReadFile,
+        WriteFile,
+
+        // network operations
         Auth,
         Sync,
         Search,

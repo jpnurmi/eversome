@@ -3,6 +3,7 @@ DEPENDPATH += $$PWD
 
 HEADERS += \
     authoperation.h \
+    fileoperation.h \
     networkoperation.h \
     notebookoperation.h \
     noteoperation.h \
@@ -12,6 +13,7 @@ HEADERS += \
 
 SOURCES += \
     authoperation.cpp \
+    fileoperation.cpp \
     networkoperation.cpp \
     notebookoperation.cpp \
     noteoperation.cpp \

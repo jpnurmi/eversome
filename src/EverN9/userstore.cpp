@@ -51,11 +51,6 @@ QDateTime UserStore::expiration() const
     return expires;
 }
 
-bool UserStore::isActive() const
-{
-    return QThreadPool::globalInstance()->activeThreadCount();
-}
-
 bool UserStore::hasCredentials() const
 {
     return !Settings::value(Settings::Username).isEmpty() &&
@@ -96,7 +91,7 @@ void UserStore::logout()
 void UserStore::onOperationStarted(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
-    emit isActiveChanged();
+    emit activityChanged();
 }
 
 void UserStore::onOperationFinished(Operation* operation)
@@ -121,7 +116,7 @@ void UserStore::onOperationFinished(Operation* operation)
 
     operation->deleteLater();
 
-    emit isActiveChanged();
+    emit activityChanged();
 }
 
 void UserStore::onOperationError(Operation* operation, const QString& error)

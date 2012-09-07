@@ -24,6 +24,7 @@
 #include "noteitem.h"
 #include "tagitem.h"
 #include <Errors_types.h>
+#include <QThreadPool>
 #include <QFileInfo>
 #include <QVector>
 #include <QDebug>
@@ -80,10 +81,10 @@ Manager::Manager(QObject *parent) : QObject(parent)
                                       QList<NoteItem*>,
                                       QList<TagItem*>)), Qt::QueuedConnection);
 
-    connect(m_user, SIGNAL(isActiveChanged()), this, SIGNAL(isBusyChanged()));
-    connect(m_note, SIGNAL(isActiveChanged()), this, SIGNAL(isBusyChanged()));
-    connect(m_writer, SIGNAL(isWritingChanged()), this, SIGNAL(isBusyChanged()));
-    connect(m_database, SIGNAL(isActiveChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_user, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_note, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_writer, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_database, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
 
     m_notebooks = new ItemModel(this);
     m_resources = new ItemModel(this);
@@ -98,8 +99,7 @@ Manager::~Manager()
 
 bool Manager::isBusy() const
 {
-    return m_database->isActive() || m_writer->isActive()
-            || m_user->isActive() || m_note->isActive();
+    return QThreadPool::globalInstance()->activeThreadCount();
 }
 
 Database* Manager::database() const

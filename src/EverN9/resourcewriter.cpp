@@ -25,11 +25,6 @@ ResourceWriter::~ResourceWriter()
 {
 }
 
-bool ResourceWriter::isActive() const
-{
-    return QThreadPool::globalInstance()->activeThreadCount();
-}
-
 void ResourceWriter::write(const QString& filePath, const QByteArray& data)
 {
     FileOperation* operation = new FileOperation(Operation::WriteFile, filePath, data);
@@ -40,7 +35,7 @@ void ResourceWriter::write(const QString& filePath, const QByteArray& data)
 void ResourceWriter::onOperationStarted(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
-    emit isActiveChanged();
+    emit activityChanged();
 }
 
 void ResourceWriter::onOperationFinished(Operation* operation)
@@ -53,7 +48,7 @@ void ResourceWriter::onOperationFinished(Operation* operation)
 
     operation->deleteLater();
 
-    emit isActiveChanged();
+    emit activityChanged();
 }
 
 void ResourceWriter::onOperationError(Operation* operation, const QString& error)

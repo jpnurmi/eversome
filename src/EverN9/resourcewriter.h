@@ -21,18 +21,15 @@ class Operation;
 class ResourceWriter : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit ResourceWriter(QObject* parent = 0);
     virtual ~ResourceWriter();
 
-    bool isActive() const;
-
     void write(const QString& filePath, const QByteArray& data);
 
 signals:
-    void isActiveChanged();
+    void activityChanged();
     void error(const QString& error);
     void written(const QString& filePath);
 

@@ -27,7 +27,6 @@ class UserStore : public QObject
     Q_PROPERTY(QUrl notesUrl READ notesUrl NOTIFY loggedIn)
     Q_PROPERTY(QDateTime currentTime READ currentTime NOTIFY loggedIn)
     Q_PROPERTY(QDateTime expiration READ expiration NOTIFY loggedIn)
-    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit UserStore(QObject* parent = 0);
@@ -39,7 +38,6 @@ public:
     QDateTime currentTime() const;
     QDateTime expiration() const;
 
-    bool isActive() const;
     Q_INVOKABLE bool hasCredentials() const;
 
 public slots:
@@ -49,7 +47,7 @@ public slots:
 signals:
     void loggedIn();
     void loggedOut();
-    void isActiveChanged();
+    void activityChanged();
     void error(const QString& error);
 
 private slots:

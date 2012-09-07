@@ -53,11 +53,6 @@ NoteStore::~NoteStore()
 {
 }
 
-bool NoteStore::isActive() const
-{
-    return QThreadPool::globalInstance()->activeThreadCount();
-}
-
 void NoteStore::sync()
 {
     int usn = Settings::value(Settings::ServerUSN).toInt();
@@ -139,7 +134,7 @@ void NoteStore::updateNotebook(const edam::Notebook& notebook)
 void NoteStore::onOperationStarted(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
-    emit isActiveChanged();
+    emit activityChanged();
 }
 
 void NoteStore::onOperationFinished(Operation* operation)
@@ -170,7 +165,7 @@ void NoteStore::onOperationFinished(Operation* operation)
 
     operation->deleteLater();
 
-    emit isActiveChanged();
+    emit activityChanged();
 }
 
 void NoteStore::onOperationError(Operation* operation, const QString& error)

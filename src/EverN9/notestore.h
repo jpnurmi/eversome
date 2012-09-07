@@ -24,13 +24,10 @@ class NetworkOperation;
 class NoteStore : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit NoteStore(UserStore *userStore);
     virtual ~NoteStore();
-
-    bool isActive() const;
 
 public slots:
     void sync();
@@ -55,7 +52,7 @@ signals:
     void progress(int percent);
     void error(const QString& error);
     void finished();
-    void isActiveChanged();
+    void activityChanged();
 
     void synced(const QVector<evernote::edam::Notebook>& notebooks,
                 const QVector<evernote::edam::Resource>& resources,

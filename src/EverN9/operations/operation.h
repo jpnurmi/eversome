@@ -32,9 +32,18 @@ public:
         ReadFile,
         WriteFile,
 
-        // network operations
+        // database operations
+        OpenDatabase,
+        CloseDatabase,
+        ResetDatabase,
+        LoadDatabase,
+        SaveDatabase,
+
+        // user store operations
         Auth,
         Sync,
+
+        // note store operations
         Search,
 
         CreateNote,

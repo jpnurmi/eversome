@@ -79,6 +79,7 @@ Manager::Manager(QObject *parent) : QObject(parent)
                                       QList<SearchItem*>,
                                       QList<NoteItem*>,
                                       QList<TagItem*>)), Qt::QueuedConnection);
+    m_database->open();
 
     connect(m_user, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
     connect(m_note, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
@@ -94,6 +95,7 @@ Manager::Manager(QObject *parent) : QObject(parent)
 
 Manager::~Manager()
 {
+    m_database->close();
 }
 
 bool Manager::isBusy() const

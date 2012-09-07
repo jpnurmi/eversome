@@ -16,25 +16,22 @@
 
 #include <QList>
 #include <QObject>
+#include "operation.h"
 
 class TagItem;
 class NoteItem;
 class SearchItem;
 class ResourceItem;
 class NotebookItem;
+class DatabaseOperation;
 
 class Database : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit Database(QObject* parent = 0);
     virtual ~Database();
-
-    bool isActive() const;
-
-    void reset();
 
     void load(QObject* parent = 0);
     void save(const QList<NotebookItem*>& notebooks,
@@ -43,8 +40,14 @@ public:
               const QList<NoteItem*>& notes,
               const QList<TagItem*>& tags);
 
+public slots:
+    void open();
+    void close();
+    void reset();
+
 signals:
-    void isActiveChanged();
+    void activityChanged();
+    void error(const QString& error);
     void loaded(const QList<NotebookItem*>& notebooks,
                 const QList<ResourceItem*>& resources,
                 const QList<SearchItem*>& searches,
@@ -52,32 +55,12 @@ signals:
                 const QList<TagItem*>& tags);
 
 private slots:
-    void resetImpl();
-    void loadImpl(QObject* parent);
-    void saveImpl(const QList<NotebookItem*>& notebooks,
-                  const QList<ResourceItem*>& resources,
-                  const QList<SearchItem*>& searches,
-                  const QList<NoteItem*>& notes,
-                  const QList<TagItem*>& tags);
-
-    QList<NotebookItem*> loadNotebooksImpl(QObject* parent);
-    void saveNotebooksImpl(const QList<NotebookItem*>& notebooks);
-
-    QList<ResourceItem*> loadResourcesImpl(QObject* parent);
-    void saveResourcesImpl(const QList<ResourceItem*>& resources);
-
-    QList<SearchItem*> loadSearchesImpl(QObject* parent);
-    void saveSearchesImpl(const QList<SearchItem*>& searches);
-
-    QList<NoteItem*> loadNotesImpl(QObject* parent);
-    void saveNotesImpl(const QList<NoteItem*>& notes);
-
-    QList<TagItem*> loadTagsImpl(QObject* parent);
-    void saveTagsImpl(const QList<TagItem*>& tags);
+    void onOperationStarted(Operation* operation);
+    void onOperationFinished(Operation* operation);
+    void onOperationError(Operation* operation, const QString& error);
 
 private:
-    volatile bool loading;
-    volatile bool saving;
+    DatabaseOperation* createOperation(Operation::Mode mode, QObject* parent = 0);
 };
 
 #endif // DATABASE_H

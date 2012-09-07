@@ -15,14 +15,13 @@
 
 #include "noteoperation.h"
 #include <NoteStore.h>
-#include <QtDebug>
 
 using namespace boost;
 using namespace apache;
 using namespace evernote;
 
 NoteOperation::NoteOperation(const edam::Note& note, Mode mode) :
-    Operation(mode), m_note(note)
+    NetworkOperation(mode), m_note(note)
 {
 }
 

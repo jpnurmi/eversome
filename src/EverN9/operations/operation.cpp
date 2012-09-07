@@ -14,19 +14,9 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "operation.h"
-#include "manager.h"
-#include <thrift/transport/THttpClient.h>
-#include <thrift/protocol/TBinaryProtocol.h>
-#include <Errors_types.h>
 #include <QMetaEnum>
-#include <QtDebug>
 
-using namespace boost;
-using namespace apache;
-using namespace evernote;
-
-Operation::Operation(Operation::Mode mode)
-    : m_port(-1), m_mode(mode)
+Operation::Operation(Operation::Mode mode) : m_mode(mode)
 {
     qRegisterMetaType<Operation*>();
 }
@@ -40,51 +30,6 @@ Operation::Mode Operation::mode() const
     return m_mode;
 }
 
-bool Operation::isValid() const
-{
-    return m_port != -1 && !m_host.isEmpty() && !m_path.isEmpty();
-}
-
-QString Operation::host() const
-{
-    return m_host;
-}
-
-void Operation::setHost(const QString& host)
-{
-    m_host = host;
-}
-
-int Operation::port() const
-{
-    return m_port;
-}
-
-void Operation::setPort(int port)
-{
-    m_port = port;
-}
-
-QString Operation::path() const
-{
-    return m_path;
-}
-
-void Operation::setPath(const QString& path)
-{
-    m_path = path;
-}
-
-QString Operation::authToken() const
-{
-    return m_token;
-}
-
-void Operation::setAuthToken(const QString& token)
-{
-    m_token = token;
-}
-
 void Operation::run()
 {
     if (!isValid()) {
@@ -94,29 +39,7 @@ void Operation::run()
 
     emit started(this);
 
-    QString err;
-    try {
-        shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(m_host.toStdString(), m_port, m_path.toStdString()));
-        shared_ptr<thrift::protocol::TProtocol> protocol(new thrift::protocol::TBinaryProtocol(transport));
-        transport->open();
-        operate(protocol);
-    } catch (edam::EDAMUserException& e) {
-        // TODO: refactor error string handling
-        err = Manager::errorString(e.errorCode);
-    } catch (edam::EDAMSystemException& e) {
-        // TODO: refactor error string handling
-        err = Manager::errorString(e.errorCode);
-    } catch (edam::EDAMNotFoundException& e) {
-        // TODO: refactor error string handling
-        err = Manager::errorString(-1); // TODO
-    } catch (thrift::TException& e) {
-        err = QString::fromUtf8(e.what());
-    }
-
-    if (!err.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << "ERROR:" << err << this;
-        emit error(this, err);
-    }
+    operate();
 
     emit finished(this);
 }

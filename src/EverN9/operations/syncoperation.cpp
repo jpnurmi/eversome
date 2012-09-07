@@ -15,13 +15,12 @@
 
 #include "syncoperation.h"
 #include <NoteStore.h>
-#include <QtDebug>
 
 using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-SyncOperation::SyncOperation(int usn) : Operation(Sync), m_usn(usn)
+SyncOperation::SyncOperation(int usn) : NetworkOperation(Sync), m_usn(usn)
 {
 }
 

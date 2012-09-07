@@ -17,14 +17,13 @@
 #include "manager.h"
 #include <UserStore_constants.h>
 #include <UserStore.h>
-#include <QtDebug>
 
 using namespace boost;
 using namespace apache;
 using namespace evernote;
 
 AuthOperation::AuthOperation(const QString& username, const QString& password, const QString& key, const QString& secret) :
-    Operation(Auth), m_username(username), m_password(password), m_key(key), m_secret(secret)
+    NetworkOperation(Auth), m_username(username), m_password(password), m_key(key), m_secret(secret)
 {
 }
 

@@ -14,11 +14,11 @@
 #ifndef OPERATION_H
 #define OPERATION_H
 
-#include <QString>
+#include <QDebug>
 #include <QObject>
+#include <QString>
 #include <QMetaType>
 #include <QRunnable>
-#include <thrift/protocol/TProtocol.h>
 
 class Operation : public QObject, public QRunnable
 {
@@ -50,20 +50,7 @@ public:
     ~Operation();
 
     Mode mode() const;
-    bool isValid() const;
-
-    QString host() const;
-    void setHost(const QString& host);
-
-    int port() const;
-    void setPort(int port);
-
-    QString path() const;
-    void setPath(const QString& path);
-
-    QString authToken() const;
-    void setAuthToken(const QString& token);
-
+    virtual bool isValid() const = 0;
     virtual void run();
 
 signals:
@@ -72,14 +59,10 @@ signals:
     void error(Operation* operation, const QString& error);
 
 protected:
-    virtual void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol) = 0;
+    virtual void operate() = 0;
 
 private:
-    int m_port;
     Mode m_mode;
-    QString m_host;
-    QString m_path;
-    QString m_token;
 };
 
 Q_DECLARE_METATYPE(Operation*)

@@ -14,11 +14,11 @@
 #ifndef SEARCHOPERATION_H
 #define SEARCHOPERATION_H
 
-#include "operation.h"
+#include "networkoperation.h"
 #include <Types_types.h>
 #include <QVector>
 
-class SearchOperation : public Operation
+class SearchOperation : public NetworkOperation
 {
     Q_OBJECT
 
@@ -29,6 +29,7 @@ public:
     evernote::edam::SavedSearch search() const;
     QVector<evernote::edam::Note> notes() const;
 
+protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
 
 private:

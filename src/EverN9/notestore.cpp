@@ -194,7 +194,7 @@ void NoteStore::startNotebookOperation(const edam::Notebook& notebook, Operation
     QThreadPool::globalInstance()->start(operation);
 }
 
-void NoteStore::setupOperation(Operation* operation) const
+void NoteStore::setupOperation(NetworkOperation* operation) const
 {
     connect(operation, SIGNAL(started(Operation*)),
                  this, SLOT(onOperationStarted(Operation*)), Qt::DirectConnection);

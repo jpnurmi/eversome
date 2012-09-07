@@ -15,14 +15,13 @@
 
 #include "notebookoperation.h"
 #include <NoteStore.h>
-#include <QtDebug>
 
 using namespace boost;
 using namespace apache;
 using namespace evernote;
 
 NotebookOperation::NotebookOperation(const edam::Notebook& notebook, Mode mode) :
-    Operation(mode), m_notebook(notebook)
+    NetworkOperation(mode), m_notebook(notebook)
 {
 }
 

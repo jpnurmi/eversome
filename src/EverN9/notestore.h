@@ -19,7 +19,7 @@
 #include "operation.h"
 
 class UserStore;
-class Operation;
+class NetworkOperation;
 
 class NoteStore : public QObject
 {
@@ -76,7 +76,7 @@ private slots:
 private:
     void startNoteOperation(const evernote::edam::Note& note, Operation::Mode mode);
     void startNotebookOperation(const evernote::edam::Notebook& notebook, Operation::Mode mode);
-    void setupOperation(Operation* operation) const;
+    void setupOperation(NetworkOperation* operation) const;
 
     UserStore* userStore;
 };

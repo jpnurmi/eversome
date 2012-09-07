@@ -14,10 +14,10 @@
 #ifndef NOTEOPERATION_H
 #define NOTEOPERATION_H
 
-#include "operation.h"
+#include "networkoperation.h"
 #include <Types_types.h>
 
-class NoteOperation : public Operation
+class NoteOperation : public NetworkOperation
 {
     Q_OBJECT
 
@@ -27,6 +27,7 @@ public:
 
     evernote::edam::Note note() const;
 
+protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
 
 private:

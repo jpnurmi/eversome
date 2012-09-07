@@ -16,14 +16,13 @@
 #include "searchoperation.h"
 #include <Limits_constants.h>
 #include <NoteStore.h>
-#include <QtDebug>
 
 using namespace boost;
 using namespace apache;
 using namespace evernote;
 
 SearchOperation::SearchOperation(const edam::SavedSearch& search) :
-    Operation(Search), m_search(search)
+    NetworkOperation(Search), m_search(search)
 {
 }
 

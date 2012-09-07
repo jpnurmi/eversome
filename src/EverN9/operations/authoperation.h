@@ -14,10 +14,10 @@
 #ifndef AUTHOPERATION_H
 #define AUTHOPERATION_H
 
-#include "operation.h"
+#include "networkoperation.h"
 #include <UserStore_types.h>
 
-class AuthOperation : public Operation
+class AuthOperation : public NetworkOperation
 {
     Q_OBJECT
 
@@ -30,6 +30,7 @@ public:
 
     evernote::edam::AuthenticationResult result() const;
 
+protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
 
 private:

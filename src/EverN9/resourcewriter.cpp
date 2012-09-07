@@ -51,7 +51,8 @@ void ResourceWriter::onOperationFinished(Operation* operation)
     emit activityChanged();
 }
 
-void ResourceWriter::onOperationError(Operation* operation, const QString& error)
+void ResourceWriter::onOperationError(Operation* operation, const QString& str)
 {
-    qDebug() << Q_FUNC_INFO << operation << error;
+    qDebug() << Q_FUNC_INFO << operation << str;
+    emit error(str);
 }

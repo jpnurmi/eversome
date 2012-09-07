@@ -119,7 +119,8 @@ void UserStore::onOperationFinished(Operation* operation)
     emit activityChanged();
 }
 
-void UserStore::onOperationError(Operation* operation, const QString& error)
+void UserStore::onOperationError(Operation* operation, const QString& str)
 {
-    qDebug() << Q_FUNC_INFO << operation << error;
+    qDebug() << Q_FUNC_INFO << operation << str;
+    emit error(str);
 }

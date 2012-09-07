@@ -14,7 +14,7 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "authoperation.h"
-#include "manager.h"
+#include "operationerror.h"
 #include <UserStore_constants.h>
 #include <UserStore.h>
 
@@ -56,13 +56,8 @@ void AuthOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
     edam::UserStoreClient client(protocol);
     if (!client.checkVersion("EverN9/0.0.3; MeeGo/Harmattan 1.2", // TODO: hardcoded values
                              edam::g_UserStore_constants.EDAM_VERSION_MAJOR,
-                             edam::g_UserStore_constants.EDAM_VERSION_MINOR)) {
-        // TODO: refactor error string handling
-        QString err = Manager::errorString(Manager::TooOldProtocol);
-        err = err.arg(edam::g_UserStore_constants.EDAM_VERSION_MAJOR)
-                 .arg(edam::g_UserStore_constants.EDAM_VERSION_MINOR);
-        throw thrift::TException(err.toStdString());
-    }
-
-    client.authenticate(m_result, m_username.toStdString(), m_password.toStdString(), m_key.toStdString(), m_secret.toStdString());
+                             edam::g_UserStore_constants.EDAM_VERSION_MINOR))
+        emit error(this, OperationError::toString(OperationError::TooOldProtocol));
+    else
+        client.authenticate(m_result, m_username.toStdString(), m_password.toStdString(), m_key.toStdString(), m_secret.toStdString());
 }

@@ -23,7 +23,6 @@
 #include "itemmodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
-#include <Errors_types.h>
 #include <QThreadPool>
 #include <QFileInfo>
 #include <QVector>
@@ -140,32 +139,6 @@ ItemModel* Manager::noteModel() const
 ItemModel* Manager::tagModel() const
 {
     return m_tags;
-}
-
-QString Manager::errorString(int code)
-{
-    switch (code) {
-        case evernote::edam::BAD_DATA_FORMAT:       return tr("The format of the request data was incorrect");
-        case evernote::edam::PERMISSION_DENIED:     return tr("Not permitted to perform action");
-        case evernote::edam::INTERNAL_ERROR:        return tr("Unexpected problem with the service");
-        case evernote::edam::DATA_REQUIRED:         return tr("A required parameter/field was absent");
-        case evernote::edam::LIMIT_REACHED:         return tr("Operation denied due to data model limit");
-        case evernote::edam::QUOTA_REACHED:         return tr("Operation denied due to user storage limit");
-        case evernote::edam::INVALID_AUTH:          return tr("Incorrect username and/or password");
-        case evernote::edam::AUTH_EXPIRED:          return tr("Authentication token expired");
-        case evernote::edam::DATA_CONFLICT:         return tr("Change denied due to data model conflict");
-        case evernote::edam::ENML_VALIDATION:       return tr("Content of submitted note was malformed");
-        case evernote::edam::SHARD_UNAVAILABLE:     return tr("Service shard with account data is temporarily down");
-        case evernote::edam::LEN_TOO_SHORT:         return tr("Operation denied due to data model limit (too short)");
-        case evernote::edam::LEN_TOO_LONG:          return tr("Operation denied due to data model limit (too long)");
-        case evernote::edam::TOO_FEW:               return tr("Operation denied due to data model limit (too few)");
-        case evernote::edam::TOO_MANY:              return tr("Operation denied due to data model limit (too many)");
-        case evernote::edam::UNSUPPORTED_OPERATION: return tr("Operation denied because it is currently unsupported");
-        case Manager::UnknownOperation:             return tr("Unknown operation");
-        case Manager::TooOldProtocol:               return tr("The application uses too old protocol version: %1.%2");
-        case evernote::edam::UNKNOWN:
-        default:                                    return tr("Unknown error occurred");
-    }
 }
 
 void Manager::onLoggedIn()

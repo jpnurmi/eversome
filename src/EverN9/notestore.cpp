@@ -168,9 +168,10 @@ void NoteStore::onOperationFinished(Operation* operation)
     emit activityChanged();
 }
 
-void NoteStore::onOperationError(Operation* operation, const QString& error)
+void NoteStore::onOperationError(Operation* operation, const QString& str)
 {
-    qDebug() << Q_FUNC_INFO << operation << error;
+    qDebug() << Q_FUNC_INFO << operation << str;
+    emit error(str);
 }
 
 void NoteStore::startNoteOperation(const edam::Note& note, Operation::Mode mode)

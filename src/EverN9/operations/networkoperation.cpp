@@ -14,8 +14,10 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "networkoperation.h"
-#include "manager.h"
+#include "operationerror.h"
 #include <thrift/transport/THttpClient.h>
+#include <thrift/transport/TTransportException.h>
+#include <thrift/protocol/TProtocolException.h>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <Errors_types.h>
 
@@ -78,27 +80,23 @@ void NetworkOperation::setAuthToken(const QString& token)
 
 void NetworkOperation::operate()
 {
-    QString err;
     try {
         shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(m_host.toStdString(), m_port, m_path.toStdString()));
         shared_ptr<thrift::protocol::TProtocol> protocol(new thrift::protocol::TBinaryProtocol(transport));
         transport->open();
         operate(protocol);
     } catch (edam::EDAMUserException& e) {
-        // TODO: refactor error string handling
-        err = Manager::errorString(e.errorCode);
+        emit error(this, OperationError::toString(e.errorCode));
     } catch (edam::EDAMSystemException& e) {
-        // TODO: refactor error string handling
-        err = Manager::errorString(e.errorCode);
+        emit error(this, OperationError::toString(e.errorCode));
     } catch (edam::EDAMNotFoundException& e) {
-        // TODO: refactor error string handling
-        err = Manager::errorString(-1); // TODO
+        emit error(this, OperationError::toString(OperationError::UnknownOperation));
+    } catch (thrift::transport::TTransportException& e) {
+        emit error(this, OperationError::toString(e.getType()));
+    } catch (thrift::protocol::TProtocolException& e) {
+        emit error(this, OperationError::toString(e.getType()));
     } catch (thrift::TException& e) {
-        err = QString::fromUtf8(e.what());
-    }
-
-    if (!err.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << "ERROR:" << err << this;
-        emit error(this, err);
+        qDebug() << Q_FUNC_INFO << "unknown error:" << e.what();
+        emit error(this, OperationError::toString(OperationError::UnknownError));
     }
 }

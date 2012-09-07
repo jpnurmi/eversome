@@ -14,6 +14,7 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "fileoperation.h"
+#include "operationerror.h"
 #include <QFileInfo>
 #include <QProcess>
 #include <QVariant>
@@ -71,7 +72,7 @@ void FileOperation::operate()
                     process.setWorkingDirectory(info.absolutePath());
                     process.start("/usr/bin/convert", args);
                     if (!process.waitForFinished())
-                        emit error(this, process.errorString()); // TODO: refactor error handling
+                        emit error(this, OperationError::toString(process.error()));
                 }
             }
             break;
@@ -82,6 +83,6 @@ void FileOperation::operate()
 
     if (file.error() != QFile::NoError) {
         qDebug() << Q_FUNC_INFO << m_filePath << file.error();
-        emit error(this, file.errorString()); // TODO: refactor error handling
+        emit error(this, OperationError::toString(file.error()));
     }
 }

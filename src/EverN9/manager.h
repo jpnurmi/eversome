@@ -40,8 +40,6 @@ public:
     bool isBusy() const;
 
     Database* database() const;
-    ResourceWriter* resourceWriter() const;
-
     UserStore* userStore() const;
     NoteStore* noteStore() const;
 

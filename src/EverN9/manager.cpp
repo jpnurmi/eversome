@@ -98,7 +98,7 @@ Manager::~Manager()
 
 bool Manager::isBusy() const
 {
-    return m_database->isActive() || m_writer->isWriting()
+    return m_database->isActive() || m_writer->isActive()
             || m_user->isActive() || m_note->isActive();
 }
 

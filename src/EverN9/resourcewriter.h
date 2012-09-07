@@ -14,33 +14,32 @@
 #ifndef RESOURCEWRITER_H
 #define RESOURCEWRITER_H
 
-#include <QSet>
 #include <QObject>
-#include <QProcess>
+
+class Operation;
 
 class ResourceWriter : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool isWriting READ isWriting NOTIFY isWritingChanged)
+    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
 
 public:
     explicit ResourceWriter(QObject* parent = 0);
     virtual ~ResourceWriter();
 
-    bool isWriting() const;
+    bool isActive() const;
 
     void write(const QString& filePath, const QByteArray& data);
 
 signals:
-    void isWritingChanged();
+    void isActiveChanged();
     void error(const QString& error);
     void written(const QString& filePath);
 
 private slots:
-    void writeImpl(const QString& filePath, const QByteArray& data);
-
-private:
-    QSet<QString> m_files;
+    void onOperationStarted(Operation* operation);
+    void onOperationFinished(Operation* operation);
+    void onOperationError(Operation* operation, const QString& error);
 };
 
 #endif // RESOURCEWRITER_H

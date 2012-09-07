@@ -26,8 +26,6 @@
 #include <QMetaType>
 #include <QtDebug>
 
-using namespace boost;
-using namespace apache;
 using namespace evernote;
 
 Q_DECLARE_METATYPE(QVector<evernote::edam::SavedSearch>)
@@ -118,22 +116,22 @@ void NoteStore::updateNote(const edam::Note& note)
     startNoteOperation(note, Operation::UpdateNote);
 }
 
-void NoteStore::createNotebook(const evernote::edam::Notebook& notebook)
+void NoteStore::createNotebook(const edam::Notebook& notebook)
 {
     startNotebookOperation(notebook, Operation::CreateNotebook);
 }
 
-void NoteStore::expungeNotebook(const evernote::edam::Notebook& notebook)
+void NoteStore::expungeNotebook(const edam::Notebook& notebook)
 {
     startNotebookOperation(notebook, Operation::ExpungeNotebook);
 }
 
-void NoteStore::getDefaultNotebook(const evernote::edam::Notebook& notebook)
+void NoteStore::getDefaultNotebook(const edam::Notebook& notebook)
 {
     startNotebookOperation(notebook, Operation::GetDefaultNotebook);
 }
 
-void NoteStore::updateNotebook(const evernote::edam::Notebook& notebook)
+void NoteStore::updateNotebook(const edam::Notebook& notebook)
 {
     startNotebookOperation(notebook, Operation::UpdateNotebook);
 }

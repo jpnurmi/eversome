@@ -21,8 +21,6 @@
 #include <QVariant>
 #include <QDebug>
 
-using namespace boost;
-using namespace apache;
 using namespace evernote;
 
 UserStore::UserStore(QObject *parent) : QObject(parent), active(false)

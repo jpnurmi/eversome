@@ -8,6 +8,7 @@ HEADERS += \
     notebookoperation.h \
     noteoperation.h \
     operation.h \
+    operationerror.h \
     searchoperation.h \
     syncoperation.h
 
@@ -18,5 +19,6 @@ SOURCES += \
     notebookoperation.cpp \
     noteoperation.cpp \
     operation.cpp \
+    operationerror.cpp \
     searchoperation.cpp \
     syncoperation.cpp

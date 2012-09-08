@@ -59,6 +59,7 @@ QDebug operator<<(QDebug debug, const SearchItem* item)
         return debug << "SearchItem(0x0) ";
     debug.nospace() << item->metaObject()->className()
                     << '(' << (void*) item
-                    << ", name = " << item->name() << ')';
+                    << ", name = " << item->name()
+                    << ", usn = " << item->usn() << ')';
     return debug.space();
 }

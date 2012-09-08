@@ -99,6 +99,7 @@ QDebug operator<<(QDebug debug, const NoteItem* item)
         return debug << "NoteItem(0x0) ";
     debug.nospace() << item->metaObject()->className()
                     << '(' << (void*) item
-                    << ", title = " << item->title() << ')';
+                    << ", title = " << item->title()
+                    << ", usn = " << item->usn() << ')';
     return debug.space();
 }

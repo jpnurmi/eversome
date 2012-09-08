@@ -59,6 +59,7 @@ QDebug operator<<(QDebug debug, const TagItem* item)
         return debug << "TagItem(0x0) ";
     debug.nospace() << item->metaObject()->className()
                     << '(' << (void*) item
-                    << ", name = " << item->name() << ')';
+                    << ", name = " << item->name()
+                    << ", usn = " << item->usn() << ')';
     return debug.space();
 }

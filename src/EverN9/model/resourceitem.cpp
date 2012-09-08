@@ -120,6 +120,7 @@ QDebug operator<<(QDebug debug, const ResourceItem* item)
         return debug << "ResourceItem(0x0) ";
     debug.nospace() << item->metaObject()->className()
                     << '(' << (void*) item
-                    << ", filePath = " << item->filePath(false) << ')';
+                    << ", filePath = " << item->filePath(false)
+                    << ", usn = " << item->usn() << ')';
     return debug.space();
 }

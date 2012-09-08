@@ -74,6 +74,7 @@ QDebug operator<<(QDebug debug, const NotebookItem* item)
         return debug << "NotebookItem(0x0) ";
     debug.nospace() << item->metaObject()->className()
                     << '(' << (void*) item
-                    << ", name = " << item->name() << ')';
+                    << ", name = " << item->name()
+                    << ", usn = " << item->usn() << ')';
     return debug.space();
 }

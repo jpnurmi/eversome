@@ -112,11 +112,11 @@ void DatabaseOperation::operate()
             db.setDatabaseName(databaseName());
             if (db.open()) {
                 QStringList queries;
-                queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER)";
-                queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT)";
-                queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT)";
-                queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT)";
-                queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT)";
+                queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER, usn INTEGER)";
+                queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT, usn INTEGER)";
+                queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT, usn INTEGER)";
+                queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, usn INTEGER)";
+                queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT, usn INTEGER)";
                 foreach (const QString& query, queries)
                     db.exec(query);
             }
@@ -183,6 +183,7 @@ QList<NotebookItem*> DatabaseOperation::loadNotebooks()
             notebook.published = record.value("isPublished").toBool();
             notebook.serviceCreated = record.value("created").toLongLong();
             notebook.serviceUpdated = record.value("updated").toLongLong();
+            notebook.updateSequenceNum = record.value("usn").toInt();
 
             NotebookItem* item = new NotebookItem(notebook);
             item->moveToThread(thread());
@@ -196,7 +197,7 @@ QList<NotebookItem*> DatabaseOperation::loadNotebooks()
 
 void DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
 {
-    QVariantList guids, names, defs, pubs, creates, updates;
+    QVariantList guids, names, defs, pubs, creates, updates, usns;
     foreach (NotebookItem* notebook, notebooks) {
         guids += notebook->guid();
         names += notebook->name();
@@ -204,15 +205,17 @@ void DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
         pubs += notebook->isPublished();
         creates += notebook->created().toMSecsSinceEpoch();
         updates += notebook->updated().toMSecsSinceEpoch();
+        usns += notebook->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO NoteBooks VALUES(?,?,?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO NoteBooks VALUES(?,?,?,?,?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(names);
     query.addBindValue(defs);
     query.addBindValue(pubs);
     query.addBindValue(creates);
     query.addBindValue(updates);
+    query.addBindValue(usns);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << notebooks.count() << res;
 }
@@ -227,6 +230,7 @@ QList<ResourceItem*> DatabaseOperation::loadResources()
             QSqlRecord record = query.record();
             resource.guid = record.value("guid").toString().toStdString();
             resource.mime = record.value("mime").toString().toStdString();
+            resource.updateSequenceNum = record.value("usn").toInt();
 
             ResourceItem* item = new ResourceItem(resource);
             item->moveToThread(thread());
@@ -240,15 +244,17 @@ QList<ResourceItem*> DatabaseOperation::loadResources()
 
 void DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
 {
-    QVariantList guids, mimes;
+    QVariantList guids, mimes, usns;
     foreach (ResourceItem* resource, resources) {
         guids += resource->guid();
         mimes += resource->mime();
+        usns += resource->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(mimes);
+    query.addBindValue(usns);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << resources.count() << res;
 }
@@ -264,6 +270,7 @@ QList<SearchItem*> DatabaseOperation::loadSearches()
             search.guid = record.value("guid").toString().toStdString();
             search.name = record.value("name").toString().toStdString();
             search.query = record.value("query").toString().toStdString();
+            search.updateSequenceNum = record.value("usn").toInt();
 
             SearchItem* item = new SearchItem(search);
             item->moveToThread(thread());
@@ -277,17 +284,19 @@ QList<SearchItem*> DatabaseOperation::loadSearches()
 
 void DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
 {
-    QVariantList guids, names, queries;
+    QVariantList guids, names, queries, usns;
     foreach (SearchItem* search, searches) {
         guids += search->guid();
         names += search->name();
         queries += search->query();
+        usns += search->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Searches VALUES(?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Searches VALUES(?,?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(names);
     query.addBindValue(queries);
+    query.addBindValue(usns);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << searches.count() << res;
 }
@@ -317,6 +326,7 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
                 r.guid = resource.toStdString();
                 note.resources.push_back(r);
             }
+            note.updateSequenceNum = record.value("usn").toInt();
 
             NoteItem* item = new NoteItem(note);
             item->moveToThread(thread());
@@ -331,7 +341,7 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
 void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
 {
     QVariantList guids, titles, contents, creates, updates,
-                 deletes, actives, notebooks, tags, resources;
+                 deletes, actives, notebooks, tags, resources, usns;
     foreach (NoteItem* note, notes) {
         guids += note->guid();
         titles += note->title();
@@ -349,9 +359,10 @@ void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
         for (uint i = 0; i < note->note().resources.size(); ++i)
             resourceGuids += QString::fromStdString(note->note().resources.at(i).guid);
         resources += resourceGuids.join(";");
+        usns += note->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(titles);
     query.addBindValue(contents);
@@ -362,6 +373,7 @@ void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
     query.addBindValue(notebooks);
     query.addBindValue(tags);
     query.addBindValue(resources);
+    query.addBindValue(usns);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << notes.count() << res;
 }
@@ -377,6 +389,7 @@ QList<TagItem*> DatabaseOperation::loadTags()
             tag.guid = record.value("guid").toString().toStdString();
             tag.name = record.value("name").toString().toStdString();
             tag.parentGuid = record.value("parentGuid").toString().toStdString();
+            tag.updateSequenceNum = record.value("usn").toInt();
 
             TagItem* item = new TagItem(tag);
             item->moveToThread(thread());
@@ -390,17 +403,19 @@ QList<TagItem*> DatabaseOperation::loadTags()
 
 void DatabaseOperation::saveTags(const QList<TagItem*>& tags)
 {
-    QVariantList guids, names, parents;
+    QVariantList guids, names, parents, usns;
     foreach (TagItem* tag, tags) {
         guids += tag->guid();
         names += tag->name();
         parents += tag->parentGuid();
+        usns += tag->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Tags VALUES(?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Tags VALUES(?,?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(names);
     query.addBindValue(parents);
+    query.addBindValue(usns);
     bool res = query.execBatch();
     qDebug() << Q_FUNC_INFO << tags.count() << res;
 }

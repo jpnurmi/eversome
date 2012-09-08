@@ -18,7 +18,7 @@
 #include <Types_types.h>
 #include "operation.h"
 
-class UserStore;
+class Session;
 class NetworkOperation;
 
 class NoteStore : public QObject
@@ -26,7 +26,7 @@ class NoteStore : public QObject
     Q_OBJECT
 
 public:
-    explicit NoteStore(UserStore *userStore);
+    explicit NoteStore(Session* session);
     virtual ~NoteStore();
 
 public slots:
@@ -75,7 +75,7 @@ private:
     void startNotebookOperation(const evernote::edam::Notebook& notebook, Operation::Mode mode);
     void setupOperation(NetworkOperation* operation) const;
 
-    UserStore* userStore;
+    Session* session;
 };
 
 #endif // NOTESTORE_H

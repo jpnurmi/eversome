@@ -14,15 +14,15 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "notestore.h"
-#include "userstore.h"
-#include "settings.h"
 #include "noteitem.h"
+#include "session.h"
 #include "manager.h"
 #include "noteoperation.h"
 #include "syncoperation.h"
 #include "searchoperation.h"
 #include "notebookoperation.h"
 #include <QThreadPool>
+#include <QSettings>
 #include <QMetaType>
 #include <QtDebug>
 
@@ -37,8 +37,10 @@ Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
-NoteStore::NoteStore(UserStore *userStore) : QObject(userStore), userStore(userStore)
+NoteStore::NoteStore(Session* session) : QObject(session), session(session)
 {
+    connect(session, SIGNAL(established()), SLOT(sync()));
+
     qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
@@ -55,7 +57,7 @@ NoteStore::~NoteStore()
 
 void NoteStore::sync()
 {
-    int usn = Settings::value(Settings::ServerUSN).toInt();
+    int usn = QSettings().value("usn", 0).toInt();
     SyncOperation* operation = new SyncOperation(usn);
     setupOperation(operation);
     qDebug() << Q_FUNC_INFO << operation;
@@ -151,7 +153,7 @@ void NoteStore::onOperationFinished(Operation* operation)
 
     SyncOperation* syncOperation = qobject_cast<SyncOperation*>(operation);
     if (syncOperation) {
-        Settings::setValue(Settings::ServerUSN, QString::number(syncOperation->usn()));
+        QSettings().setValue("usn", syncOperation->usn());
         emit synced(syncOperation->notebooks(),
                     syncOperation->resources(),
                     syncOperation->searches(),
@@ -198,8 +200,6 @@ void NoteStore::setupOperation(NetworkOperation* operation) const
                  this, SLOT(onOperationFinished(Operation*)), Qt::DirectConnection);
     connect(operation, SIGNAL(error(Operation*,QString)),
                  this, SLOT(onOperationError(Operation*,QString)), Qt::DirectConnection);
-    operation->setHost(Settings::value(Settings::Hostname));
-    operation->setPort(Settings::value(Settings::ServerPort).toInt());
-    operation->setPath(userStore->notesUrl().path());
-    operation->setAuthToken(userStore->authToken());
+    operation->setUrl(session->url());
+    operation->setAuthToken(session->authToken());
 }

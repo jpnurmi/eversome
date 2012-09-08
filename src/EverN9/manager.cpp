@@ -225,7 +225,7 @@ void Manager::setupNotes(const QList<NoteItem*>& notes)
         QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
         NotebookItem* notebook = m_notebooks->get<NotebookItem*>(notebookGuid);
         if (notebook)
-            notebook->notes()->add(QList<NoteItem*>() << note);
+            notebook->notes()->add(note);
         else
             qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
 
@@ -233,7 +233,7 @@ void Manager::setupNotes(const QList<NoteItem*>& notes)
             QString resourceGuid = QString::fromStdString(note->note().resources.at(i).guid);
             ResourceItem* resource = m_resources->get<ResourceItem*>(resourceGuid);
             if (resource)
-                note->resources()->add(QList<ResourceItem*>() << resource);
+                note->resources()->add(resource);
             else
                 qCritical() << Q_FUNC_INFO << "MISSING RESOURCE:" << resourceGuid;
         }
@@ -245,8 +245,8 @@ void Manager::setupNotes(const QList<NoteItem*>& notes)
                 qCritical() << Q_FUNC_INFO << "MISSING TAG:" << tagGuid;
                 continue;
             }
-            note->tags()->add(QList<TagItem*>() << tag);
-            tag->notes()->add(QList<NoteItem*>() << note);
+            note->tags()->add(tag);
+            tag->notes()->add(note);
         }
     }
 }

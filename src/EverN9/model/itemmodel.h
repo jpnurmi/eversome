@@ -37,6 +37,9 @@ public:
     T get(const QString& guid) const;
 
     template <typename T>
+    void add(T item);
+
+    template <typename T>
     void add(const QList<T>& items);
 
 public slots:
@@ -66,6 +69,19 @@ template <typename T>
 T ItemModel::get(const QString& guid) const
 {
     return qobject_cast<T>(m_guids.value(guid));
+}
+
+template <typename T>
+void ItemModel::add(T item)
+{
+    if (!m_guids.contains(item->guid())) {
+        const int row = rowCount();
+        beginInsertRows(QModelIndex(), row, row);
+        m_guids.insert(item->guid(), item);
+        m_items += item;
+        endInsertRows();
+        emit countChanged();
+    }
 }
 
 template <typename T>

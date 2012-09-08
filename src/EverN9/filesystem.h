@@ -11,20 +11,20 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef RESOURCEWRITER_H
-#define RESOURCEWRITER_H
+#ifndef FILESYSTEM_H
+#define FILESYSTEM_H
 
 #include <QObject>
 
 class Operation;
 
-class ResourceWriter : public QObject
+class FileSystem : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ResourceWriter(QObject* parent = 0);
-    virtual ~ResourceWriter();
+    explicit FileSystem(QObject* parent = 0);
+    virtual ~FileSystem();
 
     void write(const QString& filePath, const QByteArray& data);
 
@@ -39,4 +39,4 @@ private slots:
     void onOperationError(Operation* operation, const QString& error);
 };
 
-#endif // RESOURCEWRITER_H
+#endif // FILESYSTEM_H

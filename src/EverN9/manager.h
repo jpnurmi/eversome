@@ -20,7 +20,7 @@
 class Session;
 class NoteStore;
 class Database;
-class ResourceWriter;
+class FileSystem;
 
 class ItemModel;
 class NotebookItem;
@@ -67,7 +67,7 @@ private slots:
     void onResourceFetched(const evernote::edam::Resource& resource);
     void onNoteFetched(const evernote::edam::Note& note);
 
-    void onResourceWritten(const QString& filePath);
+    void onFileWritten(const QString& filePath);
 
     void onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
@@ -76,7 +76,7 @@ private:
 
     NoteStore* m_store;
     Database* m_database;
-    ResourceWriter* m_writer;
+    FileSystem* m_files;
 
     ItemModel* m_notebooks;
     ItemModel* m_resources;

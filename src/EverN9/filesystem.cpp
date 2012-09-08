@@ -13,32 +13,32 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "resourcewriter.h"
+#include "filesystem.h"
 #include "fileoperation.h"
 #include <QThreadPool>
 
-ResourceWriter::ResourceWriter(QObject* parent) : QObject(parent)
+FileSystem::FileSystem(QObject* parent) : QObject(parent)
 {
 }
 
-ResourceWriter::~ResourceWriter()
+FileSystem::~FileSystem()
 {
 }
 
-void ResourceWriter::write(const QString& filePath, const QByteArray& data)
+void FileSystem::write(const QString& filePath, const QByteArray& data)
 {
     FileOperation* operation = new FileOperation(Operation::WriteFile, filePath, data);
     qDebug() << Q_FUNC_INFO << operation << filePath << data.length();
     QThreadPool::globalInstance()->start(operation);
 }
 
-void ResourceWriter::onOperationStarted(Operation* operation)
+void FileSystem::onOperationStarted(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
     emit activityChanged();
 }
 
-void ResourceWriter::onOperationFinished(Operation* operation)
+void FileSystem::onOperationFinished(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;
 
@@ -51,7 +51,7 @@ void ResourceWriter::onOperationFinished(Operation* operation)
     emit activityChanged();
 }
 
-void ResourceWriter::onOperationError(Operation* operation, const QString& str)
+void FileSystem::onOperationError(Operation* operation, const QString& str)
 {
     qDebug() << Q_FUNC_INFO << operation << str;
     emit error(str);

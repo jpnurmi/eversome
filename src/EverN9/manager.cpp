@@ -13,9 +13,9 @@
 */
 #include "manager.h"
 #include "session.h"
-#include "notestore.h"
 #include "database.h"
-#include "resourcewriter.h"
+#include "notestore.h"
+#include "filesystem.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "searchitem.h"
@@ -60,8 +60,8 @@ Manager::Manager(Session* session) : QObject(session)
     qRegisterMetaType<QList<ResourceItem*> >();
     qRegisterMetaType<QList<NotebookItem*> >();
 
-    m_writer = new ResourceWriter(this);
-    connect(m_writer, SIGNAL(written(QString)), SLOT(onResourceWritten(QString)), Qt::QueuedConnection);
+    m_files = new FileSystem(this);
+    connect(m_files, SIGNAL(written(QString)), SLOT(onFileWritten(QString)), Qt::QueuedConnection);
 
     m_database = new Database(this);
     connect(m_database, SIGNAL(loaded(QList<NotebookItem*>,
@@ -78,7 +78,7 @@ Manager::Manager(Session* session) : QObject(session)
     m_database->load(this);
 
     connect(m_store, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
-    connect(m_writer, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_files, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
     connect(m_database, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
 
     m_notebooks = new ItemModel(this);
@@ -187,7 +187,7 @@ void Manager::onResourceFetched(const evernote::edam::Resource& resource)
 {
     ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
     if (item)
-        m_writer->write(item->filePath(false), QByteArray(resource.data.body.c_str(), resource.data.size));
+        m_files->write(item->filePath(false), QByteArray(resource.data.body.c_str(), resource.data.size));
 }
 
 void Manager::onNoteFetched(const evernote::edam::Note& note)
@@ -197,7 +197,7 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
         item->setContent(note.content);
 }
 
-void Manager::onResourceWritten(const QString &filePath)
+void Manager::onFileWritten(const QString &filePath)
 {
     QString guid = QFileInfo(filePath).baseName();
     ResourceItem* item = m_resources->get<ResourceItem*>(guid);

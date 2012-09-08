@@ -10,7 +10,7 @@ Package: evern9
 Architecture: any
 Replaces: evernote
 Conflicts: evernote
-Depends: ${shlibs:Depends}, ${misc:Depends}, imagemagick
+Depends: ${shlibs:Depends}, ${misc:Depends}, evernote-sharing, imagemagick
 Description: Evernote client for Meego
  Evernote client for Meego
 XSBC-Maemo-Display-Name: EverN9

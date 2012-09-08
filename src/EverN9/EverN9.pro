@@ -1,6 +1,9 @@
 #CONFIG += qdeclarative-boostable
 QT += sql
 
+CONFIG += link_pkgconfig
+PKGCONFIG += accounts-qt libsignon-qt
+
 qmlfolder.source = ../../qml/EverN9
 qmlfolder.target = qml
 DEPLOYMENTFOLDERS = qmlfolder
@@ -20,8 +23,7 @@ HEADERS += \
     manager.h \
     notestore.h \
     resourcewriter.h \
-    settings.h \
-    userstore.h
+    session.h
 
 SOURCES += \
     database.cpp \
@@ -29,8 +31,7 @@ SOURCES += \
     manager.cpp \
     notestore.cpp \
     resourcewriter.cpp \
-    settings.cpp \
-    userstore.cpp
+    session.cpp
 
 include(model/model.pri)
 include(operations/operations.pri)

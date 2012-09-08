@@ -42,6 +42,9 @@ public:
     template <typename T>
     bool add(const QList<T>& items);
 
+    template <typename T>
+    bool remove(T item);
+
 public slots:
     void clear();
 
@@ -103,6 +106,21 @@ bool ItemModel::add(const QList<T>& items)
         beginInsertRows(QModelIndex(), row, row + count - 1);
         m_items += unique;
         endInsertRows();
+        emit countChanged();
+        return true;
+    }
+    return false;
+}
+
+template <typename T>
+bool ItemModel::remove(T item)
+{
+    if (m_guids.contains(item->guid())) {
+        int idx = m_items.indexOf(item);
+        beginRemoveRows(QModelIndex(), idx, idx);
+        m_guids.remove(item->guid());
+        m_items.removeAt(idx);
+        endRemoveRows();
         emit countChanged();
         return true;
     }

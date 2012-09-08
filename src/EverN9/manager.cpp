@@ -91,6 +91,7 @@ Manager::Manager(Session* session) : QObject(session)
 Manager::~Manager()
 {
     m_database->close();
+    QThreadPool::globalInstance()->waitForDone();
 }
 
 bool Manager::isBusy() const

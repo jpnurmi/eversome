@@ -52,3 +52,13 @@ int TagItem::usn() const
 {
     return m_tag.updateSequenceNum;
 }
+
+QDebug operator<<(QDebug debug, const TagItem* item)
+{
+    if (!item)
+        return debug << "TagItem(0x0) ";
+    debug.nospace() << item->metaObject()->className()
+                    << '(' << (void*) item
+                    << ", name = " << item->name() << ')';
+    return debug.space();
+}

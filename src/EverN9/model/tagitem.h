@@ -14,6 +14,7 @@
 #ifndef TAGITEM_H
 #define TAGITEM_H
 
+#include <QDebug>
 #include <QObject>
 #include <QMetaType>
 #include <Types_types.h>
@@ -47,5 +48,7 @@ private:
 
 Q_DECLARE_METATYPE(TagItem*)
 Q_DECLARE_METATYPE(QList<TagItem*>)
+
+QDebug operator<<(QDebug debug, const TagItem* item);
 
 #endif // TAGITEM_H

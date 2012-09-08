@@ -113,3 +113,13 @@ void ResourceItem::update()
     emit filePathChanged();
     emit thumbnailChanged();
 }
+
+QDebug operator<<(QDebug debug, const ResourceItem* item)
+{
+    if (!item)
+        return debug << "ResourceItem(0x0) ";
+    debug.nospace() << item->metaObject()->className()
+                    << '(' << (void*) item
+                    << ", filePath = " << item->filePath(false) << ')';
+    return debug.space();
+}

@@ -14,6 +14,7 @@
 #ifndef NOTEBOOKITEM_H
 #define NOTEBOOKITEM_H
 
+#include <QDebug>
 #include <QObject>
 #include <QDateTime>
 #include <QMetaType>
@@ -54,5 +55,7 @@ private:
 
 Q_DECLARE_METATYPE(NotebookItem*)
 Q_DECLARE_METATYPE(QList<NotebookItem*>)
+
+QDebug operator<<(QDebug debug, const NotebookItem* item);
 
 #endif // NOTEBOOKITEM_H

@@ -14,6 +14,7 @@
 #ifndef NOTEITEM_H
 #define NOTEITEM_H
 
+#include <QDebug>
 #include <QObject>
 #include <QDateTime>
 #include <QMetaType>
@@ -67,5 +68,7 @@ private:
 
 Q_DECLARE_METATYPE(NoteItem*)
 Q_DECLARE_METATYPE(QList<NoteItem*>)
+
+QDebug operator<<(QDebug debug, const NoteItem* item);
 
 #endif // NOTEITEM_H

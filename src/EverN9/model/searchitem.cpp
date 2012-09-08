@@ -52,3 +52,13 @@ int SearchItem::usn() const
 {
     return m_search.updateSequenceNum;
 }
+
+QDebug operator<<(QDebug debug, const SearchItem* item)
+{
+    if (!item)
+        return debug << "SearchItem(0x0) ";
+    debug.nospace() << item->metaObject()->className()
+                    << '(' << (void*) item
+                    << ", name = " << item->name() << ')';
+    return debug.space();
+}

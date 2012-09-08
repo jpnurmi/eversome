@@ -92,3 +92,13 @@ void NoteItem::setContent(const std::string& content)
         emit contentChanged();
     }
 }
+
+QDebug operator<<(QDebug debug, const NoteItem* item)
+{
+    if (!item)
+        return debug << "NoteItem(0x0) ";
+    debug.nospace() << item->metaObject()->className()
+                    << '(' << (void*) item
+                    << ", title = " << item->title() << ')';
+    return debug.space();
+}

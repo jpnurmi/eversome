@@ -14,6 +14,7 @@
 #ifndef RESOURCEITEM_H
 #define RESOURCEITEM_H
 
+#include <QDebug>
 #include <QObject>
 #include <QMetaType>
 #include <Types_types.h>
@@ -57,5 +58,7 @@ private:
 
 Q_DECLARE_METATYPE(ResourceItem*)
 Q_DECLARE_METATYPE(QList<ResourceItem*>)
+
+QDebug operator<<(QDebug debug, const ResourceItem* item);
 
 #endif // RESOURCEITEM_H

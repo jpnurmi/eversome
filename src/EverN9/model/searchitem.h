@@ -14,6 +14,7 @@
 #ifndef SEARCHITEM_H
 #define SEARCHITEM_H
 
+#include <QDebug>
 #include <QObject>
 #include <QMetaType>
 #include <Types_types.h>
@@ -47,5 +48,7 @@ private:
 
 Q_DECLARE_METATYPE(SearchItem*)
 Q_DECLARE_METATYPE(QList<SearchItem*>)
+
+QDebug operator<<(QDebug debug, const SearchItem* item);
 
 #endif // SEARCHITEM_H

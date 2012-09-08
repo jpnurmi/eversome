@@ -67,3 +67,13 @@ int NotebookItem::usn() const
 {
     return m_notebook.updateSequenceNum;
 }
+
+QDebug operator<<(QDebug debug, const NotebookItem* item)
+{
+    if (!item)
+        return debug << "NotebookItem(0x0) ";
+    debug.nospace() << item->metaObject()->className()
+                    << '(' << (void*) item
+                    << ", name = " << item->name() << ')';
+    return debug.space();
+}

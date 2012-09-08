@@ -74,12 +74,14 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
     do {
         client.getSyncChunk(chunk, token, m_usn, 256, false);
 
+        if (m_usn < chunk.updateCount)
+            m_usn = chunk.chunkHighUSN;
+
         m_notebooks += QVector<edam::Notebook>::fromStdVector(chunk.notebooks);
         m_resources += QVector<edam::Resource>::fromStdVector(chunk.resources);
         m_searches += QVector<edam::SavedSearch>::fromStdVector(chunk.searches);
         m_notes += QVector<edam::Note>::fromStdVector(chunk.notes);
         m_tags += QVector<edam::Tag>::fromStdVector(chunk.tags);
-        m_usn = chunk.chunkHighUSN;
 
         qDebug() << Q_FUNC_INFO
                  << "NB:" << chunk.notebooks.size()
@@ -87,7 +89,7 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
                  << "S:" << chunk.searches.size()
                  << "N:" << chunk.notes.size()
                  << "T:" << chunk.tags.size()
-                 << "USN:" << chunk.chunkHighUSN;
+                 << "USN:" << m_usn;
 
     } while (m_usn < chunk.updateCount);
 }

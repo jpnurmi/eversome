@@ -90,6 +90,11 @@ Manager::Manager(Session* session) : QObject(session)
 
 Manager::~Manager()
 {
+    m_notebooks->clear();
+    m_resources->clear();
+    m_searches->clear();
+    m_notes->clear();
+    m_tags->clear();
     m_database->close();
     QThreadPool::globalInstance()->waitForDone();
 }

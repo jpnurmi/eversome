@@ -54,9 +54,15 @@ ResourceItem::~ResourceItem()
 {
 }
 
-evernote::edam::Resource ResourceItem::resource() const
+const evernote::edam::Resource& ResourceItem::data() const
 {
     return m_resource;
+}
+
+void ResourceItem::setData(const evernote::edam::Resource& data)
+{
+    m_resource = data;
+    emit dataChanged();
 }
 
 ResourceItem::Type ResourceItem::type() const

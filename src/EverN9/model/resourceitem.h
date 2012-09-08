@@ -22,19 +22,20 @@
 class ResourceItem : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(Type type READ type CONSTANT)
-    Q_PROPERTY(QString guid READ guid CONSTANT)
-    Q_PROPERTY(QString mime READ mime CONSTANT)
+    Q_PROPERTY(Type type READ type NOTIFY dataChanged)
+    Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
+    Q_PROPERTY(QString mime READ mime NOTIFY dataChanged)
     Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
     Q_PROPERTY(QString thumbnail READ thumbnail NOTIFY thumbnailChanged)
-    Q_PROPERTY(int usn READ usn CONSTANT)
+    Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
     Q_ENUMS(Type)
 
 public:
     explicit ResourceItem(evernote::edam::Resource resource = evernote::edam::Resource(), QObject* parent = 0);
     virtual ~ResourceItem();
 
-    evernote::edam::Resource resource() const;
+    Q_INVOKABLE const evernote::edam::Resource& data() const;
+    void setData(const evernote::edam::Resource& data);
 
     enum Type { Unknown, Image, Audio, Document, Text };
     Type type() const;
@@ -48,6 +49,7 @@ public:
     void update();
 
 signals:
+    void dataChanged();
     void filePathChanged();
     void thumbnailChanged();
 

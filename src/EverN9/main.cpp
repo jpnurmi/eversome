@@ -28,7 +28,7 @@
 
 static const QLatin1String DEFAULT_HOST("www.evernote.com");
 
-Q_DECL_EXPORT int main(int argc, char *argv[])
+Q_DECL_EXPORT int main(int argc, char* argv[])
 {
     QApplication::setApplicationName("EverN9");
     QApplication::setOrganizationName("Evernote");
@@ -57,15 +57,15 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     if (index != -1)
         host = args.value(index + 1);
 
+    Session session(host);
+    Manager* manager = new Manager(&session);
+
     qmlRegisterType<TagItem>("com.evernote.types", 1,0, "Tag");
     qmlRegisterType<NoteItem>("com.evernote.types", 1,0, "Note");
     qmlRegisterType<ItemModel>("com.evernote.types", 1,0, "ItemModel");
     qmlRegisterType<SearchItem>("com.evernote.types", 1,0, "Search");
     qmlRegisterType<ResourceItem>("com.evernote.types", 1,0, "Resource");
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
-
-    Session session(host);
-    Manager* manager = new Manager(&session);
 
     QmlApplicationViewer viewer;
     viewer.rootContext()->setContextProperty("Session", &session);

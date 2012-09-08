@@ -23,9 +23,15 @@ SearchItem::~SearchItem()
 {
 }
 
-evernote::edam::SavedSearch SearchItem::search() const
+const evernote::edam::SavedSearch& SearchItem::data() const
 {
     return m_search;
+}
+
+void SearchItem::setData(const evernote::edam::SavedSearch& data)
+{
+    m_search = data;
+    emit dataChanged();
 }
 
 QString SearchItem::guid() const

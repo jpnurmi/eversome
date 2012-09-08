@@ -59,7 +59,7 @@ void Database::save(const QList<NotebookItem*>& notebooks,
                     const QList<NoteItem*>& notes,
                     const QList<TagItem*>& tags)
 {
-    DatabaseOperation* operation = createOperation(Operation::LoadDatabase);
+    DatabaseOperation* operation = createOperation(Operation::SaveDatabase);
     operation->setNotebooks(notebooks);
     operation->setResources(resources);
     operation->setSearches(searches);

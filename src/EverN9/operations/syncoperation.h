@@ -15,9 +15,7 @@
 #define SYNCOPERATION_H
 
 #include "networkoperation.h"
-#include <Types_types.h>
-#include <QDateTime>
-#include <QVector>
+#include <NoteStore_types.h>
 
 class SyncOperation : public NetworkOperation
 {
@@ -28,24 +26,14 @@ public:
     ~SyncOperation();
 
     int usn() const;
-    QDateTime currentTime() const;
-    QVector<evernote::edam::Notebook> notebooks() const;
-    QVector<evernote::edam::Resource> resources() const;
-    QVector<evernote::edam::SavedSearch> searches() const;
-    QVector<evernote::edam::Note> notes() const;
-    QVector<evernote::edam::Tag> tags() const;
+    const evernote::edam::SyncChunk& chunk() const;
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
 
 private:
     int m_usn;
-    QDateTime m_time;
-    QVector<evernote::edam::Notebook> m_notebooks;
-    QVector<evernote::edam::Resource> m_resources;
-    QVector<evernote::edam::SavedSearch> m_searches;
-    QVector<evernote::edam::Note> m_notes;
-    QVector<evernote::edam::Tag> m_tags;
+    evernote::edam::SyncChunk m_chunk;
 };
 
 #endif // SYNCOPERATION_H

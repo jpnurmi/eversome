@@ -33,34 +33,9 @@ int SyncOperation::usn() const
     return m_usn;
 }
 
-QDateTime SyncOperation::currentTime() const
+const edam::SyncChunk& SyncOperation::chunk() const
 {
-    return m_time;
-}
-
-QVector<edam::Notebook> SyncOperation::notebooks() const
-{
-    return m_notebooks;
-}
-
-QVector<edam::Resource> SyncOperation::resources() const
-{
-    return m_resources;
-}
-
-QVector<edam::SavedSearch> SyncOperation::searches() const
-{
-    return m_searches;
-}
-
-QVector<edam::Note> SyncOperation::notes() const
-{
-    return m_notes;
-}
-
-QVector<edam::Tag> SyncOperation::tags() const
-{
-    return m_tags;
+    return m_chunk;
 }
 
 void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
@@ -72,22 +47,23 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
-    edam::SyncChunk chunk;
 
     // TODO: report progress
 
     do {
+        edam::SyncChunk chunk;
         client.getSyncChunk(chunk, token, m_usn, 256, false);
 
         if (m_usn < chunk.updateCount)
             m_usn = chunk.chunkHighUSN;
 
-        m_time = QDateTime::fromMSecsSinceEpoch(chunk.currentTime);
-        m_notebooks += QVector<edam::Notebook>::fromStdVector(chunk.notebooks);
-        m_resources += QVector<edam::Resource>::fromStdVector(chunk.resources);
-        m_searches += QVector<edam::SavedSearch>::fromStdVector(chunk.searches);
-        m_notes += QVector<edam::Note>::fromStdVector(chunk.notes);
-        m_tags += QVector<edam::Tag>::fromStdVector(chunk.tags);
+        m_chunk.updateCount = chunk.updateCount;
+        m_chunk.currentTime = chunk.currentTime;
+        m_chunk.notebooks.insert(m_chunk.notebooks.end(), chunk.notebooks.begin(), chunk.notebooks.end());
+        m_chunk.resources.insert(m_chunk.resources.end(), chunk.resources.begin(), chunk.resources.end());
+        m_chunk.searches.insert(m_chunk.searches.end(), chunk.searches.begin(), chunk.searches.end());
+        m_chunk.notes.insert(m_chunk.notes.end(), chunk.notes.begin(), chunk.notes.end());
+        m_chunk.tags.insert(m_chunk.tags.end(), chunk.tags.begin(), chunk.tags.end());
 
         qDebug() << Q_FUNC_INFO
                  << "NB:" << chunk.notebooks.size()
@@ -97,5 +73,5 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
                  << "T:" << chunk.tags.size()
                  << "USN:" << m_usn;
 
-    } while (m_usn < chunk.updateCount);
+    } while (m_usn < m_chunk.updateCount);
 }

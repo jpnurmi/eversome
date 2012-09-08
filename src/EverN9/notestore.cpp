@@ -158,15 +158,17 @@ void NoteStore::onOperationFinished(Operation* operation)
 
     SyncOperation* syncOperation = qobject_cast<SyncOperation*>(operation);
     if (syncOperation) {
-        dateTime = syncOperation->currentTime();
+        QSettings().setValue("usn", syncOperation->usn());
+        const evernote::edam::SyncChunk& chunk = syncOperation->chunk();
+
+        dateTime = QDateTime::fromMSecsSinceEpoch(chunk.currentTime);
         emit currentTimeChanged();
 
-        QSettings().setValue("usn", syncOperation->usn());
-        emit synced(syncOperation->notebooks(),
-                    syncOperation->resources(),
-                    syncOperation->searches(),
-                    syncOperation->notes(),
-                    syncOperation->tags());
+        emit synced(QVector<edam::Notebook>::fromStdVector(chunk.notebooks),
+                    QVector<edam::Resource>::fromStdVector(chunk.resources),
+                    QVector<edam::SavedSearch>::fromStdVector(chunk.searches),
+                    QVector<edam::Note>::fromStdVector(chunk.notes),
+                    QVector<edam::Tag>::fromStdVector(chunk.tags));
     }
 
     SearchOperation* searchOperation = qobject_cast<SearchOperation*>(operation);

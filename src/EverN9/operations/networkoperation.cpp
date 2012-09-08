@@ -25,7 +25,7 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-NetworkOperation::NetworkOperation(Mode mode) : Operation(mode), m_port(-1)
+NetworkOperation::NetworkOperation(Mode mode) : Operation(mode)
 {
 }
 
@@ -35,37 +35,17 @@ NetworkOperation::~NetworkOperation()
 
 bool NetworkOperation::isValid() const
 {
-    return m_port != -1 && !m_host.isEmpty() && !m_path.isEmpty();
+    return m_url.isValid() && !m_token.isEmpty();
 }
 
-QString NetworkOperation::host() const
+QUrl NetworkOperation::url() const
 {
-    return m_host;
+    return m_url;
 }
 
-void NetworkOperation::setHost(const QString& host)
+void NetworkOperation::setUrl(const QUrl& url)
 {
-    m_host = host;
-}
-
-int NetworkOperation::port() const
-{
-    return m_port;
-}
-
-void NetworkOperation::setPort(int port)
-{
-    m_port = port;
-}
-
-QString NetworkOperation::path() const
-{
-    return m_path;
-}
-
-void NetworkOperation::setPath(const QString& path)
-{
-    m_path = path;
+    m_url = url;
 }
 
 QString NetworkOperation::authToken() const
@@ -81,7 +61,9 @@ void NetworkOperation::setAuthToken(const QString& token)
 void NetworkOperation::operate()
 {
     try {
-        shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(m_host.toStdString(), m_port, m_path.toStdString()));
+        std::string host = m_url.host().toStdString();
+        std::string path = m_url.path().toStdString();
+        shared_ptr<thrift::transport::TTransport> transport(new thrift::transport::THttpClient(host, m_url.port(), path));
         shared_ptr<thrift::protocol::TProtocol> protocol(new thrift::protocol::TBinaryProtocol(transport));
         transport->open();
         operate(protocol);

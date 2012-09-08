@@ -16,6 +16,7 @@
 
 #include "operation.h"
 #include <thrift/protocol/TProtocol.h>
+#include <QUrl>
 
 class NetworkOperation : public Operation
 {
@@ -27,14 +28,8 @@ public:
 
     bool isValid() const;
 
-    QString host() const;
-    void setHost(const QString& host);
-
-    int port() const;
-    void setPort(int port);
-
-    QString path() const;
-    void setPath(const QString& path);
+    QUrl url() const;
+    void setUrl(const QUrl& url);
 
     QString authToken() const;
     void setAuthToken(const QString& token);
@@ -44,9 +39,7 @@ protected:
     virtual void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol) = 0;
 
 private:
-    int m_port;
-    QString m_host;
-    QString m_path;
+    QUrl m_url;
     QString m_token;
 };
 

@@ -38,6 +38,7 @@ public:
         ResetDatabase,
         LoadDatabase,
         SaveDatabase,
+        RemoveDatabase,
 
         // user store operations
         Auth,

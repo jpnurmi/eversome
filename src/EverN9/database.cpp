@@ -69,6 +69,20 @@ void Database::save(const QList<NotebookItem*>& notebooks,
     QThreadPool::globalInstance()->start(operation);
 }
 
+void Database::remove(const QList<NotebookItem*>& notebooks,
+                      const QList<SearchItem*>& searches,
+                      const QList<NoteItem*>& notes,
+                      const QList<TagItem*>& tags)
+{
+    DatabaseOperation* operation = createOperation(Operation::RemoveDatabase);
+    operation->setNotebooks(notebooks);
+    operation->setSearches(searches);
+    operation->setNotes(notes);
+    operation->setTags(tags);
+    qDebug() << Q_FUNC_INFO << operation;
+    QThreadPool::globalInstance()->start(operation);
+}
+
 void Database::onOperationStarted(Operation* operation)
 {
     qDebug() << Q_FUNC_INFO << operation;

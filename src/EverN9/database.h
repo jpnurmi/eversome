@@ -39,6 +39,10 @@ public:
               const QList<SearchItem*>& searches,
               const QList<NoteItem*>& notes,
               const QList<TagItem*>& tags);
+    void remove(const QList<NotebookItem*>& notebooks,
+                const QList<SearchItem*>& searches,
+                const QList<NoteItem*>& notes,
+                const QList<TagItem*>& tags);
 
 public slots:
     void open();

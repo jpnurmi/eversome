@@ -281,15 +281,16 @@ void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVecto
 void Manager::addNotes(const QList<NoteItem*>& notes)
 {
     foreach (NoteItem* note, notes) {
-        QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
+        const evernote::edam::Note& data = note->data();
+        QString notebookGuid = QString::fromStdString(data.notebookGuid);
         NotebookItem* notebook = m_notebooks->get<NotebookItem*>(notebookGuid);
         if (notebook)
             notebook->notes()->add(note);
         else
             qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
 
-        for (uint i = 0; i < note->note().resources.size(); ++i) {
-            QString resourceGuid = QString::fromStdString(note->note().resources.at(i).guid);
+        for (uint i = 0; i < data.resources.size(); ++i) {
+            QString resourceGuid = QString::fromStdString(data.resources.at(i).guid);
             ResourceItem* resource = m_resources->get<ResourceItem*>(resourceGuid);
             if (resource)
                 note->resources()->add(resource);
@@ -297,8 +298,8 @@ void Manager::addNotes(const QList<NoteItem*>& notes)
                 qCritical() << Q_FUNC_INFO << "MISSING RESOURCE:" << resourceGuid;
         }
 
-        for (uint i = 0; i < note->note().tagGuids.size(); ++i) {
-            QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
+        for (uint i = 0; i < data.tagGuids.size(); ++i) {
+            QString tagGuid = QString::fromStdString(data.tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);
             if (tag) {
                 note->tags()->add(tag);
@@ -312,15 +313,16 @@ void Manager::addNotes(const QList<NoteItem*>& notes)
 void Manager::removeNotes(const QList<NoteItem*>& notes)
 {
     foreach (NoteItem* note, notes) {
-        QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
+        const evernote::edam::Note& data = note->data();
+        QString notebookGuid = QString::fromStdString(data.notebookGuid);
         NotebookItem* notebook = m_notebooks->get<NotebookItem*>(notebookGuid);
         if (notebook)
             notebook->notes()->remove(note);
         else
             qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
 
-        for (uint i = 0; i < note->note().resources.size(); ++i) {
-            QString resourceGuid = QString::fromStdString(note->note().resources.at(i).guid);
+        for (uint i = 0; i < data.resources.size(); ++i) {
+            QString resourceGuid = QString::fromStdString(data.resources.at(i).guid);
             ResourceItem* resource = m_resources->get<ResourceItem*>(resourceGuid);
             if (resource)
                 note->resources()->remove(resource);
@@ -328,8 +330,8 @@ void Manager::removeNotes(const QList<NoteItem*>& notes)
                 qCritical() << Q_FUNC_INFO << "MISSING RESOURCE:" << resourceGuid;
         }
 
-        for (uint i = 0; i < note->note().tagGuids.size(); ++i) {
-            QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
+        for (uint i = 0; i < data.tagGuids.size(); ++i) {
+            QString tagGuid = QString::fromStdString(data.tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);
             if (tag) {
                 note->tags()->remove(tag);

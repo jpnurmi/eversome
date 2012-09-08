@@ -24,9 +24,15 @@ NoteItem::~NoteItem()
 {
 }
 
-evernote::edam::Note NoteItem::note() const
+const evernote::edam::Note& NoteItem::data() const
 {
     return m_note;
+}
+
+void NoteItem::setData(const evernote::edam::Note& data)
+{
+    m_note = data;
+    emit dataChanged();
 }
 
 QString NoteItem::guid() const

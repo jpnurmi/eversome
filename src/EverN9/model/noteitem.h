@@ -24,23 +24,24 @@
 class NoteItem : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString guid READ guid CONSTANT)
-    Q_PROPERTY(QString title READ title CONSTANT)
+    Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
+    Q_PROPERTY(QString title READ title NOTIFY dataChanged)
     Q_PROPERTY(QString content READ content NOTIFY contentChanged)
-    Q_PROPERTY(QDateTime created READ created CONSTANT)
-    Q_PROPERTY(QDateTime updated READ updated CONSTANT)
-    Q_PROPERTY(QDateTime deleted READ deleted CONSTANT)
-    Q_PROPERTY(bool isActive READ isActive CONSTANT)
+    Q_PROPERTY(QDateTime created READ created NOTIFY dataChanged)
+    Q_PROPERTY(QDateTime updated READ updated NOTIFY dataChanged)
+    Q_PROPERTY(QDateTime deleted READ deleted NOTIFY dataChanged)
+    Q_PROPERTY(bool isActive READ isActive NOTIFY dataChanged)
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
     Q_PROPERTY(ItemModel* tags READ tags CONSTANT)
     Q_PROPERTY(ItemModel* resources READ resources CONSTANT)
-    Q_PROPERTY(int usn READ usn CONSTANT)
+    Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
 
 public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
     virtual ~NoteItem();
 
-    Q_INVOKABLE evernote::edam::Note note() const;
+    Q_INVOKABLE const evernote::edam::Note& data() const;
+    void setData(const evernote::edam::Note& data);
 
     QString guid() const;
     QString title() const;
@@ -57,6 +58,7 @@ public:
     void setContent(const std::string& content);
 
 signals:
+    void dataChanged();
     void isEmptyChanged();
     void contentChanged();
 

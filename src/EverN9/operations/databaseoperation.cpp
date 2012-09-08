@@ -386,6 +386,7 @@ void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
     QVariantList guids, titles, contents, creates, updates,
                  deletes, actives, notebooks, tags, resources, usns;
     foreach (NoteItem* note, notes) {
+        const evernote::edam::Note& data = note->data();
         guids += note->guid();
         titles += note->title();
         contents += note->content();
@@ -393,14 +394,14 @@ void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
         updates += note->updated().toMSecsSinceEpoch();
         deletes += note->deleted().toMSecsSinceEpoch();
         actives += note->isActive();
-        notebooks += QString::fromStdString(note->note().notebookGuid);
+        notebooks += QString::fromStdString(data.notebookGuid);
         QStringList tagGuids;
-        for (uint i = 0; i < note->note().tagGuids.size(); ++i)
-            tagGuids += QString::fromStdString(note->note().tagGuids.at(i));
+        for (uint i = 0; i < data.tagGuids.size(); ++i)
+            tagGuids += QString::fromStdString(data.tagGuids.at(i));
         tags += tagGuids.join(";");
         QStringList resourceGuids;
-        for (uint i = 0; i < note->note().resources.size(); ++i)
-            resourceGuids += QString::fromStdString(note->note().resources.at(i).guid);
+        for (uint i = 0; i < data.resources.size(); ++i)
+            resourceGuids += QString::fromStdString(data.resources.at(i).guid);
         resources += resourceGuids.join(";");
         usns += note->usn();
     }

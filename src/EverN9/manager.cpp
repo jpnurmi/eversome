@@ -246,12 +246,11 @@ void Manager::setupNotes(const QList<NoteItem*>& notes)
         for (uint i = 0; i < note->note().tagGuids.size(); ++i) {
             QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);
-            if (!tag) {
+            if (tag) {
+                note->tags()->add(tag);
+                tag->notes()->add(note);
+            } else
                 qCritical() << Q_FUNC_INFO << "MISSING TAG:" << tagGuid;
-                continue;
-            }
-            note->tags()->add(tag);
-            tag->notes()->add(note);
         }
     }
 }

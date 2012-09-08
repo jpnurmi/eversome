@@ -12,10 +12,9 @@
 * GNU General Public License for more details.
 */
 #include "manager.h"
-#include "database.h"
-#include "settings.h"
-#include "userstore.h"
+#include "session.h"
 #include "notestore.h"
+#include "database.h"
 #include "resourcewriter.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
@@ -28,31 +27,27 @@
 #include <QVector>
 #include <QDebug>
 
-Manager::Manager(QObject *parent) : QObject(parent)
+Manager::Manager(Session* session) : QObject(session)
 {
-    m_user = new UserStore(this);
-    m_note = new NoteStore(m_user);
+    m_store = new NoteStore(session);
 
-    connect(m_user, SIGNAL(loggedIn()), this, SLOT(onLoggedIn()), Qt::QueuedConnection);
-    connect(m_user, SIGNAL(loggedOut()), this, SLOT(onLoggedOut()), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+                                   QVector<evernote::edam::Resource>,
+                                   QVector<evernote::edam::SavedSearch>,
+                                   QVector<evernote::edam::Note>,
+                                   QVector<evernote::edam::Tag>)),
+               this, SLOT(onSynced(QVector<evernote::edam::Notebook>,
+                                   QVector<evernote::edam::Resource>,
+                                   QVector<evernote::edam::SavedSearch>,
+                                   QVector<evernote::edam::Note>,
+                                   QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
 
-    connect(m_note, SIGNAL(synced(QVector<evernote::edam::Notebook>,
-                                  QVector<evernote::edam::Resource>,
-                                  QVector<evernote::edam::SavedSearch>,
-                                  QVector<evernote::edam::Note>,
-                                  QVector<evernote::edam::Tag>)),
-              this, SLOT(onSynced(QVector<evernote::edam::Notebook>,
-                                  QVector<evernote::edam::Resource>,
-                                  QVector<evernote::edam::SavedSearch>,
-                                  QVector<evernote::edam::Note>,
-                                  QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
-
-    connect(m_note, SIGNAL(resourceFetched(evernote::edam::Resource)),
-              this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
-    connect(m_note, SIGNAL(noteFetched(evernote::edam::Note)),
-              this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(m_note, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
-              this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(resourceFetched(evernote::edam::Resource)),
+               this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(noteFetched(evernote::edam::Note)),
+               this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
+               this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)), Qt::QueuedConnection);
 
     qRegisterMetaType<TagItem*>();
     qRegisterMetaType<NoteItem*>();
@@ -80,9 +75,9 @@ Manager::Manager(QObject *parent) : QObject(parent)
                                       QList<NoteItem*>,
                                       QList<TagItem*>)), Qt::QueuedConnection);
     m_database->open();
+    m_database->load(this);
 
-    connect(m_user, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
-    connect(m_note, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_store, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
     connect(m_writer, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
     connect(m_database, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
 
@@ -103,19 +98,9 @@ bool Manager::isBusy() const
     return QThreadPool::globalInstance()->activeThreadCount();
 }
 
-Database* Manager::database() const
-{
-    return m_database;
-}
-
-UserStore* Manager::userStore() const
-{
-    return m_user;
-}
-
 NoteStore* Manager::noteStore() const
 {
-    return m_note;
+    return m_store;
 }
 
 ItemModel* Manager::notebookModel() const
@@ -141,24 +126,6 @@ ItemModel* Manager::noteModel() const
 ItemModel* Manager::tagModel() const
 {
     return m_tags;
-}
-
-void Manager::onLoggedIn()
-{
-    m_database->load(this);
-    m_note->sync();
-}
-
-void Manager::onLoggedOut()
-{
-    m_note->cancel();
-    m_database->reset();
-
-    m_notebooks->clear();
-    m_resources->clear();
-    m_searches->clear();
-    m_notes->clear();
-    m_tags->clear();
 }
 
 void Manager::onLoaded(const QList<NotebookItem*>& notebooks,

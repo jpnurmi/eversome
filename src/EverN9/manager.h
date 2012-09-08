@@ -17,10 +17,11 @@
 #include <QObject>
 #include <Types_types.h>
 
+class Session;
+class NoteStore;
 class Database;
 class ResourceWriter;
-class UserStore;
-class NoteStore;
+
 class ItemModel;
 class NotebookItem;
 class ResourceItem;
@@ -34,13 +35,11 @@ class Manager : public QObject
     Q_PROPERTY(bool isBusy READ isBusy NOTIFY isBusyChanged)
 
 public:
-    explicit Manager(QObject* parent = 0);
+    explicit Manager(Session* session = 0);
     virtual ~Manager();
 
     bool isBusy() const;
 
-    Database* database() const;
-    UserStore* userStore() const;
     NoteStore* noteStore() const;
 
     ItemModel* notebookModel() const;
@@ -53,9 +52,6 @@ signals:
     void isBusyChanged();
 
 private slots:
-    void onLoggedIn();
-    void onLoggedOut();
-
     void onLoaded(const QList<NotebookItem*>& notebooks,
                   const QList<ResourceItem*>& resources,
                   const QList<SearchItem*>& searches,
@@ -78,10 +74,10 @@ private slots:
 private:
     void setupNotes(const QList<NoteItem*>& notes);
 
+    NoteStore* m_store;
     Database* m_database;
     ResourceWriter* m_writer;
-    UserStore* m_user;
-    NoteStore* m_note;
+
     ItemModel* m_notebooks;
     ItemModel* m_resources;
     ItemModel* m_searches;

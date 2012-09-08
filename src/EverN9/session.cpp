@@ -63,7 +63,6 @@ Session::Session(const QString& host, QObject* parent) :
 
 Session::~Session()
 {
-    delete m_account;
 }
 
 QUrl Session::url() const

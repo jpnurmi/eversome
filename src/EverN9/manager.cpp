@@ -135,13 +135,15 @@ void Manager::onLoaded(const QList<NotebookItem*>& notebooks,
                        const QList<NoteItem*>& notes,
                        const QList<TagItem*>& tags)
 {
-    m_notebooks->add(notebooks);
-    m_resources->add(resources);
-    m_searches->add(searches);
-    m_notes->add(notes);
-    m_tags->add(tags);
+    bool added = false;
+    added |= m_notebooks->add(notebooks);
+    added |= m_resources->add(resources);
+    added |= m_searches->add(searches);
+    added |= m_notes->add(notes);
+    added |= m_tags->add(tags);
 
-    setupNotes(m_notes->items<NoteItem*>());
+    if (added)
+        setupNotes(m_notes->items<NoteItem*>());
 }
 
 void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
@@ -150,30 +152,31 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
                        const QVector<evernote::edam::Note>& notes,
                        const QVector<evernote::edam::Tag>& tags)
 {
+    bool added = false;
     QList<NotebookItem*> notebookItems;
     foreach (const evernote::edam::Notebook& notebook, notebooks)
         notebookItems += new NotebookItem(notebook, this);
-    m_notebooks->add(notebookItems);
+    added |= m_notebooks->add(notebookItems);
 
     QList<ResourceItem*> resourceItems;
     foreach (const evernote::edam::Resource& resource, resources)
         resourceItems += new ResourceItem(resource, this);
-    m_resources->add(resourceItems);
+    added |= m_resources->add(resourceItems);
 
     QList<SearchItem*> searchItems;
     foreach (const evernote::edam::SavedSearch& search, searches)
         searchItems += new SearchItem(search, this);
-    m_searches->add(searchItems);
+    added |= m_searches->add(searchItems);
 
     QList<NoteItem*> noteItems;
     foreach (const evernote::edam::Note& note, notes)
         noteItems += new NoteItem(note, this);
-    m_notes->add(noteItems);
+    added |= m_notes->add(noteItems);
 
     QList<TagItem*> tagItems;
     foreach (const evernote::edam::Tag& tag, tags)
         tagItems += new TagItem(tag, this);
-    m_tags->add(tagItems);
+    added |= m_tags->add(tagItems);
 
     m_database->save(m_notebooks->items<NotebookItem*>(),
                      m_resources->items<ResourceItem*>(),
@@ -181,7 +184,8 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
                      m_notes->items<NoteItem*>(),
                      m_tags->items<TagItem*>());
 
-    setupNotes(m_notes->items<NoteItem*>());
+    if (added)
+        setupNotes(m_notes->items<NoteItem*>());
 }
 
 void Manager::onResourceFetched(const evernote::edam::Resource& resource)

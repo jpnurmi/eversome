@@ -25,6 +25,24 @@ FileSystem::~FileSystem()
 {
 }
 
+bool FileSystem::removeDir(const QDir& dir)
+{
+    bool result = true;
+    if (dir.exists()) {
+        QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files);
+        foreach (const QFileInfo &info, entries) {
+            if (info.isDir())
+                result &= removeDir(QDir(info.absoluteFilePath()));
+            else
+                result &= QFile::remove(info.absoluteFilePath());
+        }
+        QDir parent(dir);
+        if (parent.cdUp())
+            parent.rmdir(dir.dirName());
+    }
+    return result;
+}
+
 void FileSystem::write(const QString& filePath, const QByteArray& data)
 {
     FileOperation* operation = new FileOperation(Operation::WriteFile, filePath, data);

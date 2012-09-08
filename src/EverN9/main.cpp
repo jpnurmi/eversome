@@ -14,6 +14,7 @@
 #include <QtDeclarative>
 #include "qmlapplicationviewer.h"
 
+#include "filesystem.h"
 #include "notestore.h"
 #include "session.h"
 #include "manager.h"
@@ -26,24 +27,6 @@
 #include "tagitem.h"
 
 static const QLatin1String DEFAULT_HOST("www.evernote.com");
-
-static bool removeDir(const QDir& dir)
-{
-    bool result = true;
-    if (dir.exists()) {
-        QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files);
-        foreach (const QFileInfo &info, entries) {
-            if (info.isDir())
-                result &= removeDir(QDir(info.absoluteFilePath()));
-            else
-                result &= QFile::remove(info.absoluteFilePath());
-        }
-        QDir parent(dir);
-        if (parent.cdUp())
-            parent.rmdir(dir.dirName());
-    }
-    return result;
-}
 
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {
@@ -60,9 +43,9 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     QStringList args = app->arguments();
     if (args.contains("-reset")) {
         qDebug() << "EverN9 reset...";
-        qDebug() << "  -> Data:" << (removeDir(dataPath) ? "OK" : "FAIL!") << qPrintable("("+dataPath+")");
-        qDebug() << "  -> Cache:" << (removeDir(cachePath) ? "OK" : "FAIL!") << qPrintable("("+cachePath+")");
-        qDebug() << "  -> Config:" << (removeDir(configPath) ? "OK" : "FAIL!") << qPrintable("("+configPath+")");
+        qDebug() << "  -> Data:" << (FileSystem::removeDir(dataPath) ? "OK" : "FAIL!") << qPrintable("("+dataPath+")");
+        qDebug() << "  -> Cache:" << (FileSystem::removeDir(cachePath) ? "OK" : "FAIL!") << qPrintable("("+cachePath+")");
+        qDebug() << "  -> Config:" << (FileSystem::removeDir(configPath) ? "OK" : "FAIL!") << qPrintable("("+configPath+")");
     }
 
     QDir().mkpath(configPath);

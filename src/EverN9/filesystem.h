@@ -15,6 +15,7 @@
 #define FILESYSTEM_H
 
 #include <QObject>
+#include <QDir>
 
 class Operation;
 
@@ -25,6 +26,8 @@ class FileSystem : public QObject
 public:
     explicit FileSystem(QObject* parent = 0);
     virtual ~FileSystem();
+
+    static bool removeDir(const QDir& dir);
 
     void write(const QString& filePath, const QByteArray& data);
 

@@ -3,6 +3,7 @@ DEPENDPATH += $$PWD
 
 HEADERS += \
     itemmodel.h \
+    itemmodel_p.h \
     notebookitem.h \
     noteitem.h \
     resourceitem.h \

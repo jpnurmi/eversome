@@ -43,6 +43,9 @@ public:
     bool add(const QList<T>& items);
 
     template <typename T>
+    bool replace(T item);
+
+    template <typename T>
     bool remove(T item);
 
 public slots:
@@ -56,76 +59,7 @@ private:
     QHash<QString, QObject*> m_guids;
 };
 
-template <typename T>
-QList<T> ItemModel::items() const
-{
-    QList<T> items;
-    foreach (QObject* item, m_items) {
-        T t = qobject_cast<T>(item);
-        if (t)
-            items += t;
-    }
-    return items;
-}
-
-template <typename T>
-T ItemModel::get(const QString& guid) const
-{
-    return qobject_cast<T>(m_guids.value(guid));
-}
-
-template <typename T>
-bool ItemModel::add(T item)
-{
-    if (!m_guids.contains(item->guid())) {
-        const int row = rowCount();
-        beginInsertRows(QModelIndex(), row, row);
-        m_guids.insert(item->guid(), item);
-        m_items += item;
-        endInsertRows();
-        emit countChanged();
-        return true;
-    }
-    return false;
-}
-
-template <typename T>
-bool ItemModel::add(const QList<T>& items)
-{
-    QObjectList unique;
-    foreach (T item, items) {
-        if (m_guids.contains(item->guid()))
-            continue;
-        unique += item;
-        m_guids.insert(item->guid(), item);
-    }
-
-    if (!unique.isEmpty()) {
-        const int row = rowCount();
-        const int count = unique.count();
-        beginInsertRows(QModelIndex(), row, row + count - 1);
-        m_items += unique;
-        endInsertRows();
-        emit countChanged();
-        return true;
-    }
-    return false;
-}
-
-template <typename T>
-bool ItemModel::remove(T item)
-{
-    if (m_guids.contains(item->guid())) {
-        int idx = m_items.indexOf(item);
-        beginRemoveRows(QModelIndex(), idx, idx);
-        m_guids.remove(item->guid());
-        m_items.removeAt(idx);
-        endRemoveRows();
-        emit countChanged();
-        return true;
-    }
-    return false;
-}
+#include "itemmodel_p.h"
 
 Q_DECLARE_METATYPE(ItemModel*)
 

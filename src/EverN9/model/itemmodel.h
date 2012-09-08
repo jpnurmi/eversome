@@ -37,10 +37,10 @@ public:
     T get(const QString& guid) const;
 
     template <typename T>
-    void add(T item);
+    bool add(T item);
 
     template <typename T>
-    void add(const QList<T>& items);
+    bool add(const QList<T>& items);
 
 public slots:
     void clear();
@@ -72,7 +72,7 @@ T ItemModel::get(const QString& guid) const
 }
 
 template <typename T>
-void ItemModel::add(T item)
+bool ItemModel::add(T item)
 {
     if (!m_guids.contains(item->guid())) {
         const int row = rowCount();
@@ -81,11 +81,13 @@ void ItemModel::add(T item)
         m_items += item;
         endInsertRows();
         emit countChanged();
+        return true;
     }
+    return false;
 }
 
 template <typename T>
-void ItemModel::add(const QList<T>& items)
+bool ItemModel::add(const QList<T>& items)
 {
     QObjectList unique;
     foreach (T item, items) {
@@ -102,7 +104,9 @@ void ItemModel::add(const QList<T>& items)
         m_items += unique;
         endInsertRows();
         emit countChanged();
+        return true;
     }
+    return false;
 }
 
 Q_DECLARE_METATYPE(ItemModel*)

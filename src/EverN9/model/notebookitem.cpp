@@ -23,11 +23,6 @@ NotebookItem::~NotebookItem()
 {
 }
 
-ItemModel* NotebookItem::notes() const
-{
-    return m_notes;
-}
-
 evernote::edam::Notebook NotebookItem::notebook() const
 {
     return m_notebook;
@@ -61,4 +56,14 @@ QDateTime NotebookItem::created() const
 QDateTime NotebookItem::updated() const
 {
     return QDateTime::fromMSecsSinceEpoch(m_notebook.serviceUpdated);
+}
+
+ItemModel* NotebookItem::notes() const
+{
+    return m_notes;
+}
+
+int NotebookItem::usn() const
+{
+    return m_notebook.updateSequenceNum;
 }

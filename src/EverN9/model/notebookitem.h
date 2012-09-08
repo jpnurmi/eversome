@@ -30,6 +30,7 @@ class NotebookItem : public QObject
     Q_PROPERTY(QDateTime created READ created CONSTANT)
     Q_PROPERTY(QDateTime updated READ updated CONSTANT)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
+    Q_PROPERTY(int usn READ usn CONSTANT)
 
 public:
     explicit NotebookItem(evernote::edam::Notebook notebook = evernote::edam::Notebook(), QObject* parent = 0);
@@ -44,6 +45,7 @@ public:
     QDateTime created() const;
     QDateTime updated() const;
     ItemModel* notes() const;
+    int usn() const;
 
 private:
     ItemModel* m_notes;

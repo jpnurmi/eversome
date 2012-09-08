@@ -23,11 +23,6 @@ SearchItem::~SearchItem()
 {
 }
 
-ItemModel* SearchItem::notes() const
-{
-    return m_notes;
-}
-
 evernote::edam::SavedSearch SearchItem::search() const
 {
     return m_search;
@@ -46,4 +41,14 @@ QString SearchItem::name() const
 QString SearchItem::query() const
 {
     return QString::fromStdString(m_search.query);
+}
+
+ItemModel* SearchItem::notes() const
+{
+    return m_notes;
+}
+
+int SearchItem::usn() const
+{
+    return m_search.updateSequenceNum;
 }

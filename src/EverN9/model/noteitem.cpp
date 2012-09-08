@@ -79,6 +79,11 @@ ItemModel* NoteItem::resources() const
     return m_resources;
 }
 
+int NoteItem::usn() const
+{
+    return m_note.updateSequenceNum;
+}
+
 void NoteItem::setContent(const std::string& content)
 {
     if (m_note.content != content) {

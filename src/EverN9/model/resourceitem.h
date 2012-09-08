@@ -21,11 +21,12 @@
 class ResourceItem : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(Type type READ type CONSTANT)
     Q_PROPERTY(QString guid READ guid CONSTANT)
     Q_PROPERTY(QString mime READ mime CONSTANT)
     Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
     Q_PROPERTY(QString thumbnail READ thumbnail NOTIFY thumbnailChanged)
-    Q_PROPERTY(Type type READ type CONSTANT)
+    Q_PROPERTY(int usn READ usn CONSTANT)
     Q_ENUMS(Type)
 
 public:
@@ -41,7 +42,7 @@ public:
     QString mime() const;
     QString filePath(bool checkExists = true) const;
     QString thumbnail(bool checkExists = true) const;
-    bool isEmpty() const;
+    int usn() const;
 
     void update();
 

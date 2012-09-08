@@ -23,11 +23,6 @@ TagItem::~TagItem()
 {
 }
 
-ItemModel* TagItem::notes() const
-{
-    return m_notes;
-}
-
 evernote::edam::Tag TagItem::tag() const
 {
     return m_tag;
@@ -46,4 +41,14 @@ QString TagItem::name() const
 QString TagItem::parentGuid() const
 {
     return QString::fromStdString(m_tag.parentGuid);
+}
+
+ItemModel* TagItem::notes() const
+{
+    return m_notes;
+}
+
+int TagItem::usn() const
+{
+    return m_tag.updateSequenceNum;
 }

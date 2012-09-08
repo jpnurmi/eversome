@@ -26,6 +26,7 @@ class TagItem : public QObject
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(QString parentGuid READ parentGuid CONSTANT)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
+    Q_PROPERTY(int usn READ usn CONSTANT)
 
 public:
     explicit TagItem(evernote::edam::Tag tag = evernote::edam::Tag(), QObject* parent = 0);
@@ -37,6 +38,7 @@ public:
     QString name() const;
     QString parentGuid() const;
     ItemModel* notes() const;
+    int usn() const;
 
 private:
     ItemModel* m_notes;

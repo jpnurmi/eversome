@@ -98,6 +98,11 @@ QString ResourceItem::thumbnail(bool checkExists) const
     return file.filePath();
 }
 
+int ResourceItem::usn() const
+{
+    return m_resource.updateSequenceNum;
+}
+
 void ResourceItem::update()
 {
     m_empty = true;

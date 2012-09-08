@@ -26,6 +26,7 @@ class SearchItem : public QObject
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(QString query READ query CONSTANT)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
+    Q_PROPERTY(int usn READ usn CONSTANT)
 
 public:
     explicit SearchItem(evernote::edam::SavedSearch search = evernote::edam::SavedSearch(), QObject* parent = 0);
@@ -37,6 +38,7 @@ public:
     QString name() const;
     QString query() const;
     ItemModel* notes() const;
+    int usn() const;
 
 private:
     ItemModel* m_notes;

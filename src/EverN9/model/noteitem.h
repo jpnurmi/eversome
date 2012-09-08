@@ -33,6 +33,7 @@ class NoteItem : public QObject
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
     Q_PROPERTY(ItemModel* tags READ tags CONSTANT)
     Q_PROPERTY(ItemModel* resources READ resources CONSTANT)
+    Q_PROPERTY(int usn READ usn CONSTANT)
 
 public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
@@ -50,6 +51,7 @@ public:
     bool isEmpty() const;
     ItemModel* tags() const;
     ItemModel* resources() const;
+    int usn() const;
 
     void setContent(const std::string& content);
 

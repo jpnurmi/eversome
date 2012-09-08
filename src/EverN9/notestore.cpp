@@ -55,6 +55,11 @@ NoteStore::~NoteStore()
 {
 }
 
+QDateTime NoteStore::currentTime() const
+{
+    return dateTime;
+}
+
 void NoteStore::sync()
 {
     int usn = QSettings().value("usn", 0).toInt();
@@ -153,6 +158,9 @@ void NoteStore::onOperationFinished(Operation* operation)
 
     SyncOperation* syncOperation = qobject_cast<SyncOperation*>(operation);
     if (syncOperation) {
+        dateTime = syncOperation->currentTime();
+        emit currentTimeChanged();
+
         QSettings().setValue("usn", syncOperation->usn());
         emit synced(syncOperation->notebooks(),
                     syncOperation->resources(),

@@ -33,6 +33,11 @@ int SyncOperation::usn() const
     return m_usn;
 }
 
+QDateTime SyncOperation::currentTime() const
+{
+    return m_time;
+}
+
 QVector<edam::Notebook> SyncOperation::notebooks() const
 {
     return m_notebooks;
@@ -77,6 +82,7 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
         if (m_usn < chunk.updateCount)
             m_usn = chunk.chunkHighUSN;
 
+        m_time = QDateTime::fromMSecsSinceEpoch(chunk.currentTime);
         m_notebooks += QVector<edam::Notebook>::fromStdVector(chunk.notebooks);
         m_resources += QVector<edam::Resource>::fromStdVector(chunk.resources);
         m_searches += QVector<edam::SavedSearch>::fromStdVector(chunk.searches);

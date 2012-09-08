@@ -16,6 +16,7 @@
 
 #include "networkoperation.h"
 #include <Types_types.h>
+#include <QDateTime>
 #include <QVector>
 
 class SyncOperation : public NetworkOperation
@@ -27,6 +28,7 @@ public:
     ~SyncOperation();
 
     int usn() const;
+    QDateTime currentTime() const;
     QVector<evernote::edam::Notebook> notebooks() const;
     QVector<evernote::edam::Resource> resources() const;
     QVector<evernote::edam::SavedSearch> searches() const;
@@ -38,6 +40,7 @@ protected:
 
 private:
     int m_usn;
+    QDateTime m_time;
     QVector<evernote::edam::Notebook> m_notebooks;
     QVector<evernote::edam::Resource> m_resources;
     QVector<evernote::edam::SavedSearch> m_searches;

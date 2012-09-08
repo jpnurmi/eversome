@@ -24,20 +24,21 @@
 class NotebookItem : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString guid READ guid CONSTANT)
-    Q_PROPERTY(QString name READ name CONSTANT)
-    Q_PROPERTY(bool isDefault READ isDefault CONSTANT)
-    Q_PROPERTY(bool isPublished READ isPublished CONSTANT)
-    Q_PROPERTY(QDateTime created READ created CONSTANT)
-    Q_PROPERTY(QDateTime updated READ updated CONSTANT)
+    Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
+    Q_PROPERTY(QString name READ name NOTIFY dataChanged)
+    Q_PROPERTY(bool isDefault READ isDefault NOTIFY dataChanged)
+    Q_PROPERTY(bool isPublished READ isPublished NOTIFY dataChanged)
+    Q_PROPERTY(QDateTime created READ created NOTIFY dataChanged)
+    Q_PROPERTY(QDateTime updated READ updated NOTIFY dataChanged)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
-    Q_PROPERTY(int usn READ usn CONSTANT)
+    Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
 
 public:
     explicit NotebookItem(evernote::edam::Notebook notebook = evernote::edam::Notebook(), QObject* parent = 0);
     virtual ~NotebookItem();
 
-    evernote::edam::Notebook notebook() const;
+    Q_INVOKABLE const evernote::edam::Notebook& data() const;
+    void setData(const evernote::edam::Notebook& data);
 
     QString guid() const;
     QString name() const;
@@ -47,6 +48,9 @@ public:
     QDateTime updated() const;
     ItemModel* notes() const;
     int usn() const;
+
+signals:
+    void dataChanged();
 
 private:
     ItemModel* m_notes;

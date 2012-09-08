@@ -23,9 +23,15 @@ NotebookItem::~NotebookItem()
 {
 }
 
-evernote::edam::Notebook NotebookItem::notebook() const
+const evernote::edam::Notebook& NotebookItem::data() const
 {
     return m_notebook;
+}
+
+void NotebookItem::setData(const evernote::edam::Notebook& data)
+{
+    m_notebook = data;
+    emit dataChanged();
 }
 
 QString NotebookItem::guid() const

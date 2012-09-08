@@ -62,6 +62,11 @@ signals:
                 const QVector<evernote::edam::Note>& notes,
                 const QVector<evernote::edam::Tag>& tags);
 
+    void expunged(const QVector<std::string>& notebooks,
+                  const QVector<std::string>& searches,
+                  const QVector<std::string>& notes,
+                  const QVector<std::string>& tags);
+
     void resourceFetched(const evernote::edam::Resource& resource);
     void noteFetched(const evernote::edam::Note& note);
 

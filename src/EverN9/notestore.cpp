@@ -169,6 +169,11 @@ void NoteStore::onOperationFinished(Operation* operation)
                     QVector<edam::SavedSearch>::fromStdVector(chunk.searches),
                     QVector<edam::Note>::fromStdVector(chunk.notes),
                     QVector<edam::Tag>::fromStdVector(chunk.tags));
+
+        emit expunged(QVector<std::string>::fromStdVector(chunk.expungedNotebooks),
+                      QVector<std::string>::fromStdVector(chunk.expungedSearches),
+                      QVector<std::string>::fromStdVector(chunk.expungedNotes),
+                      QVector<std::string>::fromStdVector(chunk.expungedTags));
     }
 
     SearchOperation* searchOperation = qobject_cast<SearchOperation*>(operation);

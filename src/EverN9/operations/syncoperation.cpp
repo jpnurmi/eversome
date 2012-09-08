@@ -59,19 +59,30 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 
         m_chunk.updateCount = chunk.updateCount;
         m_chunk.currentTime = chunk.currentTime;
+
         m_chunk.notebooks.insert(m_chunk.notebooks.end(), chunk.notebooks.begin(), chunk.notebooks.end());
         m_chunk.resources.insert(m_chunk.resources.end(), chunk.resources.begin(), chunk.resources.end());
         m_chunk.searches.insert(m_chunk.searches.end(), chunk.searches.begin(), chunk.searches.end());
         m_chunk.notes.insert(m_chunk.notes.end(), chunk.notes.begin(), chunk.notes.end());
         m_chunk.tags.insert(m_chunk.tags.end(), chunk.tags.begin(), chunk.tags.end());
 
-        qDebug() << Q_FUNC_INFO
+        qDebug() << Q_FUNC_INFO << "synced" << m_usn
                  << "NB:" << chunk.notebooks.size()
                  << "R:" << chunk.resources.size()
                  << "S:" << chunk.searches.size()
                  << "N:" << chunk.notes.size()
-                 << "T:" << chunk.tags.size()
-                 << "USN:" << m_usn;
+                 << "T:" << chunk.tags.size();
+
+        m_chunk.expungedNotebooks.insert(m_chunk.expungedNotebooks.end(), chunk.expungedNotebooks.begin(), chunk.expungedNotebooks.end());
+        m_chunk.expungedSearches.insert(m_chunk.expungedSearches.end(), chunk.expungedSearches.begin(), chunk.expungedSearches.end());
+        m_chunk.expungedNotes.insert(m_chunk.expungedNotes.end(), chunk.expungedNotes.begin(), chunk.expungedNotes.end());
+        m_chunk.expungedTags.insert(m_chunk.expungedTags.end(), chunk.expungedTags.begin(), chunk.expungedTags.end());
+
+        qDebug() << Q_FUNC_INFO << "expunged" << m_usn
+                 << "NB:" << chunk.expungedNotebooks.size()
+                 << "S:" << chunk.expungedSearches.size()
+                 << "N:" << chunk.expungedNotes.size()
+                 << "T:" << chunk.expungedTags.size();
 
     } while (m_usn < m_chunk.updateCount);
 }

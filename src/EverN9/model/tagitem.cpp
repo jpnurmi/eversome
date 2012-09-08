@@ -23,9 +23,15 @@ TagItem::~TagItem()
 {
 }
 
-evernote::edam::Tag TagItem::tag() const
+const evernote::edam::Tag& TagItem::data() const
 {
     return m_tag;
+}
+
+void TagItem::setData(const evernote::edam::Tag& data)
+{
+    m_tag = data;
+    emit dataChanged();
 }
 
 QString TagItem::guid() const

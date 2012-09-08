@@ -23,23 +23,27 @@
 class TagItem : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString guid READ guid CONSTANT)
-    Q_PROPERTY(QString name READ name CONSTANT)
-    Q_PROPERTY(QString parentGuid READ parentGuid CONSTANT)
+    Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
+    Q_PROPERTY(QString name READ name NOTIFY dataChanged)
+    Q_PROPERTY(QString parentGuid READ parentGuid NOTIFY dataChanged)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
-    Q_PROPERTY(int usn READ usn CONSTANT)
+    Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
 
 public:
     explicit TagItem(evernote::edam::Tag tag = evernote::edam::Tag(), QObject* parent = 0);
     virtual ~TagItem();
 
-    evernote::edam::Tag tag() const;
+    Q_INVOKABLE const evernote::edam::Tag& data() const;
+    void setData(const evernote::edam::Tag& data);
 
     QString guid() const;
     QString name() const;
     QString parentGuid() const;
     ItemModel* notes() const;
     int usn() const;
+
+signals:
+    void dataChanged();
 
 private:
     ItemModel* m_notes;

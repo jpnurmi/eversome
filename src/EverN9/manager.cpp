@@ -27,6 +27,8 @@
 #include <QVector>
 #include <QDebug>
 
+Q_DECLARE_METATYPE(QVector<std::string>)
+
 Manager::Manager(Session* session) : QObject(session)
 {
     m_store = new NoteStore(session);
@@ -41,6 +43,12 @@ Manager::Manager(Session* session) : QObject(session)
                                    QVector<evernote::edam::SavedSearch>,
                                    QVector<evernote::edam::Note>,
                                    QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
+
+    qRegisterMetaType<QVector<std::string> >();
+    connect(m_store, SIGNAL(expunged(QVector<std::string>,QVector<std::string>,
+                                     QVector<std::string>,QVector<std::string>)),
+               this, SLOT(onExpunged(QVector<std::string>,QVector<std::string>,
+                                     QVector<std::string>,QVector<std::string>)), Qt::QueuedConnection);
 
     connect(m_store, SIGNAL(resourceFetched(evernote::edam::Resource)),
                this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
@@ -148,7 +156,7 @@ void Manager::onLoaded(const QList<NotebookItem*>& notebooks,
     added |= m_tags->add(tags);
 
     if (added)
-        setupNotes(m_notes->items<NoteItem*>());
+        addNotes(m_notes->items<NoteItem*>());
 }
 
 void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
@@ -183,14 +191,55 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
         tagItems += new TagItem(tag, this);
     added |= m_tags->add(tagItems);
 
-    m_database->save(m_notebooks->items<NotebookItem*>(),
-                     m_resources->items<ResourceItem*>(),
-                     m_searches->items<SearchItem*>(),
-                     m_notes->items<NoteItem*>(),
-                     m_tags->items<TagItem*>());
-
     if (added)
-        setupNotes(m_notes->items<NoteItem*>());
+        m_database->save(m_notebooks->items<NotebookItem*>(),
+                         m_resources->items<ResourceItem*>(),
+                         m_searches->items<SearchItem*>(),
+                         m_notes->items<NoteItem*>(),
+                         m_tags->items<TagItem*>());
+
+    if (!noteItems.isEmpty())
+        addNotes(noteItems);
+}
+
+void Manager::onExpunged(const QVector<std::string>& notebooks,
+                         const QVector<std::string>& searches,
+                         const QVector<std::string>& notes,
+                         const QVector<std::string>& tags)
+{
+    QList<NotebookItem*> notebookItems;
+    foreach (const std::string& guid, notebooks) {
+        NotebookItem* item = m_notebooks->get<NotebookItem*>(QString::fromStdString(guid));
+        if (item && m_notebooks->remove(item))
+            notebookItems += item;
+    }
+
+    QList<SearchItem*> searchItems;
+    foreach (const std::string& guid, searches) {
+        SearchItem* item = m_searches->get<SearchItem*>(QString::fromStdString(guid));
+        if (item && m_searches->remove(item))
+            searchItems += item;
+    }
+
+    QList<NoteItem*> noteItems;
+    foreach (const std::string& guid, notes) {
+        NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(guid));
+        if (item && m_notes->remove(item))
+            noteItems += item;
+    }
+
+    QList<TagItem*> tagItems;
+    foreach (const std::string& guid, tags) {
+        TagItem* item = m_tags->get<TagItem*>(QString::fromStdString(guid));
+        if (item && m_tags->remove(item))
+            tagItems += item;
+    }
+
+    if (!notebookItems.isEmpty() || !searchItems.isEmpty() || !noteItems.isEmpty() || !tagItems.isEmpty())
+        m_database->remove(notebookItems, searchItems, noteItems, tagItems);
+
+    if (!noteItems.isEmpty())
+        removeNotes(noteItems);
 }
 
 void Manager::onResourceFetched(const evernote::edam::Resource& resource)
@@ -229,7 +278,7 @@ void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVecto
     }
 }
 
-void Manager::setupNotes(const QList<NoteItem*>& notes)
+void Manager::addNotes(const QList<NoteItem*>& notes)
 {
     foreach (NoteItem* note, notes) {
         QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
@@ -254,6 +303,37 @@ void Manager::setupNotes(const QList<NoteItem*>& notes)
             if (tag) {
                 note->tags()->add(tag);
                 tag->notes()->add(note);
+            } else
+                qCritical() << Q_FUNC_INFO << "MISSING TAG:" << tagGuid;
+        }
+    }
+}
+
+void Manager::removeNotes(const QList<NoteItem*>& notes)
+{
+    foreach (NoteItem* note, notes) {
+        QString notebookGuid = QString::fromStdString(note->note().notebookGuid);
+        NotebookItem* notebook = m_notebooks->get<NotebookItem*>(notebookGuid);
+        if (notebook)
+            notebook->notes()->remove(note);
+        else
+            qCritical() << Q_FUNC_INFO << "MISSING NOTEBOOK:" << notebookGuid;
+
+        for (uint i = 0; i < note->note().resources.size(); ++i) {
+            QString resourceGuid = QString::fromStdString(note->note().resources.at(i).guid);
+            ResourceItem* resource = m_resources->get<ResourceItem*>(resourceGuid);
+            if (resource)
+                note->resources()->remove(resource);
+            else
+                qCritical() << Q_FUNC_INFO << "MISSING RESOURCE:" << resourceGuid;
+        }
+
+        for (uint i = 0; i < note->note().tagGuids.size(); ++i) {
+            QString tagGuid = QString::fromStdString(note->note().tagGuids.at(i));
+            TagItem* tag = m_tags->get<TagItem*>(tagGuid);
+            if (tag) {
+                note->tags()->remove(tag);
+                tag->notes()->remove(note);
             } else
                 qCritical() << Q_FUNC_INFO << "MISSING TAG:" << tagGuid;
         }

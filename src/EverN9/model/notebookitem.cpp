@@ -23,7 +23,7 @@ NotebookItem::~NotebookItem()
 {
 }
 
-const evernote::edam::Notebook& NotebookItem::data() const
+evernote::edam::Notebook NotebookItem::data() const
 {
     return m_notebook;
 }

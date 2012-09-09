@@ -54,7 +54,7 @@ ResourceItem::~ResourceItem()
 {
 }
 
-const evernote::edam::Resource& ResourceItem::data() const
+evernote::edam::Resource ResourceItem::data() const
 {
     return m_resource;
 }

@@ -37,7 +37,7 @@ public:
     explicit NotebookItem(evernote::edam::Notebook notebook = evernote::edam::Notebook(), QObject* parent = 0);
     virtual ~NotebookItem();
 
-    Q_INVOKABLE const evernote::edam::Notebook& data() const;
+    Q_INVOKABLE evernote::edam::Notebook data() const;
     void setData(const evernote::edam::Notebook& data);
 
     QString guid() const;

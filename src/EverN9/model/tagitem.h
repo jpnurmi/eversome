@@ -33,7 +33,7 @@ public:
     explicit TagItem(evernote::edam::Tag tag = evernote::edam::Tag(), QObject* parent = 0);
     virtual ~TagItem();
 
-    Q_INVOKABLE const evernote::edam::Tag& data() const;
+    Q_INVOKABLE evernote::edam::Tag data() const;
     void setData(const evernote::edam::Tag& data);
 
     QString guid() const;

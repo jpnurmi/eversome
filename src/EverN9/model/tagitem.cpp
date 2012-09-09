@@ -23,7 +23,7 @@ TagItem::~TagItem()
 {
 }
 
-const evernote::edam::Tag& TagItem::data() const
+evernote::edam::Tag TagItem::data() const
 {
     return m_tag;
 }

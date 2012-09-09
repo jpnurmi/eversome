@@ -33,7 +33,7 @@ public:
     explicit SearchItem(evernote::edam::SavedSearch search = evernote::edam::SavedSearch(), QObject* parent = 0);
     virtual ~SearchItem();
 
-    Q_INVOKABLE const evernote::edam::SavedSearch& data() const;
+    Q_INVOKABLE evernote::edam::SavedSearch data() const;
     void setData(const evernote::edam::SavedSearch& data);
 
     QString guid() const;

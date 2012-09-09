@@ -39,7 +39,7 @@ public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
     virtual ~NoteItem();
 
-    Q_INVOKABLE const evernote::edam::Note& data() const;
+    Q_INVOKABLE evernote::edam::Note data() const;
     void setData(const evernote::edam::Note& data);
 
     QString guid() const;

@@ -23,7 +23,7 @@ SearchItem::~SearchItem()
 {
 }
 
-const evernote::edam::SavedSearch& SearchItem::data() const
+evernote::edam::SavedSearch SearchItem::data() const
 {
     return m_search;
 }

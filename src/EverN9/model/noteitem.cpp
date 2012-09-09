@@ -27,7 +27,7 @@ NoteItem::~NoteItem()
 {
 }
 
-const evernote::edam::Note& NoteItem::data() const
+evernote::edam::Note NoteItem::data() const
 {
     return m_note;
 }

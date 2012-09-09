@@ -34,7 +34,7 @@ public:
     explicit ResourceItem(evernote::edam::Resource resource = evernote::edam::Resource(), QObject* parent = 0);
     virtual ~ResourceItem();
 
-    Q_INVOKABLE const evernote::edam::Resource& data() const;
+    Q_INVOKABLE evernote::edam::Resource data() const;
     void setData(const evernote::edam::Resource& data);
 
     enum Type { Unknown, Image, Audio, Document, Text };

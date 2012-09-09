@@ -245,15 +245,21 @@ void Manager::onExpunged(const QVector<std::string>& notebooks,
 void Manager::onResourceFetched(const evernote::edam::Resource& resource)
 {
     ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
-    if (item)
+    if (item) {
+        item->setData(resource);
         m_files->write(item->filePath(false), QByteArray(resource.data.body.c_str(), resource.data.size));
+        m_database->save(item);
+    }
 }
 
 void Manager::onNoteFetched(const evernote::edam::Note& note)
 {
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
-    if (item)
+    if (item) {
+        item->setData(note);
         m_files->write(item->filePath(false), QByteArray(note.content.c_str(), note.content.size()));
+        m_database->save(item);
+    }
 }
 
 void Manager::onFileWritten(const QString &filePath)

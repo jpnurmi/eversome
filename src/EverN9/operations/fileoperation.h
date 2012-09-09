@@ -26,8 +26,8 @@ public:
 
     bool isValid() const;
 
-    QString filePath() const;
-    QByteArray data() const;
+signals:
+    void written(const QString& filePath);
 
 protected:
     void operate();

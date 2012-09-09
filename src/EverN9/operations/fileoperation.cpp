@@ -35,16 +35,6 @@ bool FileOperation::isValid() const
     return !m_filePath.isEmpty();
 }
 
-QString FileOperation::filePath() const
-{
-    return m_filePath;
-}
-
-QByteArray FileOperation::data() const
-{
-    return m_data;
-}
-
 void FileOperation::operate()
 {
     bool succeed = false;
@@ -72,7 +62,9 @@ void FileOperation::operate()
                     process.setWorkingDirectory(info.absolutePath());
                     process.start("/usr/bin/convert", args);
                     if (!process.waitForFinished())
-                        emit error(this, OperationError::toString(process.error()));
+                        emit error(OperationError::toString(process.error()));
+
+                    emit written(m_filePath);
                 }
             }
             break;
@@ -83,6 +75,6 @@ void FileOperation::operate()
 
     if (file.error() != QFile::NoError) {
         qDebug() << Q_FUNC_INFO << m_filePath << file.error();
-        emit error(this, OperationError::toString(file.error()));
+        emit error(OperationError::toString(file.error()));
     }
 }

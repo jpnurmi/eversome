@@ -24,9 +24,7 @@ HEADERS += \
     $$EVERNOTE/NoteStore_types.h \
     $$EVERNOTE/Types_constants.h \
     $$EVERNOTE/Types_types.h \
-    $$EVERNOTE/UserStore.h \
-    $$EVERNOTE/UserStore_constants.h \
-    $$EVERNOTE/UserStore_types.h
+    $$EVERNOTE/UserStore_types.cpp
 
 SOURCES += \
     $$EVERNOTE/Errors_constants.cpp \
@@ -38,6 +36,4 @@ SOURCES += \
     $$EVERNOTE/NoteStore_types.cpp \
     $$EVERNOTE/Types_constants.cpp \
     $$EVERNOTE/Types_types.cpp \
-    $$EVERNOTE/UserStore.cpp \
-    $$EVERNOTE/UserStore_constants.cpp \
     $$EVERNOTE/UserStore_types.cpp

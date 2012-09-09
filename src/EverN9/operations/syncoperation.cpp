@@ -28,16 +28,6 @@ SyncOperation::~SyncOperation()
 {
 }
 
-int SyncOperation::usn() const
-{
-    return m_usn;
-}
-
-const edam::SyncChunk& SyncOperation::chunk() const
-{
-    return m_chunk;
-}
-
 void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
     if (mode() != Sync) {
@@ -45,26 +35,17 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
         return;
     }
 
+    edam::SyncChunk chunk;
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
 
     // TODO: report progress
 
     do {
-        edam::SyncChunk chunk;
         client.getSyncChunk(chunk, token, m_usn, 256, false);
 
         if (m_usn < chunk.updateCount)
             m_usn = chunk.chunkHighUSN;
-
-        m_chunk.updateCount = chunk.updateCount;
-        m_chunk.currentTime = chunk.currentTime;
-
-        m_chunk.notebooks.insert(m_chunk.notebooks.end(), chunk.notebooks.begin(), chunk.notebooks.end());
-        m_chunk.resources.insert(m_chunk.resources.end(), chunk.resources.begin(), chunk.resources.end());
-        m_chunk.searches.insert(m_chunk.searches.end(), chunk.searches.begin(), chunk.searches.end());
-        m_chunk.notes.insert(m_chunk.notes.end(), chunk.notes.begin(), chunk.notes.end());
-        m_chunk.tags.insert(m_chunk.tags.end(), chunk.tags.begin(), chunk.tags.end());
 
         qDebug() << Q_FUNC_INFO << "synced" << m_usn
                  << "NB:" << chunk.notebooks.size()
@@ -73,10 +54,11 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
                  << "N:" << chunk.notes.size()
                  << "T:" << chunk.tags.size();
 
-        m_chunk.expungedNotebooks.insert(m_chunk.expungedNotebooks.end(), chunk.expungedNotebooks.begin(), chunk.expungedNotebooks.end());
-        m_chunk.expungedSearches.insert(m_chunk.expungedSearches.end(), chunk.expungedSearches.begin(), chunk.expungedSearches.end());
-        m_chunk.expungedNotes.insert(m_chunk.expungedNotes.end(), chunk.expungedNotes.begin(), chunk.expungedNotes.end());
-        m_chunk.expungedTags.insert(m_chunk.expungedTags.end(), chunk.expungedTags.begin(), chunk.expungedTags.end());
+        emit synced(QVector<edam::Notebook>::fromStdVector(chunk.notebooks),
+                    QVector<edam::Resource>::fromStdVector(chunk.resources),
+                    QVector<edam::SavedSearch>::fromStdVector(chunk.searches),
+                    QVector<edam::Note>::fromStdVector(chunk.notes),
+                    QVector<edam::Tag>::fromStdVector(chunk.tags));
 
         qDebug() << Q_FUNC_INFO << "expunged" << m_usn
                  << "NB:" << chunk.expungedNotebooks.size()
@@ -84,5 +66,13 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
                  << "N:" << chunk.expungedNotes.size()
                  << "T:" << chunk.expungedTags.size();
 
-    } while (m_usn < m_chunk.updateCount);
+        emit expunged(QVector<std::string>::fromStdVector(chunk.expungedNotebooks),
+                      QVector<std::string>::fromStdVector(chunk.expungedSearches),
+                      QVector<std::string>::fromStdVector(chunk.expungedNotes),
+                      QVector<std::string>::fromStdVector(chunk.expungedTags));
+
+        emit usnChanged(m_usn);
+        emit currentTimeChanged(QDateTime::fromMSecsSinceEpoch(chunk.currentTime));
+
+    } while (m_usn < chunk.updateCount);
 }

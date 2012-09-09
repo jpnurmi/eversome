@@ -23,7 +23,6 @@
 #include "noteitem.h"
 #include "tagitem.h"
 #include <QThreadPool>
-#include <QFileInfo>
 #include <QVector>
 #include <QDebug>
 
@@ -69,7 +68,7 @@ Manager::Manager(Session* session) : QObject(session)
     qRegisterMetaType<QList<NotebookItem*> >();
 
     m_files = new FileSystem(this);
-    connect(m_files, SIGNAL(written(QString)), SLOT(onFileWritten(QString)), Qt::QueuedConnection);
+    connect(m_files, SIGNAL(writingDone(QString,QString)), SLOT(onFileWritten(QString,QString)), Qt::QueuedConnection);
 
     m_database = new Database(this);
     connect(m_database, SIGNAL(loaded(QList<NotebookItem*>,
@@ -247,7 +246,7 @@ void Manager::onResourceFetched(const evernote::edam::Resource& resource)
     ResourceItem* item = m_resources->get<ResourceItem*>(QString::fromStdString(resource.guid));
     if (item) {
         item->setData(resource);
-        m_files->write(item->filePath(false), QByteArray(resource.data.body.c_str(), resource.data.size));
+        m_files->write(item->guid(), item->filePath(false), QByteArray(resource.data.body.c_str(), resource.data.size));
         m_database->save(item);
     }
 }
@@ -257,14 +256,13 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item) {
         item->setData(note);
-        m_files->write(item->filePath(false), QByteArray(note.content.c_str(), note.content.size()));
+        m_files->write(item->guid(), item->filePath(false), QByteArray(note.content.c_str(), note.content.size()));
         m_database->save(item);
     }
 }
 
-void Manager::onFileWritten(const QString &filePath)
+void Manager::onFileWritten(const QString& guid, const QString &filePath)
 {
-    QString guid = QFileInfo(filePath).baseName();
     if (m_notes->contains(guid)) {
         NoteItem* note = m_notes->get<NoteItem*>(guid);
         if (note)

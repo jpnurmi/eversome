@@ -21,8 +21,8 @@
 #include <QFile>
 #include <QDir>
 
-FileOperation::FileOperation(Mode mode, const QString& filePath, const QByteArray& data) :
-    Operation(mode), m_data(data), m_filePath(filePath)
+FileOperation::FileOperation(Mode mode, const QString& guid, const QString& filePath, const QByteArray& data) :
+    Operation(mode), m_guid(guid), m_data(data), m_filePath(filePath)
 {
 }
 
@@ -51,7 +51,7 @@ void FileOperation::operate()
                 if (fileError != QFile::NoError)
                     emit error(OperationError::toString(fileError));
                 else
-                    emit read(m_filePath, m_data);
+                    emit readingDone(m_guid, m_filePath, m_data);
             }
             break;
         case WriteFile:
@@ -64,7 +64,7 @@ void FileOperation::operate()
                 if (fileError != QFile::NoError)
                     emit error(OperationError::toString(fileError));
                 else
-                    emit written(m_filePath);
+                    emit writingDone(m_guid, m_filePath);
             }
             break;
         case GenerateThumbnail:
@@ -79,7 +79,7 @@ void FileOperation::operate()
                 if (!process.waitForFinished())
                     emit error(OperationError::toString(process.error()));
                 else
-                    emit generated(QDir(info.absolutePath()).filePath(thumbnail));
+                    emit generatingDone(m_guid, QDir(info.absolutePath()).filePath(thumbnail));
                 qDebug() << "FileOperation::operate()" << this << m_filePath << process.error();
                 break;
             }

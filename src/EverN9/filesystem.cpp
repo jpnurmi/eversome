@@ -43,28 +43,28 @@ bool FileSystem::removeDir(const QDir& dir)
     return result;
 }
 
-void FileSystem::read(const QString& filePath)
+void FileSystem::read(const QString& guid, const QString& filePath)
 {
-    FileOperation* operation = new FileOperation(Operation::ReadFile, filePath);
-    connect(operation, SIGNAL(read(QString)), this, SIGNAL(readed(QString)));
+    FileOperation* operation = new FileOperation(Operation::ReadFile, guid, filePath);
+    connect(operation, SIGNAL(readingDone(QString,QString,QByteArray)), this, SIGNAL(readingDone(QString,QString,QByteArray)));
     setupOperation(operation);
     qDebug() << "FileSystem::read():" << operation;
     QThreadPool::globalInstance()->start(operation);
 }
 
-void FileSystem::write(const QString& filePath, const QByteArray& data)
+void FileSystem::write(const QString& guid, const QString& filePath, const QByteArray& data)
 {
-    FileOperation* operation = new FileOperation(Operation::WriteFile, filePath, data);
-    connect(operation, SIGNAL(written(QString)), this, SIGNAL(written(QString)));
+    FileOperation* operation = new FileOperation(Operation::WriteFile, guid, filePath, data);
+    connect(operation, SIGNAL(writingDone(QString,QString)), this, SIGNAL(writingDone(QString,QString)));
     setupOperation(operation);
     qDebug() << "FileSystem::write():" << operation;
     QThreadPool::globalInstance()->start(operation);
 }
 
-void FileSystem::generate(const QString& filePath)
+void FileSystem::generate(const QString& guid, const QString& filePath)
 {
-    FileOperation* operation = new FileOperation(Operation::GenerateThumbnail, filePath);
-    connect(operation, SIGNAL(generated(QString)), this, SIGNAL(generated(QString)));
+    FileOperation* operation = new FileOperation(Operation::GenerateThumbnail, guid, filePath);
+    connect(operation, SIGNAL(generatingDone(QString,QString)), this, SIGNAL(generatingDone(QString,QString)));
     setupOperation(operation);
     qDebug() << "FileSystem::generateThumbnail():" << operation;
     QThreadPool::globalInstance()->start(operation);

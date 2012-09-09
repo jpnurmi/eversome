@@ -21,20 +21,21 @@ class FileOperation : public Operation
     Q_OBJECT
 
 public:
-    FileOperation(Mode mode, const QString& filePath, const QByteArray& data = QByteArray());
+    FileOperation(Mode mode, const QString& guid, const QString& filePath, const QByteArray& data = QByteArray());
     ~FileOperation();
 
     bool isValid() const;
 
 signals:
-    void read(const QString& filePath, const QByteArray& data);
-    void written(const QString& filePath);
-    void generated(const QString& filePath);
+    void readingDone(const QString& guid, const QString& filePath, const QByteArray& data);
+    void writingDone(const QString& guid, const QString& filePath);
+    void generatingDone(const QString& guid, const QString& filePath);
 
 protected:
     void operate();
 
 private:
+    QString m_guid;
     QByteArray m_data;
     QString m_filePath;
 };

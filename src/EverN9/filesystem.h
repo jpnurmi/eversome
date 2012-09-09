@@ -29,16 +29,16 @@ public:
 
     static bool removeDir(const QDir& dir);
 
-    void read(const QString& filePath);
-    void write(const QString& filePath, const QByteArray& data);
-    void generate(const QString& filePath);
+    void read(const QString& guid, const QString& filePath);
+    void write(const QString& guid, const QString& filePath, const QByteArray& data);
+    void generate(const QString& guid, const QString& filePath);
 
 signals:
     void activityChanged();
     void error(const QString& error);
-    void readed(const QString& filePath);
-    void written(const QString& filePath);
-    void generated(const QString& filePath);
+    void readingDone(const QString& guid, const QString& filePath, const QByteArray& data);
+    void writingDone(const QString& guid, const QString& filePath);
+    void generatingDone(const QString& guid, const QString& filePath);
 
 private:
     void setupOperation(Operation* operation);

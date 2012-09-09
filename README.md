@@ -12,12 +12,12 @@ Cloning into 'EverN9'...
 [...]
 $ cd EverN9
 $ git submodule init
-Submodule 'src/3rdparty/evernote' (git://github.com/evernote/evernote-sdk-cpp.git) registered for path 'src/3rdparty/evernote'
+Submodule 'src/3rdparty/edam' (git://github.com/evernote/evernote-sdk-cpp.git) registered for path 'src/3rdparty/edam'
 Submodule 'src/3rdparty/thrift' (git://github.com/apache/thrift.git) registered for path 'src/3rdparty/thrift'
 $ git submodule update
-Cloning into 'src/3rdparty/evernote'...
+Cloning into 'src/3rdparty/edam'...
 [...]
-Submodule path 'src/3rdparty/evernote': checked out [...]
+Submodule path 'src/3rdparty/edam': checked out [...]
 Cloning into 'src/3rdparty/thrift'...
 [...]
 Submodule path 'src/3rdparty/thrift': checked out [...]

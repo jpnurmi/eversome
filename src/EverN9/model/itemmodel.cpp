@@ -27,6 +27,11 @@ ItemModel::~ItemModel()
 {
 }
 
+QObject* ItemModel::at(int index) const
+{
+    return m_items.value(index);
+}
+
 int ItemModel::rowCount(const QModelIndex& parent) const
 {
     return !parent.isValid() ? m_items.count() : 0;

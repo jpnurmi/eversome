@@ -27,6 +27,8 @@ public:
     explicit ItemModel(QObject* parent = 0);
     virtual ~ItemModel();
 
+    Q_INVOKABLE QObject* at(int index) const;
+
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 

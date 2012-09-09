@@ -32,10 +32,7 @@ SearchOperation::~SearchOperation()
 
 void SearchOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
-    if (mode() != Search) {
-        qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
-        return;
-    }
+    Q_ASSERT(mode() == Search);
 
     edam::NoteList list;
     edam::NoteFilter filter;
@@ -44,6 +41,8 @@ void SearchOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
     client.findNotes(list, token, filter, 0, limits::g_Limits_constants.EDAM_USER_NOTES_MAX);
+
+    qDebug() << "SearchOperation::operate(): searched..." << list.notes.size();
 
     emit searched(m_search, QVector<edam::Note>::fromStdVector(list.notes));
 }

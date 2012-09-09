@@ -54,7 +54,7 @@ void NotebookOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol
             usn = client.updateNotebook(token, m_notebook);
             break;
         default:
-            qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
+            Q_ASSERT(false);
             break;
     }
 }

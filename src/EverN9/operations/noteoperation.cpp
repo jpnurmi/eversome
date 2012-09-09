@@ -65,7 +65,7 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
             client.updateNote(m_note, token, m_note);
             break;
         default:
-            qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
+            Q_ASSERT(false);
             break;
     }
 }

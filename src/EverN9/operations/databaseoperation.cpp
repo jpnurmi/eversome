@@ -130,9 +130,6 @@ void DatabaseOperation::operate()
             Q_ASSERT(false);
             break;
     }
-
-    if (mode() != CloseDatabase)
-        qDebug() << "DatabaseOperation::operate():" << this << !QSqlDatabase::database().lastError().isValid();
 }
 
 QList<NotebookItem*> DatabaseOperation::loadNotebooks()

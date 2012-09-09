@@ -34,11 +34,22 @@ public:
     virtual ~Database();
 
     void load(QObject* parent = 0);
+
+    void save(NotebookItem* notebook);
+    void save(ResourceItem* resource);
+    void save(SearchItem* search);
+    void save(NoteItem* note);
+    void save(TagItem* tag);
     void save(const QList<NotebookItem*>& notebooks,
               const QList<ResourceItem*>& resources,
               const QList<SearchItem*>& searches,
               const QList<NoteItem*>& notes,
               const QList<TagItem*>& tags);
+
+    void remove(NotebookItem* notebook);
+    void remove(SearchItem* search);
+    void remove(NoteItem* note);
+    void remove(TagItem* tag);
     void remove(const QList<NotebookItem*>& notebooks,
                 const QList<SearchItem*>& searches,
                 const QList<NoteItem*>& notes,

@@ -89,7 +89,7 @@ void NoteStore::sync()
                                        QVector<std::string>,
                                        QVector<std::string>)));
     setupOperation(operation);
-    qDebug() << Q_FUNC_INFO << operation;
+    qDebug() << "NoteStore::sync():" << operation;
     QThreadPool::globalInstance()->start(operation);
 }
 
@@ -105,7 +105,7 @@ void NoteStore::search(const edam::SavedSearch& search)
     connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
                  this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)));
     setupOperation(operation);
-    qDebug() << Q_FUNC_INFO << operation;
+    qDebug() << "NoteStore::search():" << operation;
     QThreadPool::globalInstance()->start(operation);
 }
 
@@ -190,7 +190,7 @@ void NoteStore::startNoteOperation(const edam::Note& note, Operation::Mode mode)
     connect(operation, SIGNAL(resourceFetched(evernote::edam::Resource)),
                  this, SIGNAL(resourceFetched(evernote::edam::Resource)));
     setupOperation(operation);
-    qDebug() << Q_FUNC_INFO << operation;
+    qDebug() << "NoteStore::startNoteOperation():" << operation;
     QThreadPool::globalInstance()->start(operation);
 }
 
@@ -198,7 +198,7 @@ void NoteStore::startNotebookOperation(const edam::Notebook& notebook, Operation
 {
     NotebookOperation* operation = new NotebookOperation(notebook, mode);
     setupOperation(operation);
-    qDebug() << Q_FUNC_INFO << operation;
+    qDebug() << "NoteStore::startNotebookOperation():" << operation;
     QThreadPool::globalInstance()->start(operation);
 }
 

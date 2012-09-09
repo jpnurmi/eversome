@@ -91,7 +91,6 @@ DatabaseOperation* Database::createOperation(Operation::Mode mode)
     DatabaseOperation* operation = new DatabaseOperation(mode);
     connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(finished()), operation, SLOT(deleteLater()));
     connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     return operation;
 }

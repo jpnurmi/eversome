@@ -206,7 +206,6 @@ void NoteStore::setupOperation(NetworkOperation* operation) const
 {
     connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(finished()), operation, SLOT(deleteLater()));
     connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     operation->setUrl(session->url());
     operation->setAuthToken(session->authToken());

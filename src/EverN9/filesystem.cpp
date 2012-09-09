@@ -48,7 +48,6 @@ void FileSystem::write(const QString& filePath, const QByteArray& data)
     FileOperation* operation = new FileOperation(Operation::WriteFile, filePath, data);
     connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(finished()), operation, SLOT(deleteLater()));
     connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     connect(operation, SIGNAL(written(QString)), this, SIGNAL(written(QString)));
     qDebug() << Q_FUNC_INFO << operation << filePath << data.length();

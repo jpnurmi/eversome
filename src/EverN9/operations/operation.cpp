@@ -18,6 +18,7 @@
 
 Operation::Operation(Operation::Mode mode) : m_mode(mode)
 {
+    setAutoDelete(true);
 }
 
 Operation::~Operation()

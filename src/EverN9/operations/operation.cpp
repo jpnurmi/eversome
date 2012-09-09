@@ -18,7 +18,6 @@
 
 Operation::Operation(Operation::Mode mode) : m_mode(mode)
 {
-    qRegisterMetaType<Operation*>();
 }
 
 Operation::~Operation()
@@ -37,11 +36,11 @@ void Operation::run()
         return;
     }
 
-    emit started(this);
+    emit started();
 
     operate();
 
-    emit finished(this);
+    emit finished();
 }
 
 QDebug operator<<(QDebug debug, const Operation* operation)

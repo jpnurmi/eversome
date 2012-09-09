@@ -57,7 +57,7 @@ void AuthOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
     if (!client.checkVersion("EverN9/0.0.3; MeeGo/Harmattan 1.2", // TODO: hardcoded values
                              edam::g_UserStore_constants.EDAM_VERSION_MAJOR,
                              edam::g_UserStore_constants.EDAM_VERSION_MINOR))
-        emit error(this, OperationError::toString(OperationError::TooOldProtocol));
+        emit error(OperationError::toString(OperationError::TooOldProtocol));
     else
         client.authenticate(m_result, m_username.toStdString(), m_password.toStdString(), m_key.toStdString(), m_secret.toStdString());
 }

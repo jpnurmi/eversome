@@ -68,17 +68,17 @@ void NetworkOperation::operate()
         transport->open();
         operate(protocol);
     } catch (edam::EDAMUserException& e) {
-        emit error(this, OperationError::toString(e.errorCode));
+        emit error(OperationError::toString(e.errorCode));
     } catch (edam::EDAMSystemException& e) {
-        emit error(this, OperationError::toString(e.errorCode));
+        emit error(OperationError::toString(e.errorCode));
     } catch (edam::EDAMNotFoundException& e) {
-        emit error(this, OperationError::toString(OperationError::UnknownOperation));
+        emit error(OperationError::toString(OperationError::UnknownOperation));
     } catch (thrift::transport::TTransportException& e) {
-        emit error(this, OperationError::toString(e.getType()));
+        emit error(OperationError::toString(e.getType()));
     } catch (thrift::protocol::TProtocolException& e) {
-        emit error(this, OperationError::toString(e.getType()));
+        emit error(OperationError::toString(e.getType()));
     } catch (thrift::TException& e) {
         qDebug() << Q_FUNC_INFO << "unknown error:" << e.what();
-        emit error(this, OperationError::toString(OperationError::UnknownError));
+        emit error(OperationError::toString(OperationError::UnknownError));
     }
 }

@@ -69,9 +69,9 @@ public:
     virtual void run();
 
 signals:
-    void started(Operation* operation);
-    void finished(Operation* operation);
-    void error(Operation* operation, const QString& error);
+    void started();
+    void finished();
+    void error(const QString& error);
 
 protected:
     virtual void operate() = 0;
@@ -79,8 +79,6 @@ protected:
 private:
     Mode m_mode;
 };
-
-Q_DECLARE_METATYPE(Operation*)
 
 QDebug operator<<(QDebug debug, const Operation* operation);
 

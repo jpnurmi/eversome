@@ -29,12 +29,19 @@ public:
 
     static bool removeDir(const QDir& dir);
 
+    void read(const QString& filePath);
     void write(const QString& filePath, const QByteArray& data);
+    void generate(const QString& filePath);
 
 signals:
     void activityChanged();
     void error(const QString& error);
+    void readed(const QString& filePath);
     void written(const QString& filePath);
+    void generated(const QString& filePath);
+
+private:
+    void setupOperation(Operation* operation);
 };
 
 #endif // FILESYSTEM_H

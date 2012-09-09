@@ -43,13 +43,36 @@ bool FileSystem::removeDir(const QDir& dir)
     return result;
 }
 
+void FileSystem::read(const QString& filePath)
+{
+    FileOperation* operation = new FileOperation(Operation::ReadFile, filePath);
+    connect(operation, SIGNAL(read(QString)), this, SIGNAL(readed(QString)));
+    setupOperation(operation);
+    qDebug() << "FileSystem::read():" << operation;
+    QThreadPool::globalInstance()->start(operation);
+}
+
 void FileSystem::write(const QString& filePath, const QByteArray& data)
 {
     FileOperation* operation = new FileOperation(Operation::WriteFile, filePath, data);
+    connect(operation, SIGNAL(written(QString)), this, SIGNAL(written(QString)));
+    setupOperation(operation);
+    qDebug() << "FileSystem::write():" << operation;
+    QThreadPool::globalInstance()->start(operation);
+}
+
+void FileSystem::generate(const QString& filePath)
+{
+    FileOperation* operation = new FileOperation(Operation::GenerateThumbnail, filePath);
+    connect(operation, SIGNAL(generated(QString)), this, SIGNAL(generated(QString)));
+    setupOperation(operation);
+    qDebug() << "FileSystem::generateThumbnail():" << operation;
+    QThreadPool::globalInstance()->start(operation);
+}
+
+void FileSystem::setupOperation(Operation *operation)
+{
     connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(operation, SIGNAL(written(QString)), this, SIGNAL(written(QString)));
-    qDebug() << Q_FUNC_INFO << operation << filePath << data.length();
-    QThreadPool::globalInstance()->start(operation);
 }

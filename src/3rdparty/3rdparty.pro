@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 
 thrift.file = thrift.pro
 
-evernote.depends = thrift
-evernote.file = evernote.pro
+edam.depends = thrift
+edam.file = edam.pro
 
-SUBDIRS += thrift evernote
+SUBDIRS += thrift edam

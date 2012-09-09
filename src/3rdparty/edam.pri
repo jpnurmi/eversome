@@ -1,5 +1,5 @@
 isEmpty(LIBDIR):error(LIBDIR must be set)
-INCLUDEPATH += $$PWD/evernote/src
-DEPENDPATH += $$PWD/evernote/src
+INCLUDEPATH += $$PWD/edam/src
+DEPENDPATH += $$PWD/edam/src
 LIBS += -L$$LIBDIR -ledam
 QMAKE_RPATHDIR += /opt/EverN9/lib

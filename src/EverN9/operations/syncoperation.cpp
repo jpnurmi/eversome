@@ -30,10 +30,7 @@ SyncOperation::~SyncOperation()
 
 void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
-    if (mode() != Sync) {
-        qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
-        return;
-    }
+    Q_ASSERT(mode() == Sync);
 
     edam::SyncChunk chunk;
     edam::NoteStoreClient client(protocol);
@@ -47,7 +44,8 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
         if (m_usn < chunk.updateCount)
             m_usn = chunk.chunkHighUSN;
 
-        qDebug() << Q_FUNC_INFO << "synced" << m_usn
+        qDebug() << "SyncOperation::operate(): synced..."
+                 << "USN:" << m_usn
                  << "NB:" << chunk.notebooks.size()
                  << "R:" << chunk.resources.size()
                  << "S:" << chunk.searches.size()
@@ -60,7 +58,8 @@ void SyncOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
                     QVector<edam::Note>::fromStdVector(chunk.notes),
                     QVector<edam::Tag>::fromStdVector(chunk.tags));
 
-        qDebug() << Q_FUNC_INFO << "expunged" << m_usn
+        qDebug() << "SyncOperation::operate(): expunged..."
+                 << "USN:" << m_usn
                  << "NB:" << chunk.expungedNotebooks.size()
                  << "S:" << chunk.expungedSearches.size()
                  << "N:" << chunk.expungedNotes.size()

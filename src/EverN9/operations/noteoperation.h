@@ -25,7 +25,9 @@ public:
     NoteOperation(const evernote::edam::Note& note, Mode mode);
     ~NoteOperation();
 
-    evernote::edam::Note note() const;
+signals:
+    void noteFetched(const evernote::edam::Note& note);
+    void resourceFetched(const evernote::edam::Resource& resource);
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);

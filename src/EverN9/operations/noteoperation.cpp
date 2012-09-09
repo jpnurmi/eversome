@@ -29,11 +29,6 @@ NoteOperation::~NoteOperation()
 {
 }
 
-edam::Note NoteOperation::note() const
-{
-    return m_note;
-}
-
 void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
     int usn = 0; // TODO
@@ -50,8 +45,12 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
             break;
         case GetNote:
             client.getNoteContent(m_note.content, token, m_note.guid);
-            for (uint i = 0; i < m_note.resources.size(); ++i)
-                client.getResource(m_note.resources[i], token, m_note.resources.at(i).guid, true, false, false, false);
+            emit noteFetched(m_note);
+            for (uint i = 0; i < m_note.resources.size(); ++i) {
+                edam::Resource resource = m_note.resources.at(i);
+                client.getResource(resource, token, resource.guid, true, false, false, false);
+                emit resourceFetched(resource);
+            }
             break;
         case ExpungeNote:
             usn = client.expungeNote(token, m_note.guid);

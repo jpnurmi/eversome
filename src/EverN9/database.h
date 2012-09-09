@@ -58,13 +58,8 @@ signals:
                 const QList<NoteItem*>& notes,
                 const QList<TagItem*>& tags);
 
-private slots:
-    void onOperationStarted(Operation* operation);
-    void onOperationFinished(Operation* operation);
-    void onOperationError(Operation* operation, const QString& error);
-
 private:
-    DatabaseOperation* createOperation(Operation::Mode mode, QObject* parent = 0);
+    DatabaseOperation* createOperation(Operation::Mode mode);
 };
 
 #endif // DATABASE_H

@@ -48,7 +48,17 @@ void Database::reset()
 
 void Database::load(QObject* parent)
 {
-    DatabaseOperation* operation = createOperation(Operation::LoadDatabase, parent);
+    DatabaseOperation* operation = createOperation(Operation::LoadDatabase);
+    connect(operation, SIGNAL(loaded(QList<NotebookItem*>,
+                                     QList<ResourceItem*>,
+                                     QList<SearchItem*>,
+                                     QList<NoteItem*>,
+                                     QList<TagItem*>)),
+                 this, SIGNAL(loaded(QList<NotebookItem*>,
+                                     QList<ResourceItem*>,
+                                     QList<SearchItem*>,
+                                     QList<NoteItem*>,
+                                     QList<TagItem*>)));
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
 }
@@ -60,11 +70,7 @@ void Database::save(const QList<NotebookItem*>& notebooks,
                     const QList<TagItem*>& tags)
 {
     DatabaseOperation* operation = createOperation(Operation::SaveDatabase);
-    operation->setNotebooks(notebooks);
-    operation->setResources(resources);
-    operation->setSearches(searches);
-    operation->setNotes(notes);
-    operation->setTags(tags);
+    operation->setData(notebooks, resources, searches, notes, tags);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
 }
@@ -75,51 +81,17 @@ void Database::remove(const QList<NotebookItem*>& notebooks,
                       const QList<TagItem*>& tags)
 {
     DatabaseOperation* operation = createOperation(Operation::RemoveDatabase);
-    operation->setNotebooks(notebooks);
-    operation->setSearches(searches);
-    operation->setNotes(notes);
-    operation->setTags(tags);
+    operation->setData(notebooks, QList<ResourceItem*>(), searches, notes, tags);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
 }
 
-void Database::onOperationStarted(Operation* operation)
+DatabaseOperation* Database::createOperation(Operation::Mode mode)
 {
-    qDebug() << Q_FUNC_INFO << operation;
-    emit activityChanged();
-}
-
-void Database::onOperationFinished(Operation* operation)
-{
-    qDebug() << Q_FUNC_INFO << operation;
-
-    DatabaseOperation* db = qobject_cast<DatabaseOperation*>(operation);
-    if (db && db->mode() == Operation::LoadDatabase)
-        emit loaded(db->notebooks(),
-                    db->resources(),
-                    db->searches(),
-                    db->notes(),
-                    db->tags());
-
-    operation->deleteLater();
-
-    emit activityChanged();
-}
-
-void Database::onOperationError(Operation* operation, const QString& str)
-{
-    qDebug() << Q_FUNC_INFO << operation << str;
-    emit error(str);
-}
-
-DatabaseOperation* Database::createOperation(Operation::Mode mode, QObject* parent)
-{
-    DatabaseOperation* operation = new DatabaseOperation(mode, parent);
-    connect(operation, SIGNAL(started(Operation*)),
-                 this, SLOT(onOperationStarted(Operation*)), Qt::DirectConnection);
-    connect(operation, SIGNAL(finished(Operation*)),
-                 this, SLOT(onOperationFinished(Operation*)), Qt::DirectConnection);
-    connect(operation, SIGNAL(error(Operation*,QString)),
-                 this, SLOT(onOperationError(Operation*,QString)), Qt::DirectConnection);
+    DatabaseOperation* operation = new DatabaseOperation(mode);
+    connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
+    connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
+    connect(operation, SIGNAL(finished()), operation, SLOT(deleteLater()));
+    connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     return operation;
 }

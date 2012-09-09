@@ -12,9 +12,12 @@
 * GNU General Public License for more details.
 */
 #include "noteitem.h"
+#include <QDesktopServices>
+#include <QFileInfo>
+#include <QDir>
 
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
-    : QObject(parent), m_note(note)
+    : QObject(parent), m_empty(false), m_note(note)
 {
     m_tags = new ItemModel(this);
     m_resources = new ItemModel(this);
@@ -45,9 +48,13 @@ QString NoteItem::title() const
     return QString::fromStdString(m_note.title);
 }
 
-QString NoteItem::content() const
+QString NoteItem::filePath(bool checkExists) const
 {
-    return QString::fromStdString(m_note.content);
+    QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
+    QFileInfo file(dir.filePath(guid() + ".html"));
+    if (checkExists && (m_empty || !file.exists() || file.size() == 0))
+        return QString();
+    return file.filePath();
 }
 
 QDateTime NoteItem::created() const
@@ -70,11 +77,6 @@ bool NoteItem::isActive() const
     return m_note.active;
 }
 
-bool NoteItem::isEmpty() const
-{
-    return m_note.content.empty();
-}
-
 ItemModel* NoteItem::tags() const
 {
     return m_tags;
@@ -90,13 +92,12 @@ int NoteItem::usn() const
     return m_note.updateSequenceNum;
 }
 
-void NoteItem::setContent(const std::string& content)
+void NoteItem::update()
 {
-    if (m_note.content != content) {
-        m_note.content = content;
-        emit isEmptyChanged();
-        emit contentChanged();
-    }
+    m_empty = true;
+    emit filePathChanged();
+    m_empty = false;
+    emit filePathChanged();
 }
 
 QDebug operator<<(QDebug debug, const NoteItem* item)
@@ -106,6 +107,7 @@ QDebug operator<<(QDebug debug, const NoteItem* item)
     debug.nospace() << item->metaObject()->className()
                     << '(' << (void*) item
                     << ", title = " << item->title()
+                    << ", filePath = " << item->filePath(false)
                     << ", usn = " << item->usn() << ')';
     return debug.space();
 }

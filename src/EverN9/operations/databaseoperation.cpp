@@ -124,19 +124,20 @@ void DatabaseOperation::operate()
             removeSearches(m_searches);
             removeNotes(m_notes);
             removeTags(m_tags);
+            break;
         }
         default:
-            qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
+            Q_ASSERT(false);
             break;
     }
 
     if (mode() != CloseDatabase)
-        qDebug() << Q_FUNC_INFO << this << !QSqlDatabase::database().lastError().isValid();
+        qDebug() << "DatabaseOperation::operate():" << this << !QSqlDatabase::database().lastError().isValid();
 }
 
 QList<NotebookItem*> DatabaseOperation::loadNotebooks()
 {
-    QList<NotebookItem*> res;
+    QList<NotebookItem*> notebooks;
     QSqlQuery query("SELECT * FROM Notebooks ORDER BY name ASC");
     if (query.exec()) {
         while (query.next()) {
@@ -152,11 +153,11 @@ QList<NotebookItem*> DatabaseOperation::loadNotebooks()
 
             NotebookItem* item = new NotebookItem(notebook);
             item->moveToThread(thread());
-            res += item;
+            notebooks += item;
         }
     }
-    qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    qDebug() << "DatabaseOperation::loadNotebooks():" << notebooks.count();
+    return notebooks;
 }
 
 void DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
@@ -181,7 +182,7 @@ void DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
     query.addBindValue(updates);
     query.addBindValue(usns);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << notebooks.count() << res;
+    qDebug() << "DatabaseOperation::saveNotebooks():" << notebooks.count() << res;
 }
 
 void DatabaseOperation::removeNotebooks(const QList<NotebookItem*>& notebooks)
@@ -193,12 +194,12 @@ void DatabaseOperation::removeNotebooks(const QList<NotebookItem*>& notebooks)
     QSqlQuery query("DELETE FROM NoteBooks WHERE guid=?");
     query.addBindValue(guids);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << notebooks.count() << res;
+    qDebug() << "DatabaseOperation::removeNotebooks():" << notebooks.count() << res;
 }
 
 QList<ResourceItem*> DatabaseOperation::loadResources()
 {
-    QList<ResourceItem*> res;
+    QList<ResourceItem*> resources;
     QSqlQuery query("SELECT * FROM Resources");
     if (query.exec()) {
         while (query.next()) {
@@ -210,11 +211,11 @@ QList<ResourceItem*> DatabaseOperation::loadResources()
 
             ResourceItem* item = new ResourceItem(resource);
             item->moveToThread(thread());
-            res += item;
+            resources += item;
         }
     }
-    qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    qDebug() << "DatabaseOperation::loadResources():" << resources.count();
+    return resources;
 }
 
 void DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
@@ -231,7 +232,7 @@ void DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
     query.addBindValue(mimes);
     query.addBindValue(usns);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << resources.count() << res;
+    qDebug() << "DatabaseOperation::saveResources():" << resources.count() << res;
 }
 
 void DatabaseOperation::removeResources(const QList<ResourceItem*>& resources)
@@ -243,12 +244,12 @@ void DatabaseOperation::removeResources(const QList<ResourceItem*>& resources)
     QSqlQuery query("DELETE FROM Resources WHERE guid=?");
     query.addBindValue(guids);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << resources.count() << res;
+    qDebug() << "DatabaseOperation::removeResources():" << resources.count() << res;
 }
 
 QList<SearchItem*> DatabaseOperation::loadSearches()
 {
-    QList<SearchItem*> res;
+    QList<SearchItem*> searches;
     QSqlQuery query("SELECT * FROM Searches ORDER BY name ASC");
     if (query.exec()) {
         while (query.next()) {
@@ -261,11 +262,11 @@ QList<SearchItem*> DatabaseOperation::loadSearches()
 
             SearchItem* item = new SearchItem(search);
             item->moveToThread(thread());
-            res += item;
+            searches += item;
         }
     }
-    qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    qDebug() << "DatabaseOperation::loadSearches():" << searches.count();
+    return searches;
 }
 
 void DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
@@ -284,7 +285,7 @@ void DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
     query.addBindValue(queries);
     query.addBindValue(usns);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << searches.count() << res;
+    qDebug() << "DatabaseOperation::saveSearches():" << searches.count() << res;
 }
 
 void DatabaseOperation::removeSearches(const QList<SearchItem*>& searches)
@@ -296,12 +297,12 @@ void DatabaseOperation::removeSearches(const QList<SearchItem*>& searches)
     QSqlQuery query("DELETE FROM Searches WHERE guid=?");
     query.addBindValue(guids);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << searches.count() << res;
+    qDebug() << "DatabaseOperation::removeSearches():" << searches.count() << res;
 }
 
 QList<NoteItem*> DatabaseOperation::loadNotes()
 {
-    QList<NoteItem*> res;
+    QList<NoteItem*> notes;
     QSqlQuery query("SELECT * FROM Notes");
     if (query.exec()) {
         while (query.next()) {
@@ -327,11 +328,11 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
 
             NoteItem* item = new NoteItem(note);
             item->moveToThread(thread());
-            res += item;
+            notes += item;
         }
     }
-    qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    qDebug() << "DatabaseOperation::loadNotes():" << notes.count();
+    return notes;
 }
 
 void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
@@ -370,7 +371,7 @@ void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
     query.addBindValue(resources);
     query.addBindValue(usns);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << notes.count() << res;
+    qDebug() << "DatabaseOperation::saveNotes():" << notes.count() << res;
 }
 
 void DatabaseOperation::removeNotes(const QList<NoteItem*>& notes)
@@ -382,12 +383,12 @@ void DatabaseOperation::removeNotes(const QList<NoteItem*>& notes)
     QSqlQuery query("DELETE FROM Notes WHERE guid=?");
     query.addBindValue(guids);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << notes.count() << res;
+    qDebug() << "DatabaseOperation::removeNotes():" << notes.count() << res;
 }
 
 QList<TagItem*> DatabaseOperation::loadTags()
 {
-    QList<TagItem*> res;
+    QList<TagItem*> tags;
     QSqlQuery query("SELECT * FROM Tags ORDER BY name ASC");
     if (query.exec()) {
         while (query.next()) {
@@ -400,11 +401,11 @@ QList<TagItem*> DatabaseOperation::loadTags()
 
             TagItem* item = new TagItem(tag);
             item->moveToThread(thread());
-            res += item;
+            tags += item;
         }
     }
-    qDebug() << Q_FUNC_INFO << res.count();
-    return res;
+    qDebug() << "DatabaseOperation::loadTags():" << tags.count();
+    return tags;
 }
 
 void DatabaseOperation::saveTags(const QList<TagItem*>& tags)
@@ -423,7 +424,7 @@ void DatabaseOperation::saveTags(const QList<TagItem*>& tags)
     query.addBindValue(parents);
     query.addBindValue(usns);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << tags.count() << res;
+    qDebug() << "DatabaseOperation::saveTags():" << tags.count() << res;
 }
 
 void DatabaseOperation::removeTags(const QList<TagItem*>& tags)
@@ -435,5 +436,5 @@ void DatabaseOperation::removeTags(const QList<TagItem*>& tags)
     QSqlQuery query("DELETE FROM Tags WHERE guid=?");
     query.addBindValue(guids);
     bool res = query.execBatch();
-    qDebug() << Q_FUNC_INFO << tags.count() << res;
+    qDebug() << "DatabaseOperation::removeTags():" << tags.count() << res;
 }

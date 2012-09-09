@@ -2,7 +2,6 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
-    authoperation.h \
     databaseoperation.h \
     fileoperation.h \
     networkoperation.h \
@@ -14,7 +13,6 @@ HEADERS += \
     syncoperation.h
 
 SOURCES += \
-    authoperation.cpp \
     databaseoperation.cpp \
     fileoperation.cpp \
     networkoperation.cpp \

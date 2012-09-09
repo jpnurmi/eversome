@@ -40,11 +40,8 @@ public:
         SaveDatabase,
         RemoveDatabase,
 
-        // user store operations
-        Auth,
-        Sync,
-
         // note store operations
+        Sync,
         Search,
 
         CreateNote,

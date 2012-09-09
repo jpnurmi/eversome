@@ -55,15 +55,39 @@ NoteStore::~NoteStore()
 {
 }
 
+int NoteStore::usn() const
+{
+    return QSettings().value("usn").toInt();
+}
+
 QDateTime NoteStore::currentTime() const
 {
-    return dateTime;
+    return QSettings().value("time").toDateTime();
 }
 
 void NoteStore::sync()
 {
-    int usn = QSettings().value("usn", 0).toInt();
-    SyncOperation* operation = new SyncOperation(usn);
+    SyncOperation* operation = new SyncOperation(usn());
+    connect(operation, SIGNAL(usnChanged(int)), this, SLOT(setUsn(int)));
+    connect(operation, SIGNAL(currentTimeChanged(QDateTime)), this, SLOT(setCurrentTime(QDateTime)));
+    connect(operation, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+                                     QVector<evernote::edam::Resource>,
+                                     QVector<evernote::edam::SavedSearch>,
+                                     QVector<evernote::edam::Note>,
+                                     QVector<evernote::edam::Tag>)),
+                 this, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+                                     QVector<evernote::edam::Resource>,
+                                     QVector<evernote::edam::SavedSearch>,
+                                     QVector<evernote::edam::Note>,
+                                     QVector<evernote::edam::Tag>)));
+    connect(operation, SIGNAL(expunged(QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>)),
+                 this, SIGNAL(expunged(QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>)));
     setupOperation(operation);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
@@ -78,6 +102,8 @@ void NoteStore::cancel()
 void NoteStore::search(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search);
+    connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
+                 this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)));
     setupOperation(operation);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
@@ -138,62 +164,31 @@ void NoteStore::updateNotebook(const edam::Notebook& notebook)
     startNotebookOperation(notebook, Operation::UpdateNotebook);
 }
 
-void NoteStore::onOperationStarted(Operation* operation)
+void NoteStore::setUsn(int val)
 {
-    qDebug() << Q_FUNC_INFO << operation;
-    emit activityChanged();
+    int old = usn();
+    if (old != val) {
+        QSettings().setValue("usn", val);
+        emit usnChanged();
+    }
 }
 
-void NoteStore::onOperationFinished(Operation* operation)
+void NoteStore::setCurrentTime(const QDateTime& val)
 {
-    qDebug() << Q_FUNC_INFO << operation;
-
-    NoteOperation* noteOperation = qobject_cast<NoteOperation*>(operation);
-    if (noteOperation && noteOperation->mode() == NoteOperation::GetNote) {
-        edam::Note note = noteOperation->note();
-        emit noteFetched(note);
-        for (uint i = 0; i < note.resources.size(); ++i)
-            emit resourceFetched(note.resources.at(i));
-    }
-
-    SyncOperation* syncOperation = qobject_cast<SyncOperation*>(operation);
-    if (syncOperation) {
-        QSettings().setValue("usn", syncOperation->usn());
-        const evernote::edam::SyncChunk& chunk = syncOperation->chunk();
-
-        dateTime = QDateTime::fromMSecsSinceEpoch(chunk.currentTime);
+    QDateTime old = currentTime();
+    if (old != val) {
+        QSettings().setValue("time", val);
         emit currentTimeChanged();
-
-        emit synced(QVector<edam::Notebook>::fromStdVector(chunk.notebooks),
-                    QVector<edam::Resource>::fromStdVector(chunk.resources),
-                    QVector<edam::SavedSearch>::fromStdVector(chunk.searches),
-                    QVector<edam::Note>::fromStdVector(chunk.notes),
-                    QVector<edam::Tag>::fromStdVector(chunk.tags));
-
-        emit expunged(QVector<std::string>::fromStdVector(chunk.expungedNotebooks),
-                      QVector<std::string>::fromStdVector(chunk.expungedSearches),
-                      QVector<std::string>::fromStdVector(chunk.expungedNotes),
-                      QVector<std::string>::fromStdVector(chunk.expungedTags));
     }
-
-    SearchOperation* searchOperation = qobject_cast<SearchOperation*>(operation);
-    if (searchOperation)
-        emit searched(searchOperation->search(), searchOperation->notes());
-
-    operation->deleteLater();
-
-    emit activityChanged();
-}
-
-void NoteStore::onOperationError(Operation* operation, const QString& str)
-{
-    qDebug() << Q_FUNC_INFO << operation << str;
-    emit error(str);
 }
 
 void NoteStore::startNoteOperation(const edam::Note& note, Operation::Mode mode)
 {
     NoteOperation* operation = new NoteOperation(note, mode);
+    connect(operation, SIGNAL(noteFetched(evernote::edam::Note)),
+                 this, SIGNAL(noteFetched(evernote::edam::Note)));
+    connect(operation, SIGNAL(resourceFetched(evernote::edam::Resource)),
+                 this, SIGNAL(resourceFetched(evernote::edam::Resource)));
     setupOperation(operation);
     qDebug() << Q_FUNC_INFO << operation;
     QThreadPool::globalInstance()->start(operation);
@@ -209,12 +204,10 @@ void NoteStore::startNotebookOperation(const edam::Notebook& notebook, Operation
 
 void NoteStore::setupOperation(NetworkOperation* operation) const
 {
-    connect(operation, SIGNAL(started(Operation*)),
-                 this, SLOT(onOperationStarted(Operation*)), Qt::DirectConnection);
-    connect(operation, SIGNAL(finished(Operation*)),
-                 this, SLOT(onOperationFinished(Operation*)), Qt::DirectConnection);
-    connect(operation, SIGNAL(error(Operation*,QString)),
-                 this, SLOT(onOperationError(Operation*,QString)), Qt::DirectConnection);
+    connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
+    connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
+    connect(operation, SIGNAL(finished()), operation, SLOT(deleteLater()));
+    connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     operation->setUrl(session->url());
     operation->setAuthToken(session->authToken());
 }

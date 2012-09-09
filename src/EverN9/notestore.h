@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <Types_types.h>
+#include <NoteStore_types.h>
 #include "operation.h"
 
 class Session;
@@ -25,12 +26,14 @@ class NetworkOperation;
 class NoteStore : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(int usn READ usn NOTIFY usnChanged)
     Q_PROPERTY(QDateTime currentTime READ currentTime NOTIFY currentTimeChanged)
 
 public:
     explicit NoteStore(Session* session);
     virtual ~NoteStore();
 
+    int usn() const;
     QDateTime currentTime() const;
 
 public slots:
@@ -52,6 +55,7 @@ public slots:
     void updateNotebook(const evernote::edam::Notebook& notebook);
 
 signals:
+    void usnChanged();
     void activityChanged();
     void currentTimeChanged();
     void error(const QString& error);
@@ -73,9 +77,8 @@ signals:
     void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
 private slots:
-    void onOperationStarted(Operation* operation);
-    void onOperationFinished(Operation* operation);
-    void onOperationError(Operation* operation, const QString& error);
+    void setUsn(int usn);
+    void setCurrentTime(const QDateTime& time);
 
 private:
     void startNoteOperation(const evernote::edam::Note& note, Operation::Mode mode);
@@ -83,7 +86,6 @@ private:
     void setupOperation(NetworkOperation* operation) const;
 
     Session* session;
-    QDateTime dateTime;
 };
 
 #endif // NOTESTORE_H

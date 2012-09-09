@@ -92,6 +92,20 @@ int NoteItem::usn() const
     return m_note.updateSequenceNum;
 }
 
+QString NoteItem::html() const
+{
+    QString str =
+        "<html>"
+        "   <head>"
+        "       <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>"
+        "       <script src='%1' type='text/javascript' language='JavaScript'></script>"
+        "   </head>"
+        "   <body>%2</body>"
+        "</html>";
+    return str.arg("/opt/EverN9/qml/EverN9/script/note.js")
+              .arg(QString::fromStdString(m_note.content));
+}
+
 void NoteItem::update()
 {
     m_empty = true;

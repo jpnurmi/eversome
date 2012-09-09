@@ -34,6 +34,7 @@ class NoteItem : public QObject
     Q_PROPERTY(ItemModel* tags READ tags CONSTANT)
     Q_PROPERTY(ItemModel* resources READ resources CONSTANT)
     Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
+    Q_PROPERTY(QString html READ html NOTIFY dataChanged)
 
 public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
@@ -52,6 +53,7 @@ public:
     ItemModel* tags() const;
     ItemModel* resources() const;
     int usn() const;
+    QString html() const;
 
     void update();
 

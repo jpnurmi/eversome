@@ -77,7 +77,7 @@ void DatabaseOperation::operate()
                 queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER, usn INTEGER)";
                 queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT, usn INTEGER)";
                 queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT, usn INTEGER)";
-                queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, content TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, usn INTEGER)";
+                queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, usn INTEGER)";
                 queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT, usn INTEGER)";
                 foreach (const QString& query, queries)
                     db.exec(query);
@@ -309,7 +309,6 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
             QSqlRecord record = query.record();
             note.guid = record.value("guid").toString().toStdString();
             note.title = record.value("title").toString().toStdString();
-            note.content = record.value("content").toString().toStdString();
             note.created = record.value("created").toLongLong();
             note.updated = record.value("updated").toLongLong();
             note.deleted = record.value("deleted").toLongLong();
@@ -337,13 +336,12 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
 
 void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
 {
-    QVariantList guids, titles, contents, creates, updates,
-                 deletes, actives, notebooks, tags, resources, usns;
+    QVariantList guids, titles, creates, updates, deletes,
+                 actives, notebooks, tags, resources, usns;
     foreach (NoteItem* note, notes) {
         const evernote::edam::Note& data = note->data();
         guids += note->guid();
         titles += note->title();
-        contents += note->content();
         creates += note->created().toMSecsSinceEpoch();
         updates += note->updated().toMSecsSinceEpoch();
         deletes += note->deleted().toMSecsSinceEpoch();
@@ -360,10 +358,9 @@ void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
         usns += note->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(titles);
-    query.addBindValue(contents);
     query.addBindValue(creates);
     query.addBindValue(updates);
     query.addBindValue(deletes);

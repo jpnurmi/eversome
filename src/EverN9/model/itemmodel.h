@@ -30,6 +30,8 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
+    bool contains(const QString& guid) const;
+
     template <typename T>
     QList<T> items() const;
 

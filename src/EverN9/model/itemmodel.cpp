@@ -40,6 +40,11 @@ QVariant ItemModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
+bool ItemModel::contains(const QString& guid) const
+{
+    return m_guids.contains(guid);
+}
+
 void ItemModel::clear()
 {
     qDeleteAll(m_items);

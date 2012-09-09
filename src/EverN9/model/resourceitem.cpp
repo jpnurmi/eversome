@@ -12,6 +12,7 @@
 * GNU General Public License for more details.
 */
 #include "resourceitem.h"
+#include <Limits_constants.h>
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QFile>
@@ -81,16 +82,17 @@ QString ResourceItem::mime() const
     return QString::fromStdString(m_resource.mime);
 }
 
-static QString dataFilePath(const QString& fileName)
+static QString dataFilePath(const evernote::edam::Resource& resource, const QString& ext)
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
-    return dir.absoluteFilePath(fileName);
+    QByteArray hash(resource.data.bodyHash.c_str(), evernote::limits::g_Limits_constants.EDAM_HASH_LEN);
+    return dir.absoluteFilePath(hash.toHex() + ext);
 }
 
 QString ResourceItem::filePath(bool checkExists) const
 {
     QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
-    QFileInfo file(dataFilePath(guid() + ext));
+    QFileInfo file(dataFilePath(m_resource, ext));
     if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
@@ -98,7 +100,7 @@ QString ResourceItem::filePath(bool checkExists) const
 
 QString ResourceItem::thumbnail(bool checkExists) const
 {
-    QFileInfo file(dataFilePath(guid() + "-thumb.png"));
+    QFileInfo file(dataFilePath(m_resource, "-thumb.png"));
     if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();

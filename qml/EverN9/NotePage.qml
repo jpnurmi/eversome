@@ -49,11 +49,22 @@ CommonPage {
             WebView {
                 id: webView
 
+                javaScriptWindowObjects: QtObject {
+                    WebView.windowObjectName: "Qt"
+                    function openUrlExternally(url) {
+                        Qt.openUrlExternally(url);
+                    }
+                }
+
                 url: note ? note.filePath : ""
 
                 preferredWidth: flickable.width
                 preferredHeight: flickable.height
+
                 settings.defaultFontSize: UI.MEDIUM_FONT
+                settings.javascriptCanOpenWindows: true
+                settings.javascriptEnabled: true;
+                settings.pluginsEnabled: true
 
                 contentsScale: 1.0
                 onDoubleClick: contentsScale = flickable.width / webView.width
@@ -61,10 +72,21 @@ CommonPage {
         }
     }
 
-    onStatusChanged: {
-        if (status == PageStatus.Activating) {
-            if (note && !note.filePath)
-                NoteStore.getNote(note.data());
+    Repeater {
+        model: note ? note.resources : null
+        Item {
+            Connections {
+                target: modelData
+                onFilePathChanged: {
+                    if (modelData.filePath)
+                        webView.evaluateJavaScript("handleResource('foobar', '" + modelData.hash + "', '" + modelData.filePath + "')");
+                }
+            }
         }
+    }
+
+    onNoteChanged: {
+        if (note && !note.filePath)
+            NoteStore.getNote(note.data());
     }
 }

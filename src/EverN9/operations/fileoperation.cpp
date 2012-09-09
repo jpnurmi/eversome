@@ -37,44 +37,54 @@ bool FileOperation::isValid() const
 
 void FileOperation::operate()
 {
-    bool succeed = false;
     QFile file(m_filePath);
     QFileInfo info(file);
 
     switch (mode())
     {
         case ReadFile:
-            if (file.open(QFile::ReadOnly))
+            if (file.open(QFile::ReadOnly)) {
                 m_data = file.readAll();
+
+                QFile::FileError fileError = file.error();
+                qDebug() << "FileOperation::operate()" << this << m_filePath << fileError;
+                if (fileError != QFile::NoError)
+                    emit error(OperationError::toString(fileError));
+                else
+                    emit read(m_filePath, m_data);
+            }
             break;
         case WriteFile:
             if (QDir().mkpath(info.absolutePath())) {
                 if (file.open(QFile::WriteOnly | QFile::Truncate))
-                    succeed = file.write(m_data) > 0;
+                    file.write(m_data);
 
-                if (succeed) {
-                    QString thumbnail = info.baseName().replace('.', '-') + "-thumb.png";
-                    QStringList args = QStringList() << "-geometry" << "128x128" << info.fileName()+"[0]" << thumbnail;
-                    qDebug() << Q_FUNC_INFO << "/usr/bin/convert" << args;
-
-                    // TODO: split as a separate operation
-                    QProcess process;
-                    process.setWorkingDirectory(info.absolutePath());
-                    process.start("/usr/bin/convert", args);
-                    if (!process.waitForFinished())
-                        emit error(OperationError::toString(process.error()));
-
+                QFile::FileError fileError = file.error();
+                qDebug() << "FileOperation::operate()" << this << m_filePath << fileError;
+                if (fileError != QFile::NoError)
+                    emit error(OperationError::toString(fileError));
+                else
                     emit written(m_filePath);
-                }
             }
             break;
-        default:
-            qWarning() << Q_FUNC_INFO << "unknown mode" << mode();
-            break;
-    }
+        case GenerateThumbnail:
+            if (QDir().mkpath(info.absolutePath())) {
+                QString thumbnail = info.baseName().replace('.', '-') + "-thumb.png";
+                QStringList args = QStringList() << "-geometry" << "128x128" << info.fileName()+"[0]" << thumbnail;
 
-    if (file.error() != QFile::NoError) {
-        qDebug() << Q_FUNC_INFO << m_filePath << file.error();
-        emit error(OperationError::toString(file.error()));
+                QProcess process;
+                process.setWorkingDirectory(info.absolutePath());
+                process.start("/usr/bin/convert", args);
+
+                if (!process.waitForFinished())
+                    emit error(OperationError::toString(process.error()));
+                else
+                    emit generated(QDir(info.absolutePath()).filePath(thumbnail));
+                qDebug() << "FileOperation::operate()" << this << m_filePath << process.error();
+                break;
+            }
+        default:
+            Q_ASSERT(false);
+            break;
     }
 }

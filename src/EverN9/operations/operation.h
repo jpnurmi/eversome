@@ -31,6 +31,7 @@ public:
         // file operations
         ReadFile,
         WriteFile,
+        GenerateThumbnail,
 
         // database operations
         OpenDatabase,

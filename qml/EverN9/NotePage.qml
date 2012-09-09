@@ -12,6 +12,7 @@
 * GNU General Public License for more details.
 */
 import QtQuick 1.1
+import QtWebKit 1.0
 import com.nokia.meego 1.0
 import com.evernote.types 1.0
 import "UIConstants.js" as UI
@@ -22,49 +23,47 @@ CommonPage {
     property Note note
 
     title: note ? note.title : ""
-    busy: Manager.isBusy || openingLink
 
-    property bool openingLink: false
+    flickable: Flickable {
+        id: flickable
 
-    flickable: ListView {
+        contentWidth: webView.width
+        contentHeight: webView.height
 
-        header: NoteHeader {
-            id: header
+        PinchArea {
+            property double startScale
 
-            note: root.note
+            width: webView.width
+            height: webView.height
 
-            onLinkActivated: {
-                root.openingLink = true;
-                Qt.openUrlExternally(link);
+            function zoom(scale) {
+                var newScale = startScale + Math.log(scale) / Math.log(2);
+                if (webView.width > flickable.width || newScale > startScale)
+                    webView.contentsScale = newScale;
             }
 
-            Connections {
-                target: Qt.application
-                onActiveChanged: {
-                    if (!Qt.application.active)
-                        root.openingLink = false;
-                }
-            }
-        }
+            onPinchStarted: startScale = webView.contentsScale
+            onPinchUpdated: zoom(pinch.scale)
+            onPinchFinished: zoom(pinch.scale)
 
-        model: note ? note.resources : null
+            WebView {
+                id: webView
 
-        delegate: Item {
-            width: parent.width / 2
-            height: parent.width / 2
+                url: note ? note.filePath : ""
 
-            Thumbnail {
-                anchors.fill: parent
-                anchors.margins: UI.PAGE_MARGIN + UI.LARGE_SPACING
-                source: modelData.thumbnail
-                link: modelData.filePath
+                preferredWidth: flickable.width
+                preferredHeight: flickable.height
+                settings.defaultFontSize: UI.MEDIUM_FONT
+
+                contentsScale: 1.0
+                onDoubleClick: contentsScale = flickable.width / webView.width
             }
         }
     }
 
     onStatusChanged: {
         if (status == PageStatus.Activating) {
-            if (note && note.isEmpty)
+            if (note && !note.filePath)
                 NoteStore.getNote(note.data());
         }
     }

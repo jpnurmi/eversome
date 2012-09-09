@@ -34,8 +34,10 @@ Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
 Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
+Q_DECLARE_METATYPE(evernote::edam::Notebook)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
+Q_DECLARE_METATYPE(evernote::edam::Tag)
 
 NoteStore::NoteStore(Session* session) : QObject(session), session(session)
 {
@@ -47,8 +49,10 @@ NoteStore::NoteStore(Session* session) : QObject(session), session(session)
     qRegisterMetaType<QVector<evernote::edam::Note> >();
     qRegisterMetaType<QVector<evernote::edam::Tag> >();
     qRegisterMetaType<evernote::edam::SavedSearch>();
+    qRegisterMetaType<evernote::edam::Notebook>();
     qRegisterMetaType<evernote::edam::Resource>();
     qRegisterMetaType<evernote::edam::Note>();
+    qRegisterMetaType<evernote::edam::Tag>();
 }
 
 NoteStore::~NoteStore()

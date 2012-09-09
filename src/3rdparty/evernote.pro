@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = evernote
+TARGET = edam
 CONFIG -= qt
 DESTDIR = ../../lib
 

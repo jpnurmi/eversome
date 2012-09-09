@@ -28,25 +28,23 @@ class DatabaseOperation : public Operation
     Q_OBJECT
 
 public:
-    DatabaseOperation(Mode mode, QObject* parent);
+    DatabaseOperation(Mode mode);
     ~DatabaseOperation();
 
     bool isValid() const;
 
-    QList<NotebookItem*> notebooks() const;
-    void setNotebooks(const QList<NotebookItem*>& notebooks);
+    void setData(const QList<NotebookItem*>& notebooks,
+                 const QList<ResourceItem*>& resources,
+                 const QList<SearchItem*>& searches,
+                 const QList<NoteItem*>& notes,
+                 const QList<TagItem*>& tags);
 
-    QList<ResourceItem*> resources() const;
-    void setResources(const QList<ResourceItem*>& resources);
-
-    QList<SearchItem*> searches() const;
-    void setSearches(const QList<SearchItem*>& searches);
-
-    QList<NoteItem*> notes() const;
-    void setNotes(const QList<NoteItem*>& notes);
-
-    QList<TagItem*> tags() const;
-    void setTags(const QList<TagItem*>& tags);
+signals:
+    void loaded(const QList<NotebookItem*>& notebooks,
+                const QList<ResourceItem*>& resources,
+                const QList<SearchItem*>& searches,
+                const QList<NoteItem*>& notes,
+                const QList<TagItem*>& tags);
 
 protected:
     void operate();

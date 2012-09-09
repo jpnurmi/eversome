@@ -38,9 +38,8 @@ static QString databaseName()
     return dir.absoluteFilePath(QApplication::applicationName() + ".db");
 }
 
-DatabaseOperation::DatabaseOperation(Mode mode, QObject* parent) : Operation(mode)
+DatabaseOperation::DatabaseOperation(Mode mode) : Operation(mode)
 {
-    setParent(parent);
 }
 
 DatabaseOperation::~DatabaseOperation()
@@ -52,53 +51,16 @@ bool DatabaseOperation::isValid() const
     return true; // TODO
 }
 
-QList<NotebookItem*> DatabaseOperation::notebooks() const
-{
-    return m_notebooks;
-}
-
-void DatabaseOperation::setNotebooks(const QList<NotebookItem*>& notebooks)
+void DatabaseOperation::setData(const QList<NotebookItem*>& notebooks,
+                                const QList<ResourceItem*>& resources,
+                                const QList<SearchItem*>& searches,
+                                const QList<NoteItem*>& notes,
+                                const QList<TagItem*>& tags)
 {
     m_notebooks = notebooks;
-}
-
-QList<ResourceItem*> DatabaseOperation::resources() const
-{
-    return m_resources;
-}
-
-void DatabaseOperation::setResources(const QList<ResourceItem*>& resources)
-{
     m_resources = resources;
-}
-
-QList<SearchItem*> DatabaseOperation::searches() const
-{
-    return m_searches;
-}
-
-void DatabaseOperation::setSearches(const QList<SearchItem*>& searches)
-{
     m_searches = searches;
-}
-
-QList<NoteItem*> DatabaseOperation::notes() const
-{
-    return m_notes;
-}
-
-void DatabaseOperation::setNotes(const QList<NoteItem*>& notes)
-{
     m_notes = notes;
-}
-
-QList<TagItem*> DatabaseOperation::tags() const
-{
-    return m_tags;
-}
-
-void DatabaseOperation::setTags(const QList<TagItem*>& tags)
-{
     m_tags = tags;
 }
 
@@ -144,11 +106,7 @@ void DatabaseOperation::operate()
         }
         case LoadDatabase:
         {
-            m_notebooks = loadNotebooks();
-            m_resources = loadResources();
-            m_searches = loadSearches();
-            m_notes = loadNotes();
-            m_tags = loadTags();
+            emit loaded(loadNotebooks(), loadResources(), loadSearches(), loadNotes(), loadTags());
             break;
         }
         case SaveDatabase:
@@ -194,7 +152,6 @@ QList<NotebookItem*> DatabaseOperation::loadNotebooks()
 
             NotebookItem* item = new NotebookItem(notebook);
             item->moveToThread(thread());
-            item->setParent(parent());
             res += item;
         }
     }
@@ -253,7 +210,6 @@ QList<ResourceItem*> DatabaseOperation::loadResources()
 
             ResourceItem* item = new ResourceItem(resource);
             item->moveToThread(thread());
-            item->setParent(parent());
             res += item;
         }
     }
@@ -305,7 +261,6 @@ QList<SearchItem*> DatabaseOperation::loadSearches()
 
             SearchItem* item = new SearchItem(search);
             item->moveToThread(thread());
-            item->setParent(parent());
             res += item;
         }
     }
@@ -373,7 +328,6 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
 
             NoteItem* item = new NoteItem(note);
             item->moveToThread(thread());
-            item->setParent(parent());
             res += item;
         }
     }
@@ -449,7 +403,6 @@ QList<TagItem*> DatabaseOperation::loadTags()
 
             TagItem* item = new TagItem(tag);
             item->moveToThread(thread());
-            item->setParent(parent());
             res += item;
         }
     }

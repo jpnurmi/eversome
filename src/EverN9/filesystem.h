@@ -35,11 +35,6 @@ signals:
     void activityChanged();
     void error(const QString& error);
     void written(const QString& filePath);
-
-private slots:
-    void onOperationStarted(Operation* operation);
-    void onOperationFinished(Operation* operation);
-    void onOperationError(Operation* operation, const QString& error);
 };
 
 #endif // FILESYSTEM_H

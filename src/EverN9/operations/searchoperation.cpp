@@ -30,16 +30,6 @@ SearchOperation::~SearchOperation()
 {
 }
 
-edam::SavedSearch SearchOperation::search() const
-{
-    return m_search;
-}
-
-QVector<edam::Note> SearchOperation::notes() const
-{
-    return m_notes;
-}
-
 void SearchOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
     if (mode() != Search) {
@@ -55,5 +45,5 @@ void SearchOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
     std::string token = authToken().toStdString();
     client.findNotes(list, token, filter, 0, limits::g_Limits_constants.EDAM_USER_NOTES_MAX);
 
-    m_notes = QVector<edam::Note>::fromStdVector(list.notes);
+    emit searched(m_search, QVector<edam::Note>::fromStdVector(list.notes));
 }

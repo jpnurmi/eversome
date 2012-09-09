@@ -26,15 +26,14 @@ public:
     SearchOperation(const evernote::edam::SavedSearch& search);
     ~SearchOperation();
 
-    evernote::edam::SavedSearch search() const;
-    QVector<evernote::edam::Note> notes() const;
+signals:
+    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
 
 private:
     evernote::edam::SavedSearch m_search;
-    QVector<evernote::edam::Note> m_notes;
 };
 
 #endif // SEARCHOPERATION_H

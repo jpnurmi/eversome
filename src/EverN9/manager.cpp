@@ -253,15 +253,22 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
 {
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item)
-        item->setContent(note.content);
+        m_files->write(item->filePath(false), QByteArray(note.content.c_str(), note.content.size()));
 }
 
 void Manager::onFileWritten(const QString &filePath)
 {
     QString guid = QFileInfo(filePath).baseName();
-    ResourceItem* item = m_resources->get<ResourceItem*>(guid);
-    if (item)
-        item->update();
+    if (m_notes->contains(guid)) {
+        NoteItem* note = m_notes->get<NoteItem*>(guid);
+        if (note)
+            note->update();
+    } else if (m_resources->contains(guid)) {
+        ResourceItem* resource = m_resources->get<ResourceItem*>(guid);
+        if (resource)
+            resource->update();
+    } else
+        qCritical() << Q_FUNC_INFO << "UNIDENTIFIED FILE:" << filePath;
 }
 
 void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes)

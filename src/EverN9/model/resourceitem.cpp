@@ -82,17 +82,21 @@ QString ResourceItem::mime() const
     return QString::fromStdString(m_resource.mime);
 }
 
-static QString dataFilePath(const evernote::edam::Resource& resource, const QString& ext)
+QByteArray ResourceItem::hash() const
+{
+    return QByteArray(m_resource.data.bodyHash.c_str(), evernote::limits::g_Limits_constants.EDAM_HASH_LEN).toHex();
+}
+
+static QString dataFilePath(const QByteArray& hash, const QString& ext)
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
-    QByteArray hash(resource.data.bodyHash.c_str(), evernote::limits::g_Limits_constants.EDAM_HASH_LEN);
-    return dir.absoluteFilePath(hash.toHex() + ext);
+    return dir.absoluteFilePath(hash + ext);
 }
 
 QString ResourceItem::filePath(bool checkExists) const
 {
     QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
-    QFileInfo file(dataFilePath(m_resource, ext));
+    QFileInfo file(dataFilePath(hash(), ext));
     if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
@@ -100,7 +104,7 @@ QString ResourceItem::filePath(bool checkExists) const
 
 QString ResourceItem::thumbnail(bool checkExists) const
 {
-    QFileInfo file(dataFilePath(m_resource, "-thumb.png"));
+    QFileInfo file(dataFilePath(hash(), "-thumb.png"));
     if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();

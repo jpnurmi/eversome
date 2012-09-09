@@ -20,21 +20,21 @@
 
 typedef QHash<QString, QString> StringHash;
 Q_GLOBAL_STATIC_WITH_INITIALIZER(StringHash, file_extensions, {
-    x->insert("application/msword", "doc");
-    x->insert("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
-    x->insert("application/pdf", "pdf");
-    x->insert("audio/amr", "amr");
-    x->insert("audio/mpeg", "mp3");
-    x->insert("audio/wav", "wav");
-    x->insert("audio/vnd.wave", "wav");
-    x->insert("image/bmp", "bmp");
-    x->insert("image/gif", "gif");
-    x->insert("image/jpg", "jpg");
-    x->insert("image/jpeg", "jpg");
-    x->insert("image/pjpeg", "jpg");
-    x->insert("image/png", "png");
-    x->insert("text/plain", "txt");
-    x->insert("text/html", "html");
+    x->insert("application/msword", ".doc");
+    x->insert("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx");
+    x->insert("application/pdf", ".pdf");
+    x->insert("audio/amr", ".amr");
+    x->insert("audio/mpeg", ".mp3");
+    x->insert("audio/wav", ".wav");
+    x->insert("audio/vnd.wave", ".wav");
+    x->insert("image/bmp", ".bmp");
+    x->insert("image/gif", ".gif");
+    x->insert("image/jpg", ".jpg");
+    x->insert("image/jpeg", ".jpg");
+    x->insert("image/pjpeg", ".jpg");
+    x->insert("image/png", ".png");
+    x->insert("text/plain", ".txt");
+    x->insert("text/html", ".html");
 })
 
 typedef QHash<QString, ResourceItem::Type> TypeHash;
@@ -90,7 +90,7 @@ static QString dataFilePath(const QString& fileName)
 QString ResourceItem::filePath(bool checkExists) const
 {
     QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
-    QFileInfo file(dataFilePath(guid() + "." + ext));
+    QFileInfo file(dataFilePath(guid() + ext));
     if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();

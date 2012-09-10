@@ -47,7 +47,9 @@ void FileOperation::operate()
                 m_data = file.readAll();
 
                 QFile::FileError fileError = file.error();
-                qDebug() << "FileOperation::operate()" << this << m_filePath << fileError;
+                qDebug() << "FileOperation::operate(): read..."
+                         << (fileError == QFile::NoError ? "OK" : "FAIL!")
+                         << qPrintable("("+info.fileName()+")");
                 if (fileError != QFile::NoError)
                     emit error(OperationError::toString(fileError));
                 else
@@ -60,7 +62,9 @@ void FileOperation::operate()
                     file.write(m_data);
 
                 QFile::FileError fileError = file.error();
-                qDebug() << "FileOperation::operate()" << this << m_filePath << fileError;
+                qDebug() << "FileOperation::operate(): wrote..."
+                         << (fileError == QFile::NoError ? "OK" : "FAIL!")
+                         << qPrintable("("+info.fileName()+")");
                 if (fileError != QFile::NoError)
                     emit error(OperationError::toString(fileError));
                 else
@@ -80,7 +84,9 @@ void FileOperation::operate()
                     emit error(OperationError::toString(process.error()));
                 else
                     emit generatingDone(m_guid, QDir(info.absolutePath()).filePath(thumbnail));
-                qDebug() << "FileOperation::operate()" << this << m_filePath << process.error();
+                qDebug() << "FileOperation::operate(): generated..."
+                         << (process.error() == QProcess::UnknownError ? "OK" : "FAIL!")
+                         << qPrintable("("+thumbnail+")");
                 break;
             }
         default:

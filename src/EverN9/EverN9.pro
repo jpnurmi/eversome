@@ -19,6 +19,7 @@ include(../3rdparty/edam.pri)
 include(../3rdparty/thrift.pri)
 
 HEADERS += \
+    account.h \
     database.h \
     filesystem.h \
     manager.h \
@@ -26,6 +27,7 @@ HEADERS += \
     session.h
 
 SOURCES += \
+    account.cpp \
     database.cpp \
     filesystem.cpp \
     main.cpp \

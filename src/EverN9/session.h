@@ -14,7 +14,6 @@
 #ifndef SESSION_H
 #define SESSION_H
 
-#include <Accounts/Account>
 #include <SignOn/AuthSession>
 #include <SignOn/SessionData>
 #include <SignOn/Identity>
@@ -29,7 +28,7 @@ class Session : public QObject
     Q_PROPERTY(QString authToken READ authToken NOTIFY established)
 
 public:
-    explicit Session(const QString& host, QObject* parent = 0);
+    explicit Session(int id, const QString& host, QObject* parent = 0);
     virtual ~Session();
 
     QUrl url() const;
@@ -49,7 +48,6 @@ private:
     QString m_host;
     SignOn::SessionData m_data;
     SignOn::Identity* m_identity;
-    Accounts::Account* m_account;
     SignOn::AuthSession* m_session;
 };
 

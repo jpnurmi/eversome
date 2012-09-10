@@ -14,30 +14,14 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "session.h"
-#include <accounts-qt/manager.h>
 #include <QtDebug>
 
 static const int EDAM_PORT = 80;
 
-Session::Session(const QString& host, QObject* parent) :
-    QObject(parent), m_host(host), m_identity(0), m_account(0), m_session(0)
+Session::Session(int id, const QString& host, QObject* parent) :
+    QObject(parent), m_host(host), m_identity(0), m_session(0)
 {
-    // TODO:
-    Accounts::Manager manager;
-    foreach (Accounts::AccountId id, manager.accountList())
-    {
-        Accounts::Account* account = manager.account(id);
-        if (account->providerName() == "evernote") {
-            m_account = account;
-            break;
-        }
-    }
-
-    // TODO:
-    if (!m_account)
-        m_account = manager.createAccount("evernote");
-
-    m_identity = SignOn::Identity::existingIdentity(m_account->credentialsId(), this);
+    m_identity = SignOn::Identity::existingIdentity(id, this);
 
     // TODO:
     if (!m_identity) {
@@ -47,7 +31,7 @@ Session::Session(const QString& host, QObject* parent) :
         m_identity = SignOn::Identity::newIdentity(info, this);
     }
 
-    qDebug() << Q_FUNC_INFO << m_account << m_identity;
+    qDebug() << Q_FUNC_INFO << m_identity;
 
     m_session = m_identity->createSession("evernote");
 

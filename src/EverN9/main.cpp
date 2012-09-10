@@ -16,6 +16,7 @@
 
 #include "filesystem.h"
 #include "notestore.h"
+#include "account.h"
 #include "session.h"
 #include "manager.h"
 
@@ -57,9 +58,6 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     if (index != -1)
         host = args.value(index + 1);
 
-    Session session(host);
-    Manager* manager = new Manager(&session);
-
     qmlRegisterType<TagItem>("com.evernote.types", 1,0, "Tag");
     qmlRegisterType<NoteItem>("com.evernote.types", 1,0, "Note");
     qmlRegisterType<ItemModel>("com.evernote.types", 1,0, "ItemModel");
@@ -67,16 +65,22 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     qmlRegisterType<ResourceItem>("com.evernote.types", 1,0, "Resource");
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
-    QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("Session", &session);
-    viewer.rootContext()->setContextProperty("Manager", manager);
-    viewer.rootContext()->setContextProperty("NoteStore", manager->noteStore());
-    viewer.rootContext()->setContextProperty("Notebooks", manager->notebookModel());
-    viewer.rootContext()->setContextProperty("Searches", manager->searchModel());
-    viewer.rootContext()->setContextProperty("Tags", manager->tagModel());
-    viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
+    Account account;
+    if (account.init()) { // TODO else { account.create(); ... }
+        Session session(account.id(), host);
+        Manager* manager = new Manager(&session);
 
-    viewer.showExpanded();
-    return app->exec();
+        QmlApplicationViewer viewer;
+        viewer.rootContext()->setContextProperty("Session", &session);
+        viewer.rootContext()->setContextProperty("Manager", manager);
+        viewer.rootContext()->setContextProperty("NoteStore", manager->noteStore());
+        viewer.rootContext()->setContextProperty("Notebooks", manager->notebookModel());
+        viewer.rootContext()->setContextProperty("Searches", manager->searchModel());
+        viewer.rootContext()->setContextProperty("Tags", manager->tagModel());
+        viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+        viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
+
+        viewer.showExpanded();
+        return app->exec();
+    }
 }

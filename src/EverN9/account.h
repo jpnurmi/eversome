@@ -39,7 +39,6 @@ signals:
     void created(int credentialsId);
 
 private slots:
-    void onTimeout();
     void onAccountCreated(int accountId);
 
 private:

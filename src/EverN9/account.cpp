@@ -14,7 +14,6 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "account.h"
-#include <QTimer>
 
 Account::Account(QObject* parent) : QObject(parent), m_account(0), m_proxy(0)
 {
@@ -49,29 +48,21 @@ void Account::create()
         connect(m_proxy, SIGNAL(failed()), this, SIGNAL(failed()));
         connect(m_proxy, SIGNAL(cancelled()), this, SIGNAL(cancelled()));
         connect(m_proxy, SIGNAL(created(int)), this, SLOT(onAccountCreated(int)));
-
-        // ProviderPluginProxy does not emit any signal if and when
-        // the accounts UI is closed without creating an account...
-        QTimer* timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
-        timer->start(2000);
     }
     m_proxy->createAccount(m_manager.provider("evernote"), QString());
 }
 
-void Account::onTimeout()
-{
-    if (!m_proxy)
-        sender()->deleteLater();
-    else if (!m_proxy->isPluginRunning())
-        emit cancelled();
-}
-
 void Account::onAccountCreated(int accountId)
 {
-    m_account = m_manager.account(accountId);
-    if (m_account)
-        emit created(m_account->credentialsId());
+    if (accountId > 0) {
+        m_account = m_manager.account(accountId);
+        if (m_account)
+            emit created(m_account->credentialsId());
+        else
+            emit failed();
+    } else {
+        emit cancelled();
+    }
     m_proxy->deleteLater();
     m_proxy = 0;
 }

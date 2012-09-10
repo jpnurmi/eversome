@@ -107,7 +107,7 @@ void DatabaseOperation::operate()
         }
         case LoadDatabase:
         {
-            operation = "loaded";
+            operation = "loaded...";
             m_notebooks = loadNotebooks();
             m_resources = loadResources();
             m_searches = loadSearches();
@@ -118,7 +118,7 @@ void DatabaseOperation::operate()
         }
         case SaveDatabase:
         {
-            operation = "saved";
+            operation = "saved...";
             saveNotebooks(m_notebooks);
             saveResources(m_resources);
             saveSearches(m_searches);
@@ -128,7 +128,7 @@ void DatabaseOperation::operate()
         }
         case RemoveDatabase:
         {
-            operation = "removed";
+            operation = "removed...";
             removeNotebooks(m_notebooks);
             removeSearches(m_searches);
             removeNotes(m_notes);
@@ -141,7 +141,7 @@ void DatabaseOperation::operate()
     }
 
     if (operation)
-        qDebug() << "DatabaseOperation::operate(): " << operation << "..."
+        qDebug() << "DatabaseOperation::operate():" << operation
                  << "NB:" << m_notebooks.count()
                  << "R:" << m_resources.count()
                  << "S:" << m_searches.count()

@@ -67,8 +67,8 @@ void Session::establish(int credentialsId)
                  this, SLOT(onError(SignOn::Error)));
     connect(m_session, SIGNAL(response(SignOn::SessionData)),
                  this, SLOT(onResponse(SignOn::SessionData)));
-    connect(m_session, SIGNAL(stateChanged(SignOn::AuthSession::AuthSessionState,QString)),
-                 this, SLOT(onStateChanged(SignOn::AuthSession::AuthSessionState,QString)));
+    connect(m_session, SIGNAL(stateChanged(AuthSession::AuthSessionState,QString)),
+                 this, SLOT(onStateChanged(AuthSession::AuthSessionState,QString)));
 
     m_session->process(SignOn::SessionData(), "AuthLogin");
 }

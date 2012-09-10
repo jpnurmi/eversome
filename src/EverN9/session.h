@@ -21,6 +21,7 @@
 #include <QUrl>
 
 class Account;
+using namespace SignOn;
 
 class Session : public QObject
 {
@@ -47,7 +48,7 @@ signals:
 private slots:
     void onError(const SignOn::Error& error);
     void onResponse(const SignOn::SessionData& data);
-    void onStateChanged(SignOn::AuthSession::AuthSessionState state, const QString& message);
+    void onStateChanged(AuthSession::AuthSessionState state, const QString& message);
 
 private:
     QString m_host;

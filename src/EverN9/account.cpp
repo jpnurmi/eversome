@@ -14,30 +14,24 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "account.h"
-#include <QtDebug>
+#include <QTimer>
 
-Account::Account(QObject* parent) : QObject(parent), m_account(0)
+Account::Account(QObject* parent) : QObject(parent), m_account(0), m_proxy(0)
 {
-    connect(&m_manager, SIGNAL(accountCreated(Accounts::AccountId)),
-                  this, SLOT(onAccountCreated(Accounts::AccountId)));
-    connect(&m_manager, SIGNAL(accountRemoved(Accounts::AccountId)),
-                  this, SLOT(onAccountRemoved(Accounts::AccountId)));
-    connect(&m_manager, SIGNAL(accountUpdated(Accounts::AccountId)),
-                  this, SLOT(onAccountUpdated(Accounts::AccountId)));
 }
 
 Account::~Account()
 {
 }
 
-int Account::id() const
+int Account::credentialsId() const
 {
-    return m_account ? m_account->id() : -1;
+    return m_account ? m_account->credentialsId() : -1;
 }
 
 bool Account::init()
 {
-    foreach (Accounts::AccountId id, m_manager.accountList())
+    foreach (Accounts::AccountId id, m_manager.accountListEnabled())
     {
         Accounts::Account* account = m_manager.account(id);
         if (account->providerName() == "evernote") {
@@ -50,25 +44,34 @@ bool Account::init()
 
 void Account::create()
 {
-    // TODO
-    if (!m_account)
-        m_account = m_manager.createAccount("evernote");
+    if (!m_proxy) {
+        m_proxy = new AccountsUI::ProviderPluginProxy(this);
+        connect(m_proxy, SIGNAL(failed()), this, SIGNAL(failed()));
+        connect(m_proxy, SIGNAL(cancelled()), this, SIGNAL(cancelled()));
+        connect(m_proxy, SIGNAL(created(int)), this, SLOT(onAccountCreated(int)));
+
+        // ProviderPluginProxy does not emit any signal if and when
+        // the accounts UI is closed without creating an account...
+        QTimer* timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
+        timer->start(2000);
+    }
+    m_proxy->createAccount(m_manager.provider("evernote"), QString());
 }
 
-void Account::onAccountCreated(Accounts::AccountId id)
+void Account::onTimeout()
 {
-    // TODO
-    qDebug() << Q_FUNC_INFO << id;
+    if (!m_proxy)
+        sender()->deleteLater();
+    else if (!m_proxy->isPluginRunning())
+        emit cancelled();
 }
 
-void Account::onAccountRemoved(Accounts::AccountId id)
+void Account::onAccountCreated(int accountId)
 {
-    // TODO
-    qDebug() << Q_FUNC_INFO << id;
-}
-
-void Account::onAccountUpdated(Accounts::AccountId id)
-{
-    // TODO
-    qDebug() << Q_FUNC_INFO << id;
+    m_account = m_manager.account(accountId);
+    if (m_account)
+        emit created(m_account->credentialsId());
+    m_proxy->deleteLater();
+    m_proxy = 0;
 }

@@ -18,31 +18,9 @@
 
 static const int EDAM_PORT = 80;
 
-Session::Session(int id, const QString& host, QObject* parent) :
+Session::Session(const QString& host, QObject* parent) :
     QObject(parent), m_host(host), m_identity(0), m_session(0)
 {
-    m_identity = SignOn::Identity::existingIdentity(id, this);
-
-    // TODO:
-    if (!m_identity) {
-        SignOn::IdentityInfo info;
-        info.setCaption("Evernote");
-        info.setMethod("evernote", QStringList() << "AuthLogin");
-        m_identity = SignOn::Identity::newIdentity(info, this);
-    }
-
-    qDebug() << Q_FUNC_INFO << m_identity;
-
-    m_session = m_identity->createSession("evernote");
-
-    connect(m_session, SIGNAL(error(SignOn::Error)),
-                 this, SLOT(onError(SignOn::Error)));
-    connect(m_session, SIGNAL(response(SignOn::SessionData)),
-                 this, SLOT(onResponse(SignOn::SessionData)));
-    connect(m_session, SIGNAL(stateChanged(SignOn::AuthSession::AuthSessionState,QString)),
-                 this, SLOT(onStateChanged(SignOn::AuthSession::AuthSessionState,QString)));
-
-    m_session->process(SignOn::SessionData(), "AuthLogin");
 }
 
 Session::~Session()
@@ -67,6 +45,32 @@ QString Session::userName() const
 QString Session::authToken() const
 {
     return m_data.getProperty("SecretKey").toString();
+}
+
+void Session::establish(int credentialsId)
+{
+    m_identity = SignOn::Identity::existingIdentity(credentialsId, this);
+
+    // TODO:
+    if (!m_identity) {
+        SignOn::IdentityInfo info;
+        info.setCaption("Evernote");
+        info.setMethod("evernote", QStringList() << "AuthLogin");
+        m_identity = SignOn::Identity::newIdentity(info, this);
+    }
+
+    m_session = m_identity->createSession("evernote");
+
+    qDebug() << Q_FUNC_INFO << m_identity << credentialsId << m_session;
+
+    connect(m_session, SIGNAL(error(SignOn::Error)),
+                 this, SLOT(onError(SignOn::Error)));
+    connect(m_session, SIGNAL(response(SignOn::SessionData)),
+                 this, SLOT(onResponse(SignOn::SessionData)));
+    connect(m_session, SIGNAL(stateChanged(SignOn::AuthSession::AuthSessionState,QString)),
+                 this, SLOT(onStateChanged(SignOn::AuthSession::AuthSessionState,QString)));
+
+    m_session->process(SignOn::SessionData(), "AuthLogin");
 }
 
 void Session::onError(const SignOn::Error& err)

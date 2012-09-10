@@ -20,6 +20,8 @@
 #include <SignOn/Error>
 #include <QUrl>
 
+class Account;
+
 class Session : public QObject
 {
     Q_OBJECT
@@ -28,12 +30,15 @@ class Session : public QObject
     Q_PROPERTY(QString authToken READ authToken NOTIFY established)
 
 public:
-    explicit Session(int id, const QString& host, QObject* parent = 0);
+    explicit Session(const QString& host, QObject* parent = 0);
     virtual ~Session();
 
     QUrl url() const;
     QString userName() const;
     QString authToken() const;
+
+public slots:
+    void establish(int credentialsId);
 
 signals:
     void established();

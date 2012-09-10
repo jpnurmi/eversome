@@ -2,7 +2,7 @@
 QT += sql
 
 CONFIG += link_pkgconfig
-PKGCONFIG += accounts-qt libsignon-qt
+PKGCONFIG += accounts-qt NAccountsUI libsignon-qt
 
 qmlfolder.source = ../../qml/EverN9
 qmlfolder.target = qml

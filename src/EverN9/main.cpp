@@ -12,6 +12,7 @@
 * GNU General Public License for more details.
 */
 #include <QtDeclarative>
+#include <MApplication>
 #include "qmlapplicationviewer.h"
 
 #include "filesystem.h"
@@ -33,7 +34,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
 {
     QApplication::setApplicationName("EverN9");
     QApplication::setOrganizationName("Evernote");
-    QScopedPointer<QApplication> app(createApplication(argc, argv));
+    MApplication app(argc, argv);
 
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
@@ -41,7 +42,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     QString cachePath = QDesktopServices::storageLocation(QDesktopServices::CacheLocation);
     QString configPath = QFileInfo(QSettings().fileName()).absolutePath();
 
-    QStringList args = app->arguments();
+    QStringList args = app.arguments();
     if (args.contains("-reset")) {
         qDebug() << "EverN9 reset...";
         qDebug() << "  -> Data:" << (FileSystem::removeDir(dataPath) ? "OK" : "FAIL!") << qPrintable("("+dataPath+")");
@@ -66,21 +67,28 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     qmlRegisterType<NotebookItem>("com.evernote.types", 1,0, "Notebook");
 
     Account account;
-    if (account.init()) { // TODO else { account.create(); ... }
-        Session session(account.id(), host);
-        Manager* manager = new Manager(&session);
+    Session session(host);
+    Manager* manager = new Manager(&session);
+    QmlApplicationViewer viewer;
+    viewer.rootContext()->setContextProperty("Session", &session);
+    viewer.rootContext()->setContextProperty("Manager", manager);
+    viewer.rootContext()->setContextProperty("NoteStore", manager->noteStore());
+    viewer.rootContext()->setContextProperty("Notebooks", manager->notebookModel());
+    viewer.rootContext()->setContextProperty("Searches", manager->searchModel());
+    viewer.rootContext()->setContextProperty("Tags", manager->tagModel());
+    viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
 
-        QmlApplicationViewer viewer;
-        viewer.rootContext()->setContextProperty("Session", &session);
-        viewer.rootContext()->setContextProperty("Manager", manager);
-        viewer.rootContext()->setContextProperty("NoteStore", manager->noteStore());
-        viewer.rootContext()->setContextProperty("Notebooks", manager->notebookModel());
-        viewer.rootContext()->setContextProperty("Searches", manager->searchModel());
-        viewer.rootContext()->setContextProperty("Tags", manager->tagModel());
-        viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-        viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
-
+    if (account.init()) {
+        session.establish(account.credentialsId());
         viewer.showExpanded();
-        return app->exec();
+    } else {
+        QObject::connect(&account, SIGNAL(failed()), &app, SLOT(quit())); // TODO
+        QObject::connect(&account, SIGNAL(cancelled()), &app, SLOT(quit()));
+        QObject::connect(&account, SIGNAL(created(int)), &session, SLOT(establish(int)));
+        QObject::connect(&account, SIGNAL(created(int)), &viewer, SLOT(showFullScreen()));
+        QTimer::singleShot(0, &account, SLOT(create()));
     }
+
+    return app.exec();
 }

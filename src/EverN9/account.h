@@ -17,6 +17,7 @@
 #include <QObject>
 #include <Accounts/Account>
 #include <Accounts/Manager>
+#include <AccountsUI/ProviderPluginProxy>
 
 class Account : public QObject
 {
@@ -26,20 +27,25 @@ public:
     explicit Account(QObject* parent = 0);
     virtual ~Account();
 
-    int id() const;
+    int credentialsId() const;
 
 public slots:
     bool init();
     void create();
 
+signals:
+    void failed();
+    void cancelled();
+    void created(int credentialsId);
+
 private slots:
-    void onAccountCreated(Accounts::AccountId id);
-    void onAccountRemoved(Accounts::AccountId id);
-    void onAccountUpdated(Accounts::AccountId id);
+    void onTimeout();
+    void onAccountCreated(int accountId);
 
 private:
     Accounts::Manager m_manager;
     Accounts::Account* m_account;
+    AccountsUI::ProviderPluginProxy* m_proxy;
 };
 
 #endif // _ACCOUNT_H_

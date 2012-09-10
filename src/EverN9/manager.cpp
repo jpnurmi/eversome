@@ -24,6 +24,7 @@
 #include "tagitem.h"
 #include <QThreadPool>
 #include <QVector>
+#include <QTimer>
 #include <QDebug>
 
 Q_DECLARE_METATYPE(QVector<std::string>)
@@ -84,9 +85,9 @@ Manager::Manager(Session* session) : QObject(session)
     m_database->open();
     m_database->load(this);
 
-    connect(m_store, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
-    connect(m_files, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
-    connect(m_database, SIGNAL(activityChanged()), this, SIGNAL(isBusyChanged()));
+    connect(m_store, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
+    connect(m_files, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
+    connect(m_database, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
 
     m_notebooks = new ItemModel(this);
     m_resources = new ItemModel(this);
@@ -139,6 +140,11 @@ ItemModel* Manager::noteModel() const
 ItemModel* Manager::tagModel() const
 {
     return m_tags;
+}
+
+void Manager::onActivityChanged()
+{
+    QTimer::singleShot(200, this, SIGNAL(isBusyChanged()));
 }
 
 void Manager::onLoaded(const QList<NotebookItem*>& notebooks,

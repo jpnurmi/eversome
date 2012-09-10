@@ -52,6 +52,8 @@ signals:
     void isBusyChanged();
 
 private slots:
+    void onActivityChanged();
+
     void onLoaded(const QList<NotebookItem*>& notebooks,
                   const QList<ResourceItem*>& resources,
                   const QList<SearchItem*>& searches,

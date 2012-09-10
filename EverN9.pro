@@ -16,3 +16,13 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/control \
     qtc_packaging/debian_harmattan/compat \
     qtc_packaging/debian_harmattan/changelog
+
+THRIFT = $$files(src/3rdparty/thrift/*)
+isEmpty(THRIFT):error(The thrift submodule is missing.  \
+                      Run \'git submodule init\' and \
+                      \'git submodule update\' in $$_PRO_FILE_PWD_)
+
+EDAM = $$files(src/3rdparty/edam/*)
+isEmpty(EDAM):error(The edam submodule is missing.  \
+                    Run \'git submodule init\' and \
+                    \'git submodule update\' in $$_PRO_FILE_PWD_)

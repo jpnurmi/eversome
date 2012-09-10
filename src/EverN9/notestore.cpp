@@ -128,11 +128,6 @@ void NoteStore::getNote(const edam::Note& note)
     startNoteOperation(note, Operation::GetNote);
 }
 
-void NoteStore::expungeNote(const edam::Note& note)
-{
-    startNoteOperation(note, Operation::ExpungeNote);
-}
-
 void NoteStore::shareNote(const edam::Note& note)
 {
     startNoteOperation(note, Operation::ShareNote);
@@ -151,11 +146,6 @@ void NoteStore::updateNote(const edam::Note& note)
 void NoteStore::createNotebook(const edam::Notebook& notebook)
 {
     startNotebookOperation(notebook, Operation::CreateNotebook);
-}
-
-void NoteStore::expungeNotebook(const edam::Notebook& notebook)
-{
-    startNotebookOperation(notebook, Operation::ExpungeNotebook);
 }
 
 void NoteStore::getDefaultNotebook(const edam::Notebook& notebook)

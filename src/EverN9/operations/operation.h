@@ -48,13 +48,11 @@ public:
         CreateNote,
         DeleteNote,
         GetNote,
-        ExpungeNote,
         ShareNote,
         UnshareNote,
         UpdateNote,
 
         CreateNotebook,
-        ExpungeNotebook,
         GetDefaultNotebook,
         UpdateNotebook
     };

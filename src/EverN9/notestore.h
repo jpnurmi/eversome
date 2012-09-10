@@ -44,13 +44,11 @@ public slots:
     void createNote(const evernote::edam::Note& note);
     void deleteNote(const evernote::edam::Note& note);
     void getNote(const evernote::edam::Note& note);
-    void expungeNote(const evernote::edam::Note& note);
     void shareNote(const evernote::edam::Note& note);
     void unshareNote(const evernote::edam::Note& note);
     void updateNote(const evernote::edam::Note& note);
 
     void createNotebook(const evernote::edam::Notebook& notebook);
-    void expungeNotebook(const evernote::edam::Notebook& notebook);
     void getDefaultNotebook(const evernote::edam::Notebook& notebook);
     void updateNotebook(const evernote::edam::Notebook& notebook);
 

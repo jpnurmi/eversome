@@ -52,9 +52,6 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
                 emit resourceFetched(resource);
             }
             break;
-        case ExpungeNote:
-            usn = client.expungeNote(token, m_note.guid);
-            break;
         case ShareNote:
             client.shareNote(key, token, m_note.guid);
             break;

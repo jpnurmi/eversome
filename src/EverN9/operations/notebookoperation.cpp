@@ -44,9 +44,6 @@ void NotebookOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol
         case CreateNotebook:
             client.createNotebook(m_notebook, token, m_notebook);
             break;
-        case ExpungeNotebook:
-            usn = client.expungeNotebook(token, m_notebook.guid);
-            break;
         case GetDefaultNotebook:
             client.getDefaultNotebook(m_notebook, token);
             break;

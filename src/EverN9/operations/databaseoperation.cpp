@@ -66,6 +66,7 @@ void DatabaseOperation::setData(const QList<NotebookItem*>& notebooks,
 
 void DatabaseOperation::operate()
 {
+    const char* operation = 0;
     switch (mode())
     {
         case OpenDatabase:
@@ -106,11 +107,18 @@ void DatabaseOperation::operate()
         }
         case LoadDatabase:
         {
-            emit loaded(loadNotebooks(), loadResources(), loadSearches(), loadNotes(), loadTags());
+            operation = "loaded";
+            m_notebooks = loadNotebooks();
+            m_resources = loadResources();
+            m_searches = loadSearches();
+            m_notes = loadNotes();
+            m_tags = loadTags();
+            emit loaded(m_notebooks, m_resources, m_searches, m_notes, m_tags);
             break;
         }
         case SaveDatabase:
         {
+            operation = "saved";
             saveNotebooks(m_notebooks);
             saveResources(m_resources);
             saveSearches(m_searches);
@@ -120,6 +128,7 @@ void DatabaseOperation::operate()
         }
         case RemoveDatabase:
         {
+            operation = "removed";
             removeNotebooks(m_notebooks);
             removeSearches(m_searches);
             removeNotes(m_notes);
@@ -130,6 +139,14 @@ void DatabaseOperation::operate()
             Q_ASSERT(false);
             break;
     }
+
+    if (operation)
+        qDebug() << "DatabaseOperation::operate(): " << operation << "..."
+                 << "NB:" << m_notebooks.count()
+                 << "R:" << m_resources.count()
+                 << "S:" << m_searches.count()
+                 << "N:" << m_notes.count()
+                 << "T:" << m_tags.count();
 }
 
 QList<NotebookItem*> DatabaseOperation::loadNotebooks()
@@ -153,11 +170,10 @@ QList<NotebookItem*> DatabaseOperation::loadNotebooks()
             notebooks += item;
         }
     }
-    qDebug() << "DatabaseOperation::loadNotebooks():" << notebooks.count();
     return notebooks;
 }
 
-void DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
+bool DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
 {
     QVariantList guids, names, defs, pubs, creates, updates, usns;
     foreach (NotebookItem* notebook, notebooks) {
@@ -178,11 +194,10 @@ void DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
     query.addBindValue(creates);
     query.addBindValue(updates);
     query.addBindValue(usns);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::saveNotebooks():" << notebooks.count() << res;
+    return query.execBatch();
 }
 
-void DatabaseOperation::removeNotebooks(const QList<NotebookItem*>& notebooks)
+bool DatabaseOperation::removeNotebooks(const QList<NotebookItem*>& notebooks)
 {
     QVariantList guids;
     foreach (NotebookItem* notebook, notebooks)
@@ -190,8 +205,7 @@ void DatabaseOperation::removeNotebooks(const QList<NotebookItem*>& notebooks)
 
     QSqlQuery query("DELETE FROM NoteBooks WHERE guid=?");
     query.addBindValue(guids);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::removeNotebooks():" << notebooks.count() << res;
+    return query.execBatch();
 }
 
 QList<ResourceItem*> DatabaseOperation::loadResources()
@@ -212,11 +226,10 @@ QList<ResourceItem*> DatabaseOperation::loadResources()
             resources += item;
         }
     }
-    qDebug() << "DatabaseOperation::loadResources():" << resources.count();
     return resources;
 }
 
-void DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
+bool DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
 {
     QVariantList guids, mimes, hashes, usns;
     foreach (ResourceItem* resource, resources) {
@@ -231,11 +244,10 @@ void DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
     query.addBindValue(mimes);
     query.addBindValue(hashes);
     query.addBindValue(usns);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::saveResources():" << resources.count() << res;
+    return query.execBatch();
 }
 
-void DatabaseOperation::removeResources(const QList<ResourceItem*>& resources)
+bool DatabaseOperation::removeResources(const QList<ResourceItem*>& resources)
 {
     QVariantList guids;
     foreach (ResourceItem* resource, resources)
@@ -243,8 +255,7 @@ void DatabaseOperation::removeResources(const QList<ResourceItem*>& resources)
 
     QSqlQuery query("DELETE FROM Resources WHERE guid=?");
     query.addBindValue(guids);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::removeResources():" << resources.count() << res;
+    return query.execBatch();
 }
 
 QList<SearchItem*> DatabaseOperation::loadSearches()
@@ -265,11 +276,10 @@ QList<SearchItem*> DatabaseOperation::loadSearches()
             searches += item;
         }
     }
-    qDebug() << "DatabaseOperation::loadSearches():" << searches.count();
     return searches;
 }
 
-void DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
+bool DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
 {
     QVariantList guids, names, queries, usns;
     foreach (SearchItem* search, searches) {
@@ -284,11 +294,10 @@ void DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
     query.addBindValue(names);
     query.addBindValue(queries);
     query.addBindValue(usns);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::saveSearches():" << searches.count() << res;
+    return query.execBatch();
 }
 
-void DatabaseOperation::removeSearches(const QList<SearchItem*>& searches)
+bool DatabaseOperation::removeSearches(const QList<SearchItem*>& searches)
 {
     QVariantList guids;
     foreach (SearchItem* search, searches)
@@ -296,8 +305,7 @@ void DatabaseOperation::removeSearches(const QList<SearchItem*>& searches)
 
     QSqlQuery query("DELETE FROM Searches WHERE guid=?");
     query.addBindValue(guids);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::removeSearches():" << searches.count() << res;
+    return query.execBatch();
 }
 
 QList<NoteItem*> DatabaseOperation::loadNotes()
@@ -331,11 +339,10 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
             notes += item;
         }
     }
-    qDebug() << "DatabaseOperation::loadNotes():" << notes.count();
     return notes;
 }
 
-void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
+bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
 {
     QVariantList guids, titles, creates, updates, deletes,
                  actives, notebooks, tags, resources, usns;
@@ -370,11 +377,10 @@ void DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
     query.addBindValue(tags);
     query.addBindValue(resources);
     query.addBindValue(usns);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::saveNotes():" << notes.count() << res;
+    return query.execBatch();
 }
 
-void DatabaseOperation::removeNotes(const QList<NoteItem*>& notes)
+bool DatabaseOperation::removeNotes(const QList<NoteItem*>& notes)
 {
     QVariantList guids;
     foreach (NoteItem* note, notes)
@@ -382,8 +388,7 @@ void DatabaseOperation::removeNotes(const QList<NoteItem*>& notes)
 
     QSqlQuery query("DELETE FROM Notes WHERE guid=?");
     query.addBindValue(guids);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::removeNotes():" << notes.count() << res;
+    return query.execBatch();
 }
 
 QList<TagItem*> DatabaseOperation::loadTags()
@@ -404,11 +409,10 @@ QList<TagItem*> DatabaseOperation::loadTags()
             tags += item;
         }
     }
-    qDebug() << "DatabaseOperation::loadTags():" << tags.count();
     return tags;
 }
 
-void DatabaseOperation::saveTags(const QList<TagItem*>& tags)
+bool DatabaseOperation::saveTags(const QList<TagItem*>& tags)
 {
     QVariantList guids, names, parents, usns;
     foreach (TagItem* tag, tags) {
@@ -423,11 +427,10 @@ void DatabaseOperation::saveTags(const QList<TagItem*>& tags)
     query.addBindValue(names);
     query.addBindValue(parents);
     query.addBindValue(usns);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::saveTags():" << tags.count() << res;
+    return query.execBatch();
 }
 
-void DatabaseOperation::removeTags(const QList<TagItem*>& tags)
+bool DatabaseOperation::removeTags(const QList<TagItem*>& tags)
 {
     QVariantList guids;
     foreach (TagItem* tag, tags)
@@ -435,6 +438,5 @@ void DatabaseOperation::removeTags(const QList<TagItem*>& tags)
 
     QSqlQuery query("DELETE FROM Tags WHERE guid=?");
     query.addBindValue(guids);
-    bool res = query.execBatch();
-    qDebug() << "DatabaseOperation::removeTags():" << tags.count() << res;
+    return query.execBatch();
 }

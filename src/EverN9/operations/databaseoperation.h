@@ -51,24 +51,24 @@ protected:
 
 private:
     QList<NotebookItem*> loadNotebooks();
-    void saveNotebooks(const QList<NotebookItem*>& notebooks);
-    void removeNotebooks(const QList<NotebookItem*>& notebooks);
+    bool saveNotebooks(const QList<NotebookItem*>& notebooks);
+    bool removeNotebooks(const QList<NotebookItem*>& notebooks);
 
     QList<ResourceItem*> loadResources();
-    void saveResources(const QList<ResourceItem*>& resources);
-    void removeResources(const QList<ResourceItem*>& resources);
+    bool saveResources(const QList<ResourceItem*>& resources);
+    bool removeResources(const QList<ResourceItem*>& resources);
 
     QList<SearchItem*> loadSearches();
-    void saveSearches(const QList<SearchItem*>& searches);
-    void removeSearches(const QList<SearchItem*>& searches);
+    bool saveSearches(const QList<SearchItem*>& searches);
+    bool removeSearches(const QList<SearchItem*>& searches);
 
     QList<NoteItem*> loadNotes();
-    void saveNotes(const QList<NoteItem*>& notes);
-    void removeNotes(const QList<NoteItem*>& notes);
+    bool saveNotes(const QList<NoteItem*>& notes);
+    bool removeNotes(const QList<NoteItem*>& notes);
 
     QList<TagItem*> loadTags();
-    void saveTags(const QList<TagItem*>& tags);
-    void removeTags(const QList<TagItem*>& tags);
+    bool saveTags(const QList<TagItem*>& tags);
+    bool removeTags(const QList<TagItem*>& tags);
 
     QList<NotebookItem*> m_notebooks;
     QList<ResourceItem*> m_resources;

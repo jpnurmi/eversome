@@ -2,7 +2,7 @@ Source: evern9
 Section: user/other
 Priority: optional
 Maintainer: Stanislav Dombrovsky <yeswolf@gmail.com>
-Build-Depends: debhelper (>= 5), libqt4-dev
+Build-Depends: debhelper (>= 5), libqt4-dev, libaccounts-qt-dev, libsignon-qt-dev
 Standards-Version: 3.7.3
 Homepage: http://projects.developer.nokia.com/evernote
 
@@ -10,7 +10,7 @@ Package: evern9
 Architecture: any
 Replaces: evernote
 Conflicts: evernote
-Depends: ${shlibs:Depends}, ${misc:Depends}, evernote-sharing, imagemagick
+Depends: ${shlibs:Depends}, ${misc:Depends}, evernote-sharing, accounts-ui, libsignon-qt0, imagemagick
 Description: Evernote client for Meego
  Evernote client for Meego
 XSBC-Maemo-Display-Name: EverN9

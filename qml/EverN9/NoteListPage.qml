@@ -27,11 +27,33 @@ CommonPage {
             highlighted: index % 2
             note: modelData
             onClicked: pageStack.push(notePage, {note: modelData})
+            onPressAndHold: {
+                var menu = noteMenu.createObject(root, {note: modelData});
+                menu.open();
+            }
         }
     }
 
     Component {
         id: notePage
         NotePage { }
+    }
+
+    Component {
+        id: noteMenu
+        ContextMenu {
+            id: menu
+            property Note note
+            MenuLayout {
+                MenuItem {
+                    text: qsTr("Delete")
+                    onClicked: NoteStore.deleteNote(note.data())
+                }
+            }
+            onStatusChanged: {
+                if (status === DialogStatus.Closing)
+                    menu.destroy(1000);
+            }
+        }
     }
 }

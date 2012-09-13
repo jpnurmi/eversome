@@ -26,8 +26,13 @@ public:
     ~NoteOperation();
 
 signals:
+    void noteCreated(const evernote::edam::Note& note);
+    void noteDeleted(const evernote::edam::Note& note);
     void noteFetched(const evernote::edam::Note& note);
     void resourceFetched(const evernote::edam::Resource& resource);
+    void noteShared(const evernote::edam::Note& note);
+    void noteUnshared(const evernote::edam::Note& note);
+    void noteUpdated(const evernote::edam::Note& note);
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);

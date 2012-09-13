@@ -39,9 +39,12 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
     {
         case CreateNote:
             client.createNote(m_note, token, m_note);
+            emit noteCreated(m_note);
             break;
         case DeleteNote:
             usn = client.deleteNote(token, m_note.guid);
+            m_note.active = false;
+            emit noteDeleted(m_note);
             break;
         case GetNote:
             client.getNoteContent(m_note.content, token, m_note.guid);
@@ -54,12 +57,15 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
             break;
         case ShareNote:
             client.shareNote(key, token, m_note.guid);
+            emit noteShared(m_note);
             break;
         case UnshareNote:
             client.stopSharingNote(token, m_note.guid);
+            emit noteUnshared(m_note);
             break;
         case UpdateNote:
             client.updateNote(m_note, token, m_note);
+            emit noteUpdated(m_note);
             break;
         default:
             Q_ASSERT(false);

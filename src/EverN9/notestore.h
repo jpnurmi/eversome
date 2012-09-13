@@ -69,8 +69,13 @@ signals:
                   const QVector<std::string>& notes,
                   const QVector<std::string>& tags);
 
-    void resourceFetched(const evernote::edam::Resource& resource);
+    void noteCreated(const evernote::edam::Note& note);
+    void noteDeleted(const evernote::edam::Note& note);
     void noteFetched(const evernote::edam::Note& note);
+    void resourceFetched(const evernote::edam::Resource& resource);
+    void noteShared(const evernote::edam::Note& note);
+    void noteUnshared(const evernote::edam::Note& note);
+    void noteUpdated(const evernote::edam::Note& note);
 
     void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 
@@ -79,7 +84,6 @@ private slots:
     void setCurrentTime(const QDateTime& time);
 
 private:
-    void startNoteOperation(const evernote::edam::Note& note, Operation::Mode mode);
     void startNotebookOperation(const evernote::edam::Notebook& notebook, Operation::Mode mode);
     void setupOperation(NetworkOperation* operation) const;
 

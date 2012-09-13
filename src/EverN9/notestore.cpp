@@ -115,32 +115,64 @@ void NoteStore::search(const edam::SavedSearch& search)
 
 void NoteStore::createNote(const edam::Note& note)
 {
-    startNoteOperation(note, Operation::CreateNote);
+    NoteOperation* operation = new NoteOperation(note, Operation::CreateNote);
+    connect(operation, SIGNAL(noteCreated(evernote::edam::Note)),
+                 this, SIGNAL(noteCreated(evernote::edam::Note)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::createNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::deleteNote(const edam::Note& note)
 {
-    startNoteOperation(note, Operation::DeleteNote);
+    NoteOperation* operation = new NoteOperation(note, Operation::DeleteNote);
+    connect(operation, SIGNAL(noteDeleted(evernote::edam::Note)),
+                 this, SIGNAL(noteDeleted(evernote::edam::Note)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::deleteNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::getNote(const edam::Note& note)
 {
-    startNoteOperation(note, Operation::GetNote);
+    NoteOperation* operation = new NoteOperation(note, Operation::GetNote);
+    connect(operation, SIGNAL(noteFetched(evernote::edam::Note)),
+                 this, SIGNAL(noteFetched(evernote::edam::Note)));
+    connect(operation, SIGNAL(resourceFetched(evernote::edam::Resource)),
+                 this, SIGNAL(resourceFetched(evernote::edam::Resource)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::getNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::shareNote(const edam::Note& note)
 {
-    startNoteOperation(note, Operation::ShareNote);
+    NoteOperation* operation = new NoteOperation(note, Operation::ShareNote);
+    connect(operation, SIGNAL(noteShared(evernote::edam::Note)),
+                 this, SIGNAL(noteShared(evernote::edam::Note)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::shareNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::unshareNote(const edam::Note& note)
 {
-    startNoteOperation(note, Operation::UnshareNote);
+    NoteOperation* operation = new NoteOperation(note, Operation::UnshareNote);
+    connect(operation, SIGNAL(noteUnshared(evernote::edam::Note)),
+                 this, SIGNAL(noteUnshared(evernote::edam::Note)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::unshareNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::updateNote(const edam::Note& note)
 {
-    startNoteOperation(note, Operation::UpdateNote);
+    NoteOperation* operation = new NoteOperation(note, Operation::UpdateNote);
+    connect(operation, SIGNAL(noteUpdated(evernote::edam::Note)),
+                 this, SIGNAL(noteUpdated(evernote::edam::Note)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::updateNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::createNotebook(const edam::Notebook& notebook)
@@ -174,18 +206,6 @@ void NoteStore::setCurrentTime(const QDateTime& val)
         QSettings().setValue("time", val);
         emit currentTimeChanged();
     }
-}
-
-void NoteStore::startNoteOperation(const edam::Note& note, Operation::Mode mode)
-{
-    NoteOperation* operation = new NoteOperation(note, mode);
-    connect(operation, SIGNAL(noteFetched(evernote::edam::Note)),
-                 this, SIGNAL(noteFetched(evernote::edam::Note)));
-    connect(operation, SIGNAL(resourceFetched(evernote::edam::Resource)),
-                 this, SIGNAL(resourceFetched(evernote::edam::Resource)));
-    setupOperation(operation);
-    qDebug() << "NoteStore::startNoteOperation():" << operation;
-    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::startNotebookOperation(const edam::Notebook& notebook, Operation::Mode mode)

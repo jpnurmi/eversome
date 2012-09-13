@@ -73,6 +73,7 @@ private slots:
 
     void onResourceFetched(const evernote::edam::Resource& resource);
     void onNoteFetched(const evernote::edam::Note& note);
+    void onNoteDeleted(const evernote::edam::Note& note);
 
     void onFileWritten(const QString& guid, const QString& filePath);
 

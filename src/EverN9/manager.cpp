@@ -54,6 +54,8 @@ Manager::Manager(Session* session) : QObject(session)
                this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
     connect(m_store, SIGNAL(noteFetched(evernote::edam::Note)),
                this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(noteDeleted(evernote::edam::Note)),
+               this, SLOT(onNoteDeleted(evernote::edam::Note)), Qt::QueuedConnection);
     connect(m_store, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
                this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)), Qt::QueuedConnection);
 
@@ -263,6 +265,15 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
     if (item) {
         item->setData(note);
         m_files->write(item->guid(), item->filePath(false), item->html().toUtf8());
+        m_database->save(item);
+    }
+}
+
+void Manager::onNoteDeleted(const evernote::edam::Note& note)
+{
+    NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
+    if (item) {
+        item->setData(note);
         m_database->save(item);
     }
 }

@@ -21,6 +21,9 @@ CommonDelegate {
 
     property Note note
 
+    visible: !!note && note.isActive
+    height: visible ? preferredHeight : 0
+
     Label {
         id: nameLabel
 

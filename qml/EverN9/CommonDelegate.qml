@@ -26,7 +26,9 @@ BorderImage {
     signal pressAndHold()
 
     width: parent.width
-    height: container.height + 2 * UI.LARGE_SPACING
+    height: preferredHeight
+
+    property real preferredHeight: container.height + 2 * UI.LARGE_SPACING
 
     border.top: 8
     border.left: 16

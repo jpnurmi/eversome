@@ -46,6 +46,10 @@ CommonPage {
             property Note note
             MenuLayout {
                 MenuItem {
+                    text: qsTr("Edit")
+                    onClicked: Qt.openUrlExternally("https://www.evernote.com/mobile/EditNote.action?noteGuid=" + note.guid)
+                }
+                MenuItem {
                     text: qsTr("Delete")
                     onClicked: NoteStore.deleteNote(note.data())
                 }

@@ -63,7 +63,7 @@ void Database::load(QObject* parent)
     QThreadPool::globalInstance()->start(operation);
 }
 
-void Database::save(NotebookItem* notebook)
+void Database::saveNotebook(NotebookItem* notebook)
 {
     save(QList<NotebookItem*>() << notebook,
          QList<ResourceItem*>(),
@@ -72,7 +72,7 @@ void Database::save(NotebookItem* notebook)
          QList<TagItem*>());
 }
 
-void Database::save(ResourceItem* resource)
+void Database::saveResource(ResourceItem* resource)
 {
     save(QList<NotebookItem*>(),
          QList<ResourceItem*>() << resource,
@@ -81,7 +81,7 @@ void Database::save(ResourceItem* resource)
          QList<TagItem*>());
 }
 
-void Database::save(SearchItem* search)
+void Database::saveSearch(SearchItem* search)
 {
     save(QList<NotebookItem*>(),
          QList<ResourceItem*>(),
@@ -90,7 +90,7 @@ void Database::save(SearchItem* search)
          QList<TagItem*>());
 }
 
-void Database::save(NoteItem* note)
+void Database::saveNote(NoteItem* note)
 {
     save(QList<NotebookItem*>(),
          QList<ResourceItem*>(),
@@ -99,7 +99,7 @@ void Database::save(NoteItem* note)
          QList<TagItem*>());
 }
 
-void Database::save(TagItem* tag)
+void Database::saveTag(TagItem* tag)
 {
     save(QList<NotebookItem*>(),
          QList<ResourceItem*>(),
@@ -120,7 +120,7 @@ void Database::save(const QList<NotebookItem*>& notebooks,
     QThreadPool::globalInstance()->start(operation);
 }
 
-void Database::remove(NotebookItem* notebook)
+void Database::removeNotebook(NotebookItem* notebook)
 {
     remove(QList<NotebookItem*>() << notebook,
            QList<SearchItem*>(),
@@ -128,7 +128,7 @@ void Database::remove(NotebookItem* notebook)
            QList<TagItem*>());
 }
 
-void Database::remove(SearchItem* search)
+void Database::removeSearch(SearchItem* search)
 {
     remove(QList<NotebookItem*>(),
            QList<SearchItem*>() << search,
@@ -136,7 +136,7 @@ void Database::remove(SearchItem* search)
            QList<TagItem*>());
 }
 
-void Database::remove(NoteItem* note)
+void Database::removeNote(NoteItem* note)
 {
     remove(QList<NotebookItem*>(),
            QList<SearchItem*>(),
@@ -144,7 +144,7 @@ void Database::remove(NoteItem* note)
            QList<TagItem*>());
 }
 
-void Database::remove(TagItem* tag)
+void Database::removeTag(TagItem* tag)
 {
     remove(QList<NotebookItem*>(),
            QList<SearchItem*>(),

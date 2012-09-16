@@ -35,21 +35,21 @@ public:
 
     void load(QObject* parent = 0);
 
-    void save(NotebookItem* notebook);
-    void save(ResourceItem* resource);
-    void save(SearchItem* search);
-    void save(NoteItem* note);
-    void save(TagItem* tag);
+    Q_INVOKABLE void saveNotebook(NotebookItem* notebook);
+    Q_INVOKABLE void saveResource(ResourceItem* resource);
+    Q_INVOKABLE void saveSearch(SearchItem* search);
+    Q_INVOKABLE void saveNote(NoteItem* note);
+    Q_INVOKABLE void saveTag(TagItem* tag);
     void save(const QList<NotebookItem*>& notebooks,
               const QList<ResourceItem*>& resources,
               const QList<SearchItem*>& searches,
               const QList<NoteItem*>& notes,
               const QList<TagItem*>& tags);
 
-    void remove(NotebookItem* notebook);
-    void remove(SearchItem* search);
-    void remove(NoteItem* note);
-    void remove(TagItem* tag);
+    Q_INVOKABLE void removeNotebook(NotebookItem* notebook);
+    Q_INVOKABLE void removeSearch(SearchItem* search);
+    Q_INVOKABLE void removeNote(NoteItem* note);
+    Q_INVOKABLE void removeTag(TagItem* tag);
     void remove(const QList<NotebookItem*>& notebooks,
                 const QList<SearchItem*>& searches,
                 const QList<NoteItem*>& notes,

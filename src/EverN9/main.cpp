@@ -17,6 +17,7 @@
 
 #include "filesystem.h"
 #include "notestore.h"
+#include "database.h"
 #include "account.h"
 #include "session.h"
 #include "manager.h"
@@ -78,6 +79,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     QmlApplicationViewer viewer;
     viewer.rootContext()->setContextProperty("Session", &session);
     viewer.rootContext()->setContextProperty("Manager", manager);
+    viewer.rootContext()->setContextProperty("Database", manager->database());
     viewer.rootContext()->setContextProperty("NoteStore", manager->noteStore());
     viewer.rootContext()->setContextProperty("Notebooks", manager->notebookModel());
     viewer.rootContext()->setContextProperty("Searches", manager->searchModel());

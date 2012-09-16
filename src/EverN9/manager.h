@@ -41,6 +41,7 @@ public:
     bool isBusy() const;
 
     NoteStore* noteStore() const;
+    Database* database() const;
 
     ItemModel* notebookModel() const;
     ItemModel* resourceModel() const;

@@ -119,6 +119,11 @@ NoteStore* Manager::noteStore() const
     return m_store;
 }
 
+Database* Manager::database() const
+{
+    return m_database;
+}
+
 ItemModel* Manager::notebookModel() const
 {
     return m_notebooks;

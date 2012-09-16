@@ -145,6 +145,15 @@ void NoteStore::getNote(const edam::Note& note)
     QThreadPool::globalInstance()->start(operation);
 }
 
+void NoteStore::moveNote(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook)
+{
+    evernote::edam::Note tmp;
+    tmp.guid = note.guid;
+    tmp.title = note.title;
+    tmp.notebookGuid = notebook.guid;
+    updateNote(tmp);
+}
+
 void NoteStore::shareNote(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, Operation::ShareNote);

@@ -41,11 +41,54 @@ CommonPage {
 
     Component {
         id: noteMenu
-        NoteMenu {
+        ContextMenu {
             id: menu
+
+            property Note note
+
+            MenuLayout {
+                MenuItem {
+                    text: qsTr("Edit")
+                    onClicked: Qt.openUrlExternally("https://www.evernote.com/mobile/EditNote.action?noteGuid=" + note.guid)
+                }
+                MenuItem {
+                    text: qsTr("Move")
+                    onClicked: {
+                        var dialog = notebookDialog.createObject(root, {note: note});
+                        dialog.open();
+                    }
+                }
+                MenuItem {
+                    text: qsTr("Delete")
+                    onClicked: NoteStore.deleteNote(note.data())
+                }
+            }
+
             onStatusChanged: {
-                if (status === DialogStatus.Closing)
+               if (status === DialogStatus.Closing)
                     menu.destroy(1000);
+            }
+        }
+    }
+
+    Component {
+        id: notebookDialog
+        SelectionDialog {
+            id: dialog
+
+            property Note note
+
+            onAccepted: {
+                if (selectedIndex !== -1)
+                    NoteStore.moveNote(note.data(), Notebooks.at(selectedIndex).data())
+                dialog.destroy(1000);
+            }
+
+            onRejected: dialog.destroy(1000)
+
+            Component.onCompleted: {
+                for (var i = 0; i < Notebooks.count; ++i)
+                    dialog.model.append({name: Notebooks.at(i).name})
             }
         }
     }

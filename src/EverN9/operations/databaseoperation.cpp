@@ -78,7 +78,7 @@ void DatabaseOperation::operate()
                 queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER, usn INTEGER)";
                 queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT, hash TEXT, usn INTEGER)";
                 queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT, usn INTEGER)";
-                queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, usn INTEGER)";
+                queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, unread INTEGER, usn INTEGER)";
                 queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT, usn INTEGER)";
                 foreach (const QString& query, queries)
                     db.exec(query);
@@ -335,6 +335,7 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
             note.updateSequenceNum = record.value("usn").toInt();
 
             NoteItem* item = new NoteItem(note);
+            item->setUnread(record.value("unread").toBool());
             item->moveToThread(thread());
             notes += item;
         }
@@ -345,7 +346,7 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
 bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
 {
     QVariantList guids, titles, creates, updates, deletes,
-                 actives, notebooks, tags, resources, usns;
+                 actives, notebooks, tags, resources, unreads, usns;
     foreach (NoteItem* note, notes) {
         const evernote::edam::Note& data = note->data();
         guids += note->guid();
@@ -363,10 +364,11 @@ bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
         for (uint i = 0; i < data.resources.size(); ++i)
             resourceGuids += QString::fromStdString(data.resources.at(i).guid);
         resources += resourceGuids.join(";");
+        unreads += note->isUnread();
         usns += note->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?,?)");
     query.addBindValue(guids);
     query.addBindValue(titles);
     query.addBindValue(creates);
@@ -376,6 +378,7 @@ bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
     query.addBindValue(notebooks);
     query.addBindValue(tags);
     query.addBindValue(resources);
+    query.addBindValue(unreads);
     query.addBindValue(usns);
     return query.execBatch();
 }

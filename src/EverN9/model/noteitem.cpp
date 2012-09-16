@@ -17,7 +17,7 @@
 #include <QDir>
 
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
-    : QObject(parent), m_empty(false), m_note(note)
+    : QObject(parent), m_empty(false), m_unread(true), m_note(note)
 {
     m_tags = new ItemModel(this);
     m_resources = new ItemModel(this);
@@ -104,6 +104,19 @@ QString NoteItem::html() const
         "</html>";
     return str.arg("/opt/EverN9/qml/EverN9/script/note.js")
               .arg(QString::fromStdString(m_note.content));
+}
+
+bool NoteItem::isUnread() const
+{
+    return m_unread;
+}
+
+void NoteItem::setUnread(bool unread)
+{
+    if (m_unread != unread) {
+        m_unread = unread;
+        emit unreadChanged();
+    }
 }
 
 void NoteItem::update()

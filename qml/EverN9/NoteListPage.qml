@@ -24,7 +24,6 @@ CommonPage {
     flickable: ListView {
         model: notes
         delegate: NoteDelegate {
-            highlighted: index % 2
             note: modelData
             onClicked: pageStack.push(notePage, {note: modelData})
             onPressAndHold: {

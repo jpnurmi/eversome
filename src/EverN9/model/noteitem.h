@@ -35,6 +35,7 @@ class NoteItem : public QObject
     Q_PROPERTY(ItemModel* resources READ resources CONSTANT)
     Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
     Q_PROPERTY(QString html READ html NOTIFY dataChanged)
+    Q_PROPERTY(bool unread READ isUnread WRITE setUnread NOTIFY unreadChanged)
 
 public:
     explicit NoteItem(evernote::edam::Note note = evernote::edam::Note(), QObject* parent = 0);
@@ -55,14 +56,19 @@ public:
     int usn() const;
     QString html() const;
 
+    bool isUnread() const;
+    void setUnread(bool unread);
+
     void update();
 
 signals:
     void dataChanged();
     void filePathChanged();
+    void unreadChanged();
 
 private:
     bool m_empty;
+    bool m_unread;
     ItemModel* m_tags;
     ItemModel* m_resources;
     evernote::edam::Note m_note;

@@ -22,6 +22,7 @@ CommonDelegate {
     property Note note
 
     visible: !!note && note.isActive
+    highlighted: !!note && note.unread
     height: visible ? preferredHeight : 0
 
     Label {

@@ -58,9 +58,12 @@ CommonPage {
 
     onNoteChanged: {
         if (note) {
-            note.unread = false;
             if (!note.filePath)
                 NoteStore.getNote(note.data());
+            if (note.unread) {
+                note.unread = false;
+                Database.saveNote(note);
+            }
         }
     }
 }

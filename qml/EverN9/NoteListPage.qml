@@ -51,10 +51,17 @@ CommonPage {
                     onClicked: Qt.openUrlExternally("https://www.evernote.com/mobile/EditNote.action?noteGuid=" + note.guid)
                 }
                 MenuItem {
-                    text: qsTr("Move")
+                    text: qsTr("Move to")
                     onClicked: {
                         var dialog = notebookDialog.createObject(root, {note: note});
                         dialog.open();
+                    }
+                }
+                MenuItem {
+                    text: !!note && note.unread ? qsTr("Mark as read") : qsTr("Mark as unread")
+                    onClicked: {
+                        note.unread = !note.unread;
+                        Database.saveNote(note);
                     }
                 }
                 MenuItem {

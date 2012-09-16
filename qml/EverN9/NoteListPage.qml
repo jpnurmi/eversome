@@ -40,36 +40,12 @@ CommonPage {
 
     Component {
         id: noteMenu
-        ContextMenu {
+        NoteMenu {
             id: menu
-
-            property Note note
-
-            MenuLayout {
-                MenuItem {
-                    text: qsTr("Edit")
-                    onClicked: Qt.openUrlExternally("https://www.evernote.com/mobile/EditNote.action?noteGuid=" + note.guid)
-                }
-                MenuItem {
-                    text: qsTr("Move to")
-                    onClicked: {
-                        var dialog = notebookDialog.createObject(root, {note: note});
-                        dialog.open();
-                    }
-                }
-                MenuItem {
-                    text: !!note && note.unread ? qsTr("Mark as read") : qsTr("Mark as unread")
-                    onClicked: {
-                        note.unread = !note.unread;
-                        Database.saveNote(note);
-                    }
-                }
-                MenuItem {
-                    text: qsTr("Delete")
-                    onClicked: NoteStore.deleteNote(note.data())
-                }
+            onMoving: {
+                var dialog = notebookDialog.createObject(root, {note: note});
+                dialog.open();
             }
-
             onStatusChanged: {
                if (status === DialogStatus.Closing)
                     menu.destroy(1000);
@@ -79,23 +55,10 @@ CommonPage {
 
     Component {
         id: notebookDialog
-        SelectionDialog {
+        NotebookDialog {
             id: dialog
-
-            property Note note
-
-            onAccepted: {
-                if (selectedIndex !== -1)
-                    NoteStore.moveNote(note.data(), Notebooks.at(selectedIndex).data())
-                dialog.destroy(1000);
-            }
-
+            onAccepted: dialog.destroy(1000)
             onRejected: dialog.destroy(1000)
-
-            Component.onCompleted: {
-                for (var i = 0; i < Notebooks.count; ++i)
-                    dialog.model.append({name: Notebooks.at(i).name})
-            }
         }
     }
 }

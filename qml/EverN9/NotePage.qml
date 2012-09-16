@@ -24,6 +24,25 @@ CommonPage {
 
     title: note ? note.title : ""
 
+    menu: NoteMenu {
+        id: menu
+        parent: root
+        note: root.note
+        onMoving: {
+            var dialog = notebookDialog.createObject(root, {note: note});
+            dialog.open();
+        }
+    }
+
+    Component {
+        id: notebookDialog
+        NotebookDialog {
+            id: dialog
+            onAccepted: dialog.destroy(1000)
+            onRejected: dialog.destroy(1000)
+        }
+    }
+
     flickable: FlickableWebView {
         id: flickable
 

@@ -12,7 +12,7 @@
 * GNU General Public License for more details.
 */
 import QtQuick 1.1
-import QtWebKit 1.0
+import QtWebKit 1.1
 import com.nokia.meego 1.0
 import com.evernote.types 1.0
 import "UIConstants.js" as UI
@@ -24,52 +24,23 @@ CommonPage {
 
     title: note ? note.title : ""
 
-    flickable: Flickable {
+    flickable: FlickableWebView {
         id: flickable
 
-        contentWidth: webView.width
-        contentHeight: webView.height
+        webView.url: note ? note.filePath : ""
+        webView.backgroundColor: "transparent"
 
-        PinchArea {
-            property double startScale
-
-            width: webView.width
-            height: webView.height
-
-            function zoom(scale) {
-                var newScale = startScale + Math.log(scale) / Math.log(2);
-                if (webView.width > flickable.width || newScale > startScale)
-                    webView.contentsScale = newScale;
-            }
-
-            onPinchStarted: startScale = webView.contentsScale
-            onPinchUpdated: zoom(pinch.scale)
-            onPinchFinished: zoom(pinch.scale)
-
-            WebView {
-                id: webView
-
-                javaScriptWindowObjects: QtObject {
-                    WebView.windowObjectName: "Qt"
-                    function openUrlExternally(url) {
-                        Qt.openUrlExternally(url);
-                    }
-                }
-
-                url: note ? note.filePath : ""
-
-                preferredWidth: flickable.width
-                preferredHeight: flickable.height
-
-                settings.defaultFontSize: UI.MEDIUM_FONT
-                settings.javascriptCanOpenWindows: true
-                settings.javascriptEnabled: true;
-                settings.pluginsEnabled: true
-
-                contentsScale: 1.0
-                onDoubleClick: contentsScale = flickable.width / webView.width
+        webView.javaScriptWindowObjects: QtObject {
+            WebView.windowObjectName: "qml"
+            function openUrlExternally(url) {
+                Qt.openUrlExternally(url);
             }
         }
+
+        webView.settings.pluginsEnabled: true
+        webView.settings.javascriptEnabled: true
+        webView.settings.printElementBackgrounds: false
+        webView.settings.defaultFontSize: UI.MEDIUM_FONT
     }
 
     Repeater {
@@ -79,7 +50,7 @@ CommonPage {
                 target: modelData
                 onFilePathChanged: {
                     if (modelData.filePath)
-                        webView.evaluateJavaScript("handleResource('foobar', '" + modelData.hash + "', '" + modelData.filePath + "')");
+                        flickable.webView.evaluateJavaScript("handleResource('foobar', '" + modelData.hash + "', '" + modelData.filePath + "')");
                 }
             }
         }

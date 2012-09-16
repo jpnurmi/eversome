@@ -7,7 +7,7 @@ function handleResource(name, hash, filePath) {
                 if (element.getAttribute("type").indexOf("image") != -1)
                     element.innerHTML = "<img alt='" + name + "' src='" + filePath + "'/>";
                 else
-                    element.innerHTML = "<a href='#' onclick=\"window.Qt.openUrlExternally('" + filePath + "');\">" + name + "</a>";
+                    element.innerHTML = "<a href='#' onclick=\"window.qml.openUrlExternally('" + filePath + "');\">" + name + "</a>";
             }
         }
     }

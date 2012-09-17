@@ -57,6 +57,9 @@ public slots:
 
 signals:
     void countChanged();
+    void added(QObject* item);
+    void added(const QObjectList& items);
+    void removed(QObject* item);
 
 private:
     QList<QObject*> m_items;

@@ -45,6 +45,7 @@ bool ItemModel::add(T item)
         m_items += item;
         endInsertRows();
         emit countChanged();
+        emit added(item);
         return true;
     } else {
         replace(item);
@@ -73,6 +74,7 @@ bool ItemModel::add(const QList<T>& items)
         m_items += unique;
         endInsertRows();
         emit countChanged();
+        emit added(unique);
         return true;
     }
     return false;
@@ -87,6 +89,8 @@ bool ItemModel::replace(T item)
         int idx = m_items.indexOf(old);
         m_items.replace(idx, item);
         emit dataChanged(index(idx), index(idx));
+        emit removed(old);
+        emit added(item);
         old->deleteLater();
         return true;
     }
@@ -104,6 +108,7 @@ bool ItemModel::remove(T item)
         m_items.removeAt(idx);
         endRemoveRows();
         emit countChanged();
+        emit removed(item);
         return true;
     }
     return false;

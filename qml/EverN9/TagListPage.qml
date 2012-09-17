@@ -23,14 +23,28 @@ CommonPage {
     flickable: ListView {
         model: Tags
         delegate: TagDelegate {
-            highlighted: index % 2
             tag: modelData
             onClicked: pageStack.push(noteListPage, {title: tag.name, container: tag})
+            onPressAndHold: {
+                var menu = noteListMenu.createObject(root, {container: tag});
+                menu.open();
+            }
         }
     }
 
     Component {
         id: noteListPage
         NoteListPage { }
+    }
+
+    Component {
+        id: noteListMenu
+        NoteListMenu {
+            id: menu
+            onStatusChanged: {
+               if (status === DialogStatus.Closing)
+                    menu.destroy(1000);
+            }
+        }
     }
 }

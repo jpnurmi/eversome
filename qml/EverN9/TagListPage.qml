@@ -25,7 +25,7 @@ CommonPage {
         delegate: TagDelegate {
             highlighted: index % 2
             tag: modelData
-            onClicked: pageStack.push(noteListPage, {title: tag.name, notes: tag.notes})
+            onClicked: pageStack.push(noteListPage, {title: tag.name, container: tag})
         }
     }
 

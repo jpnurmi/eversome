@@ -19,10 +19,16 @@ import "UIConstants.js" as UI
 CommonPage {
     id: root
 
-    property ItemModel notes
+    property QtObject container
+
+    menu: NoteListMenu {
+        id: menu
+        parent: root
+        container: root.container
+    }
 
     flickable: ListView {
-        model: notes
+        model: container ? container.notes : 0
         delegate: NoteDelegate {
             note: modelData
             onClicked: pageStack.push(notePage, {note: modelData})

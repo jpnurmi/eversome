@@ -27,7 +27,7 @@ CommonPage {
             search: modelData
             onClicked: {
                 NoteStore.search(search.search());
-                pageStack.push(noteListPage, {title: search.name, notes: search.notes})
+                pageStack.push(noteListPage, {title: search.name, container: search})
             }
         }
     }

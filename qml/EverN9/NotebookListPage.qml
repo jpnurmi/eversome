@@ -24,12 +24,27 @@ CommonPage {
         model: Notebooks
         delegate: NotebookDelegate {
             notebook: modelData
-            onClicked: pageStack.push(noteListPage, {title: notebook.name, notes: notebook.notes})
+            onClicked: pageStack.push(noteListPage, {title: notebook.name, container: notebook})
+            onPressAndHold: {
+                var menu = noteListMenu.createObject(root, {container: notebook});
+                menu.open();
+            }
         }
     }
 
     Component {
         id: noteListPage
         NoteListPage { }
+    }
+
+    Component {
+        id: noteListMenu
+        NoteListMenu {
+            id: menu
+            onStatusChanged: {
+               if (status === DialogStatus.Closing)
+                    menu.destroy(1000);
+            }
+        }
     }
 }

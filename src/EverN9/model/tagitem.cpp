@@ -12,11 +12,16 @@
 * GNU General Public License for more details.
 */
 #include "tagitem.h"
+#include "noteitem.h"
 
 TagItem::TagItem(evernote::edam::Tag tag, QObject* parent)
     : QObject(parent), m_tag(tag)
 {
     m_notes = new ItemModel(this);
+    connect(m_notes, SIGNAL(countChanged()), this, SIGNAL(unreadChanged()));
+    connect(m_notes, SIGNAL(added(QObject*)), this, SLOT(onNoteAdded(QObject*)));
+    connect(m_notes, SIGNAL(added(QObjectList)), this, SLOT(onNotesAdded(QObjectList)));
+    connect(m_notes, SIGNAL(removed(QObject*)), this, SLOT(onNoteRemoved(QObject*)));
 }
 
 TagItem::~TagItem()
@@ -57,6 +62,37 @@ ItemModel* TagItem::notes() const
 int TagItem::usn() const
 {
     return m_tag.updateSequenceNum;
+}
+
+bool TagItem::isUnread() const
+{
+    foreach (NoteItem* note, m_notes->items<NoteItem*>()) {
+        if (note->isUnread())
+            return true;
+    }
+    return false;
+}
+
+void TagItem::setUnread(bool unread)
+{
+    foreach (NoteItem* note, m_notes->items<NoteItem*>())
+        note->setUnread(unread);
+}
+
+void TagItem::onNoteAdded(QObject* note)
+{
+    connect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
+}
+
+void TagItem::onNotesAdded(const QObjectList& notes)
+{
+    foreach (QObject* note, notes)
+        connect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
+}
+
+void TagItem::onNoteRemoved(QObject* note)
+{
+    disconnect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
 }
 
 QDebug operator<<(QDebug debug, const TagItem* item)

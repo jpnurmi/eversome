@@ -23,11 +23,14 @@ CommonPage {
     flickable: ListView {
         model: Searches
         delegate: SearchDelegate {
-            highlighted: index % 2
             search: modelData
             onClicked: {
-                NoteStore.search(search.search());
+                NoteStore.search(search.data());
                 pageStack.push(noteListPage, {title: search.name, container: search})
+            }
+            onPressAndHold: {
+                var menu = noteListMenu.createObject(root, {container: search});
+                menu.open();
             }
         }
     }
@@ -35,5 +38,16 @@ CommonPage {
     Component {
         id: noteListPage
         NoteListPage { }
+    }
+
+    Component {
+        id: noteListMenu
+        NoteListMenu {
+            id: menu
+            onStatusChanged: {
+               if (status === DialogStatus.Closing)
+                    menu.destroy(1000);
+            }
+        }
     }
 }

@@ -21,6 +21,8 @@ CommonDelegate {
 
     property Search search
 
+    highlighted: !!search && search.unread
+
     Label {
         id: nameLabel
 

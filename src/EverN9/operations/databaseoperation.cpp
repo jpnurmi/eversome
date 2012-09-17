@@ -29,6 +29,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariant>
+#include <QThread>
 #include <QDebug>
 #include <QDir>
 
@@ -36,6 +37,19 @@ static QString databaseName()
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
     return dir.absoluteFilePath(QApplication::applicationName() + ".db");
+}
+
+static QSqlDatabase currentDatabase()
+{
+    QString id = QString::number(QThread::currentThreadId());
+    QSqlDatabase db = QSqlDatabase::database(id);
+    if (!db.isValid()) {
+        db = QSqlDatabase::addDatabase("QSQLITE", id);
+        db.setDatabaseName(databaseName());
+        if (!db.open())
+            qCritical() << Q_FUNC_INFO << "CANNOT OPEN" << db.lastError().text();
+    }
+    return db;
 }
 
 DatabaseOperation::DatabaseOperation(Mode mode) : Operation(mode)
@@ -71,24 +85,24 @@ void DatabaseOperation::operate()
     {
         case OpenDatabase:
         {
-            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-            db.setDatabaseName(databaseName());
-            if (db.open()) {
-                QStringList queries;
-                queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER, usn INTEGER)";
-                queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT, hash TEXT, usn INTEGER)";
-                queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT, usn INTEGER)";
-                queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, unread INTEGER, usn INTEGER)";
-                queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT, usn INTEGER)";
-                foreach (const QString& query, queries)
-                    db.exec(query);
-            }
+            QStringList queries;
+            queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER, usn INTEGER)";
+            queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT, hash TEXT, usn INTEGER)";
+            queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT, usn INTEGER)";
+            queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, unread INTEGER, usn INTEGER)";
+            queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT, usn INTEGER)";
+
+            QSqlDatabase db = currentDatabase();
+            foreach (const QString& query, queries)
+                db.exec(query);
             break;
         }
         case CloseDatabase:
         {
-            QSqlDatabase::database().close();
-            QSqlDatabase::removeDatabase(databaseName());
+            foreach (const QString& id, QSqlDatabase::connectionNames()) {
+                QSqlDatabase::database(id).close();
+                QSqlDatabase::removeDatabase(id);
+            }
             break;
         }
         case ResetDatabase:
@@ -100,7 +114,7 @@ void DatabaseOperation::operate()
             queries += "DELETE FROM Notes";
             queries += "DELETE FROM Tags";
 
-            QSqlDatabase db = QSqlDatabase::database();
+            QSqlDatabase db = currentDatabase();
             foreach (const QString& query, queries)
                 db.exec(query);
             break;
@@ -108,31 +122,34 @@ void DatabaseOperation::operate()
         case LoadDatabase:
         {
             operation = "loaded...";
-            m_notebooks = loadNotebooks();
-            m_resources = loadResources();
-            m_searches = loadSearches();
-            m_notes = loadNotes();
-            m_tags = loadTags();
+            QSqlDatabase db = currentDatabase();
+            m_notebooks = loadNotebooks(db);
+            m_resources = loadResources(db);
+            m_searches = loadSearches(db);
+            m_notes = loadNotes(db);
+            m_tags = loadTags(db);
             emit loaded(m_notebooks, m_resources, m_searches, m_notes, m_tags);
             break;
         }
         case SaveDatabase:
         {
             operation = "saved...";
-            saveNotebooks(m_notebooks);
-            saveResources(m_resources);
-            saveSearches(m_searches);
-            saveNotes(m_notes);
-            saveTags(m_tags);
+            QSqlDatabase db = currentDatabase();
+            saveNotebooks(m_notebooks, db);
+            saveResources(m_resources, db);
+            saveSearches(m_searches, db);
+            saveNotes(m_notes, db);
+            saveTags(m_tags, db);
             break;
         }
         case RemoveDatabase:
         {
             operation = "removed...";
-            removeNotebooks(m_notebooks);
-            removeSearches(m_searches);
-            removeNotes(m_notes);
-            removeTags(m_tags);
+            QSqlDatabase db = currentDatabase();
+            removeNotebooks(m_notebooks, db);
+            removeSearches(m_searches, db);
+            removeNotes(m_notes, db);
+            removeTags(m_tags, db);
             break;
         }
         default:
@@ -149,10 +166,10 @@ void DatabaseOperation::operate()
                  << "T:" << m_tags.count();
 }
 
-QList<NotebookItem*> DatabaseOperation::loadNotebooks()
+QList<NotebookItem*> DatabaseOperation::loadNotebooks(QSqlDatabase db)
 {
     QList<NotebookItem*> notebooks;
-    QSqlQuery query("SELECT * FROM Notebooks ORDER BY name ASC");
+    QSqlQuery query("SELECT * FROM Notebooks ORDER BY name ASC", db);
     if (query.exec()) {
         while (query.next()) {
             evernote::edam::Notebook notebook;
@@ -173,7 +190,7 @@ QList<NotebookItem*> DatabaseOperation::loadNotebooks()
     return notebooks;
 }
 
-bool DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
+bool DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks, QSqlDatabase db)
 {
     QVariantList guids, names, defs, pubs, creates, updates, usns;
     foreach (NotebookItem* notebook, notebooks) {
@@ -186,7 +203,7 @@ bool DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
         usns += notebook->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO NoteBooks VALUES(?,?,?,?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO NoteBooks VALUES(?,?,?,?,?,?,?)", db);
     query.addBindValue(guids);
     query.addBindValue(names);
     query.addBindValue(defs);
@@ -197,21 +214,21 @@ bool DatabaseOperation::saveNotebooks(const QList<NotebookItem*>& notebooks)
     return query.execBatch();
 }
 
-bool DatabaseOperation::removeNotebooks(const QList<NotebookItem*>& notebooks)
+bool DatabaseOperation::removeNotebooks(const QList<NotebookItem*>& notebooks, QSqlDatabase db)
 {
     QVariantList guids;
     foreach (NotebookItem* notebook, notebooks)
         guids += notebook->guid();
 
-    QSqlQuery query("DELETE FROM NoteBooks WHERE guid=?");
+    QSqlQuery query("DELETE FROM NoteBooks WHERE guid=?", db);
     query.addBindValue(guids);
     return query.execBatch();
 }
 
-QList<ResourceItem*> DatabaseOperation::loadResources()
+QList<ResourceItem*> DatabaseOperation::loadResources(QSqlDatabase db)
 {
     QList<ResourceItem*> resources;
-    QSqlQuery query("SELECT * FROM Resources");
+    QSqlQuery query("SELECT * FROM Resources", db);
     if (query.exec()) {
         while (query.next()) {
             evernote::edam::Resource resource;
@@ -229,7 +246,7 @@ QList<ResourceItem*> DatabaseOperation::loadResources()
     return resources;
 }
 
-bool DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
+bool DatabaseOperation::saveResources(const QList<ResourceItem*>& resources, QSqlDatabase db)
 {
     QVariantList guids, mimes, hashes, usns;
     foreach (ResourceItem* resource, resources) {
@@ -239,7 +256,7 @@ bool DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
         usns += resource->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?,?,?)", db);
     query.addBindValue(guids);
     query.addBindValue(mimes);
     query.addBindValue(hashes);
@@ -247,21 +264,21 @@ bool DatabaseOperation::saveResources(const QList<ResourceItem*>& resources)
     return query.execBatch();
 }
 
-bool DatabaseOperation::removeResources(const QList<ResourceItem*>& resources)
+bool DatabaseOperation::removeResources(const QList<ResourceItem*>& resources, QSqlDatabase db)
 {
     QVariantList guids;
     foreach (ResourceItem* resource, resources)
         guids += resource->guid();
 
-    QSqlQuery query("DELETE FROM Resources WHERE guid=?");
+    QSqlQuery query("DELETE FROM Resources WHERE guid=?", db);
     query.addBindValue(guids);
     return query.execBatch();
 }
 
-QList<SearchItem*> DatabaseOperation::loadSearches()
+QList<SearchItem*> DatabaseOperation::loadSearches(QSqlDatabase db)
 {
     QList<SearchItem*> searches;
-    QSqlQuery query("SELECT * FROM Searches ORDER BY name ASC");
+    QSqlQuery query("SELECT * FROM Searches ORDER BY name ASC", db);
     if (query.exec()) {
         while (query.next()) {
             evernote::edam::SavedSearch search;
@@ -279,7 +296,7 @@ QList<SearchItem*> DatabaseOperation::loadSearches()
     return searches;
 }
 
-bool DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
+bool DatabaseOperation::saveSearches(const QList<SearchItem*>& searches, QSqlDatabase db)
 {
     QVariantList guids, names, queries, usns;
     foreach (SearchItem* search, searches) {
@@ -289,7 +306,7 @@ bool DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
         usns += search->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Searches VALUES(?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Searches VALUES(?,?,?,?)", db);
     query.addBindValue(guids);
     query.addBindValue(names);
     query.addBindValue(queries);
@@ -297,21 +314,21 @@ bool DatabaseOperation::saveSearches(const QList<SearchItem*>& searches)
     return query.execBatch();
 }
 
-bool DatabaseOperation::removeSearches(const QList<SearchItem*>& searches)
+bool DatabaseOperation::removeSearches(const QList<SearchItem*>& searches, QSqlDatabase db)
 {
     QVariantList guids;
     foreach (SearchItem* search, searches)
         guids += search->guid();
 
-    QSqlQuery query("DELETE FROM Searches WHERE guid=?");
+    QSqlQuery query("DELETE FROM Searches WHERE guid=?", db);
     query.addBindValue(guids);
     return query.execBatch();
 }
 
-QList<NoteItem*> DatabaseOperation::loadNotes()
+QList<NoteItem*> DatabaseOperation::loadNotes(QSqlDatabase db)
 {
     QList<NoteItem*> notes;
-    QSqlQuery query("SELECT * FROM Notes");
+    QSqlQuery query("SELECT * FROM Notes", db);
     if (query.exec()) {
         while (query.next()) {
             evernote::edam::Note note;
@@ -343,7 +360,7 @@ QList<NoteItem*> DatabaseOperation::loadNotes()
     return notes;
 }
 
-bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
+bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes, QSqlDatabase db)
 {
     QVariantList guids, titles, creates, updates, deletes,
                  actives, notebooks, tags, resources, unreads, usns;
@@ -368,7 +385,7 @@ bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
         usns += note->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Notes VALUES(?,?,?,?,?,?,?,?,?,?,?)", db);
     query.addBindValue(guids);
     query.addBindValue(titles);
     query.addBindValue(creates);
@@ -383,21 +400,21 @@ bool DatabaseOperation::saveNotes(const QList<NoteItem*>& notes)
     return query.execBatch();
 }
 
-bool DatabaseOperation::removeNotes(const QList<NoteItem*>& notes)
+bool DatabaseOperation::removeNotes(const QList<NoteItem*>& notes, QSqlDatabase db)
 {
     QVariantList guids;
     foreach (NoteItem* note, notes)
         guids += note->guid();
 
-    QSqlQuery query("DELETE FROM Notes WHERE guid=?");
+    QSqlQuery query("DELETE FROM Notes WHERE guid=?", db);
     query.addBindValue(guids);
     return query.execBatch();
 }
 
-QList<TagItem*> DatabaseOperation::loadTags()
+QList<TagItem*> DatabaseOperation::loadTags(QSqlDatabase db)
 {
     QList<TagItem*> tags;
-    QSqlQuery query("SELECT * FROM Tags ORDER BY name ASC");
+    QSqlQuery query("SELECT * FROM Tags ORDER BY name ASC", db);
     if (query.exec()) {
         while (query.next()) {
             evernote::edam::Tag tag;
@@ -415,7 +432,7 @@ QList<TagItem*> DatabaseOperation::loadTags()
     return tags;
 }
 
-bool DatabaseOperation::saveTags(const QList<TagItem*>& tags)
+bool DatabaseOperation::saveTags(const QList<TagItem*>& tags, QSqlDatabase db)
 {
     QVariantList guids, names, parents, usns;
     foreach (TagItem* tag, tags) {
@@ -425,7 +442,7 @@ bool DatabaseOperation::saveTags(const QList<TagItem*>& tags)
         usns += tag->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Tags VALUES(?,?,?,?)");
+    QSqlQuery query("INSERT OR REPLACE INTO Tags VALUES(?,?,?,?)", db);
     query.addBindValue(guids);
     query.addBindValue(names);
     query.addBindValue(parents);
@@ -433,13 +450,13 @@ bool DatabaseOperation::saveTags(const QList<TagItem*>& tags)
     return query.execBatch();
 }
 
-bool DatabaseOperation::removeTags(const QList<TagItem*>& tags)
+bool DatabaseOperation::removeTags(const QList<TagItem*>& tags, QSqlDatabase db)
 {
     QVariantList guids;
     foreach (TagItem* tag, tags)
         guids += tag->guid();
 
-    QSqlQuery query("DELETE FROM Tags WHERE guid=?");
+    QSqlQuery query("DELETE FROM Tags WHERE guid=?", db);
     query.addBindValue(guids);
     return query.execBatch();
 }

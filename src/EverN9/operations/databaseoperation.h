@@ -15,6 +15,7 @@
 #define DATABASEOPERATION_H
 
 #include "operation.h"
+#include <QSqlDatabase>
 #include <QList>
 
 class TagItem;
@@ -50,25 +51,25 @@ protected:
     void operate();
 
 private:
-    QList<NotebookItem*> loadNotebooks();
-    bool saveNotebooks(const QList<NotebookItem*>& notebooks);
-    bool removeNotebooks(const QList<NotebookItem*>& notebooks);
+    QList<NotebookItem*> loadNotebooks(QSqlDatabase db);
+    bool saveNotebooks(const QList<NotebookItem*>& notebooks, QSqlDatabase db);
+    bool removeNotebooks(const QList<NotebookItem*>& notebooks, QSqlDatabase db);
 
-    QList<ResourceItem*> loadResources();
-    bool saveResources(const QList<ResourceItem*>& resources);
-    bool removeResources(const QList<ResourceItem*>& resources);
+    QList<ResourceItem*> loadResources(QSqlDatabase db);
+    bool saveResources(const QList<ResourceItem*>& resources, QSqlDatabase db);
+    bool removeResources(const QList<ResourceItem*>& resources, QSqlDatabase db);
 
-    QList<SearchItem*> loadSearches();
-    bool saveSearches(const QList<SearchItem*>& searches);
-    bool removeSearches(const QList<SearchItem*>& searches);
+    QList<SearchItem*> loadSearches(QSqlDatabase db);
+    bool saveSearches(const QList<SearchItem*>& searches, QSqlDatabase db);
+    bool removeSearches(const QList<SearchItem*>& searches, QSqlDatabase db);
 
-    QList<NoteItem*> loadNotes();
-    bool saveNotes(const QList<NoteItem*>& notes);
-    bool removeNotes(const QList<NoteItem*>& notes);
+    QList<NoteItem*> loadNotes(QSqlDatabase db);
+    bool saveNotes(const QList<NoteItem*>& notes, QSqlDatabase db);
+    bool removeNotes(const QList<NoteItem*>& notes, QSqlDatabase db);
 
-    QList<TagItem*> loadTags();
-    bool saveTags(const QList<TagItem*>& tags);
-    bool removeTags(const QList<TagItem*>& tags);
+    QList<TagItem*> loadTags(QSqlDatabase db);
+    bool saveTags(const QList<TagItem*>& tags, QSqlDatabase db);
+    bool removeTags(const QList<TagItem*>& tags, QSqlDatabase db);
 
     QList<NotebookItem*> m_notebooks;
     QList<ResourceItem*> m_resources;

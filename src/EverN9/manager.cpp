@@ -31,6 +31,9 @@ Q_DECLARE_METATYPE(QVector<std::string>)
 
 Manager::Manager(Session* session) : QObject(session)
 {
+    // thread(s) do not expire -> DB connections per thread
+    QThreadPool::globalInstance()->setExpiryTimeout(-1);
+
     m_store = new NoteStore(session);
 
     connect(m_store, SIGNAL(synced(QVector<evernote::edam::Notebook>,

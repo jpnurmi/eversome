@@ -12,11 +12,16 @@
 * GNU General Public License for more details.
 */
 #include "notebookitem.h"
+#include "noteitem.h"
 
 NotebookItem::NotebookItem(evernote::edam::Notebook notebook, QObject* parent)
     : QObject(parent), m_notebook(notebook)
 {
     m_notes = new ItemModel(this);
+    connect(m_notes, SIGNAL(countChanged()), this, SIGNAL(unreadChanged()));
+    connect(m_notes, SIGNAL(added(QObject*)), this, SLOT(onNoteAdded(QObject*)));
+    connect(m_notes, SIGNAL(added(QObjectList)), this, SLOT(onNotesAdded(QObjectList)));
+    connect(m_notes, SIGNAL(removed(QObject*)), this, SLOT(onNoteRemoved(QObject*)));
 }
 
 NotebookItem::~NotebookItem()
@@ -72,6 +77,37 @@ ItemModel* NotebookItem::notes() const
 int NotebookItem::usn() const
 {
     return m_notebook.updateSequenceNum;
+}
+
+bool NotebookItem::isUnread() const
+{
+    foreach (NoteItem* note, m_notes->items<NoteItem*>()) {
+        if (note->isUnread())
+            return true;
+    }
+    return false;
+}
+
+void NotebookItem::setUnread(bool unread)
+{
+    foreach (NoteItem* note, m_notes->items<NoteItem*>())
+        note->setUnread(unread);
+}
+
+void NotebookItem::onNoteAdded(QObject* note)
+{
+    connect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
+}
+
+void NotebookItem::onNotesAdded(const QObjectList& notes)
+{
+    foreach (QObject* note, notes)
+        connect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
+}
+
+void NotebookItem::onNoteRemoved(QObject* note)
+{
+    disconnect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
 }
 
 QDebug operator<<(QDebug debug, const NotebookItem* item)

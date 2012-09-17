@@ -21,6 +21,8 @@ CommonDelegate {
 
     property Notebook notebook
 
+    highlighted: !!notebook && notebook.unread
+
     Label {
         id: nameLabel
 

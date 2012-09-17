@@ -28,6 +28,7 @@ class SearchItem : public QObject
     Q_PROPERTY(QString query READ query NOTIFY dataChanged)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
     Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
+    Q_PROPERTY(bool unread READ isUnread WRITE setUnread NOTIFY unreadChanged)
 
 public:
     explicit SearchItem(evernote::edam::SavedSearch search = evernote::edam::SavedSearch(), QObject* parent = 0);
@@ -42,8 +43,17 @@ public:
     ItemModel* notes() const;
     int usn() const;
 
+    bool isUnread() const;
+    void setUnread(bool unread);
+
 signals:
     void dataChanged();
+    void unreadChanged();
+
+private slots:
+    void onNoteAdded(QObject* note);
+    void onNotesAdded(const QObjectList& notes);
+    void onNoteRemoved(QObject* note);
 
 private:
     ItemModel* m_notes;

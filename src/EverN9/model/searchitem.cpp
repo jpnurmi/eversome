@@ -12,11 +12,16 @@
 * GNU General Public License for more details.
 */
 #include "searchitem.h"
+#include "noteitem.h"
 
 SearchItem::SearchItem(evernote::edam::SavedSearch search, QObject* parent)
     : QObject(parent), m_search(search)
 {
     m_notes = new ItemModel(this);
+    connect(m_notes, SIGNAL(countChanged()), this, SIGNAL(unreadChanged()));
+    connect(m_notes, SIGNAL(added(QObject*)), this, SLOT(onNoteAdded(QObject*)));
+    connect(m_notes, SIGNAL(added(QObjectList)), this, SLOT(onNotesAdded(QObjectList)));
+    connect(m_notes, SIGNAL(removed(QObject*)), this, SLOT(onNoteRemoved(QObject*)));
 }
 
 SearchItem::~SearchItem()
@@ -57,6 +62,37 @@ ItemModel* SearchItem::notes() const
 int SearchItem::usn() const
 {
     return m_search.updateSequenceNum;
+}
+
+bool SearchItem::isUnread() const
+{
+    foreach (NoteItem* note, m_notes->items<NoteItem*>()) {
+        if (note->isUnread())
+            return true;
+    }
+    return false;
+}
+
+void SearchItem::setUnread(bool unread)
+{
+    foreach (NoteItem* note, m_notes->items<NoteItem*>())
+        note->setUnread(unread);
+}
+
+void SearchItem::onNoteAdded(QObject* note)
+{
+    connect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
+}
+
+void SearchItem::onNotesAdded(const QObjectList& notes)
+{
+    foreach (QObject* note, notes)
+        connect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
+}
+
+void SearchItem::onNoteRemoved(QObject* note)
+{
+    disconnect(note, SIGNAL(unreadChanged()), this, SIGNAL(unreadChanged()));
 }
 
 QDebug operator<<(QDebug debug, const SearchItem* item)

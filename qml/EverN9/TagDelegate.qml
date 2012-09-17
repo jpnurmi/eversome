@@ -21,6 +21,8 @@ CommonDelegate {
 
     property Tag tag
 
+    highlighted: !!tag && tag.unread
+
     Label {
         id: nameLabel
 

@@ -2,13 +2,20 @@ TEMPLATE = subdirs
 
 3rdparty.subdir = src/3rdparty
 
-evern9.depends = 3rdparty
-evern9.subdir = src/EverN9
+eversome.depends = 3rdparty
+eversome.subdir = src/eversome
 
-SUBDIRS += 3rdparty evern9
+SUBDIRS += 3rdparty eversome
 
 OTHER_FILES += \
     README.md \
+    qtc_packaging/debian_harmattan/rules \
+    qtc_packaging/debian_harmattan/README \
+    qtc_packaging/debian_harmattan/manifest.aegis \
+    qtc_packaging/debian_harmattan/copyright \
+    qtc_packaging/debian_harmattan/control \
+    qtc_packaging/debian_harmattan/compat \
+    qtc_packaging/debian_harmattan/changelog \
     qtc_packaging/debian_harmattan/rules \
     qtc_packaging/debian_harmattan/README \
     qtc_packaging/debian_harmattan/manifest.aegis \

@@ -33,7 +33,7 @@ static const QLatin1String DEFAULT_HOST("www.evernote.com");
 
 Q_DECL_EXPORT int main(int argc, char* argv[])
 {
-    QApplication::setApplicationName("EverN9");
+    QApplication::setApplicationName("Eversome");
     QApplication::setOrganizationName("Evernote");
     QScopedPointer<QApplication> app(createApplication(argc, argv));
 
@@ -51,7 +51,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
 
     QStringList args = app->arguments();
     if (args.contains("-reset")) {
-        qDebug() << "EverN9 reset...";
+        qDebug() << "Eversome reset...";
         qDebug() << "  -> Data:" << (FileSystem::removeDir(dataPath) ? "OK" : "FAIL!") << qPrintable("("+dataPath+")");
         qDebug() << "  -> Cache:" << (FileSystem::removeDir(cachePath) ? "OK" : "FAIL!") << qPrintable("("+cachePath+")");
         qDebug() << "  -> Config:" << (FileSystem::removeDir(configPath) ? "OK" : "FAIL!") << qPrintable("("+configPath+")");
@@ -85,7 +85,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     viewer.rootContext()->setContextProperty("Searches", manager->searchModel());
     viewer.rootContext()->setContextProperty("Tags", manager->tagModel());
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    viewer.setMainQmlFile(QLatin1String("qml/EverN9/main.qml"));
+    viewer.setMainQmlFile(QLatin1String("qml/eversome/main.qml"));
 
     if (account.init()) {
         session.establish(account.credentialsId());

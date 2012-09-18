@@ -1,15 +1,15 @@
-This package was debianized by Stanislav Dombrovsky <yeswolf@gmail.com> on
-Fri, 30 Sep 2011 05:20:53 -0700.
+This package was debianized by J-P Nurmi <jpnurmi@gmail.com> on
+Tue, 18 Sep 2012 22:10:57 +0200.
 
-It was downloaded from <url://example.com>
+It was downloaded from http://github.com/jpnurmi/eversome
 
 Upstream Author(s):
 
-    Stanislav Dombrovsky
+    J-P Nurmi <jpnurmi@gmail.com>
 
 Copyright:
 
-    Copyright (C) 2011 Stanislav Dombrovsky
+    Copyright (C) 2012 J-P Nurmi <jpnurmi@gmail.com>
 
 License:
 
@@ -30,9 +30,5 @@ License:
 On Debian systems, the complete text of the GNU General
 Public License can be found in `/usr/share/common-licenses/GPL'.
 
-The Debian packaging is (C) 2011, Stanislav Dombrovsky <yeswolf@gmail.com> and
+The Debian packaging is (C) 2012, J-P Nurmi <jpnurmi@gmail.com> and
 is licensed under the GPL, see above.
-
-
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.

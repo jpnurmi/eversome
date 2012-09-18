@@ -5,4 +5,4 @@ INCLUDEPATH += $$PWD/thrift/lib/cpp/src
 INCLUDEPATH += $$PWD/thrift/lib/cpp/src/thrift
 DEPENDPATH += $$PWD/thrift/lib/cpp/src/thrift
 LIBS += -L$$LIBDIR -lthrift
-QMAKE_RPATHDIR += /opt/EverN9/lib
+QMAKE_RPATHDIR += /opt/eversome/lib

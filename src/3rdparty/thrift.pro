@@ -3,7 +3,7 @@ TARGET = thrift
 CONFIG -= qt
 DESTDIR = ../../lib
 
-target.path = /opt/EverN9/lib
+target.path = /opt/eversome/lib
 INSTALLS += target
 
 THRIFT = $$PWD/thrift/lib/cpp/src/thrift

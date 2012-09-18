@@ -4,7 +4,7 @@ QT += sql
 CONFIG += link_pkgconfig
 PKGCONFIG += accounts-qt NAccountsUI libsignon-qt
 
-qmlfolder.source = ../../qml/EverN9
+qmlfolder.source = ../../qml/eversome
 qmlfolder.target = qml
 DEPLOYMENTFOLDERS = qmlfolder
 
@@ -39,8 +39,8 @@ include(model/model.pri)
 include(operations/operations.pri)
 
 OTHER_FILES += \
-    EverN9_harmattan.desktop \
-    EverN9.desktop \
-    EverN9.svg \
-    EverN964.png \
-    EverN980.png
+    eversome_harmattan.desktop \
+    eversome.desktop \
+    eversome.svg \
+    eversome64.png \
+    eversome80.png

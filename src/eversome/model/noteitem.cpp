@@ -102,7 +102,7 @@ QString NoteItem::html() const
         "   </head>"
         "   <body>%2</body>"
         "</html>";
-    return str.arg("/opt/EverN9/qml/EverN9/script/note.js")
+    return str.arg("/opt/eversome/qml/eversome/script/note.js") // TODO
               .arg(QString::fromStdString(m_note.content));
 }
 

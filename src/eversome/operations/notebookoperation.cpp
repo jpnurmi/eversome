@@ -29,11 +29,6 @@ NotebookOperation::~NotebookOperation()
 {
 }
 
-edam::Notebook NotebookOperation::notebook() const
-{
-    return m_notebook;
-}
-
 void NotebookOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
     int usn = 0; // TODO
@@ -43,12 +38,19 @@ void NotebookOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol
     {
         case CreateNotebook:
             client.createNotebook(m_notebook, token, m_notebook);
+            emit notebookCreated(m_notebook);
+            break;
+        case GetNotebook:
+            client.getNotebook(m_notebook, token, m_notebook.guid);
+            emit notebookFetched(m_notebook);
             break;
         case GetDefaultNotebook:
             client.getDefaultNotebook(m_notebook, token);
+            emit defaultNotebookFetched(m_notebook);
             break;
         case UpdateNotebook:
             usn = client.updateNotebook(token, m_notebook);
+            emit notebookUpdated(m_notebook);
             break;
         default:
             Q_ASSERT(false);

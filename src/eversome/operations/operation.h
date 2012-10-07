@@ -53,6 +53,7 @@ public:
         UpdateNote,
 
         CreateNotebook,
+        GetNotebook,
         GetDefaultNotebook,
         UpdateNotebook
     };

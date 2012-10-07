@@ -50,6 +50,7 @@ public slots:
     void updateNote(const evernote::edam::Note& note);
 
     void createNotebook(const evernote::edam::Notebook& notebook);
+    void getNotebook(const evernote::edam::Notebook& notebook);
     void getDefaultNotebook(const evernote::edam::Notebook& notebook);
     void updateNotebook(const evernote::edam::Notebook& notebook);
 
@@ -77,6 +78,11 @@ signals:
     void noteShared(const evernote::edam::Note& note);
     void noteUnshared(const evernote::edam::Note& note);
     void noteUpdated(const evernote::edam::Note& note);
+
+    void notebookCreated(const evernote::edam::Notebook& notebook);
+    void notebookFetched(const evernote::edam::Notebook& notebook);
+    void defaultNotebookFetched(const evernote::edam::Notebook& notebook);
+    void notebookUpdated(const evernote::edam::Notebook& notebook);
 
     void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
 

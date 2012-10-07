@@ -186,17 +186,42 @@ void NoteStore::updateNote(const edam::Note& note)
 
 void NoteStore::createNotebook(const edam::Notebook& notebook)
 {
-    startNotebookOperation(notebook, Operation::CreateNotebook);
+    NotebookOperation* operation = new NotebookOperation(notebook, Operation::CreateNotebook);
+    connect(operation, SIGNAL(notebookCreated(evernote::edam::Notebook)),
+                 this, SIGNAL(notebookCreated(evernote::edam::Notebook)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::createNobook():" << operation;
+    QThreadPool::globalInstance()->start(operation);
+}
+
+void NoteStore::getNotebook(const evernote::edam::Notebook& notebook)
+{
+    NotebookOperation* operation = new NotebookOperation(notebook, Operation::GetNotebook);
+    connect(operation, SIGNAL(notebookFetched(evernote::edam::Notebook)),
+                 this, SIGNAL(notebookFetched(evernote::edam::Notebook)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::getNotebook():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::getDefaultNotebook(const edam::Notebook& notebook)
 {
-    startNotebookOperation(notebook, Operation::GetDefaultNotebook);
+    NotebookOperation* operation = new NotebookOperation(notebook, Operation::GetDefaultNotebook);
+    connect(operation, SIGNAL(defaultNotebookFetched(evernote::edam::Notebook)),
+                 this, SIGNAL(defaultNotebookFetched(evernote::edam::Notebook)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::getDefaultNotebook():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::updateNotebook(const edam::Notebook& notebook)
 {
-    startNotebookOperation(notebook, Operation::UpdateNotebook);
+    NotebookOperation* operation = new NotebookOperation(notebook, Operation::UpdateNotebook);
+    connect(operation, SIGNAL(notebookUpdated(evernote::edam::Notebook)),
+                 this, SIGNAL(notebookUpdated(evernote::edam::Notebook)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::updateNotebook():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::setUsn(int val)
@@ -215,14 +240,6 @@ void NoteStore::setCurrentTime(const QDateTime& val)
         QSettings().setValue("time", val);
         emit currentTimeChanged();
     }
-}
-
-void NoteStore::startNotebookOperation(const edam::Notebook& notebook, Operation::Mode mode)
-{
-    NotebookOperation* operation = new NotebookOperation(notebook, mode);
-    setupOperation(operation);
-    qDebug() << "NoteStore::startNotebookOperation():" << operation;
-    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::setupOperation(NetworkOperation* operation) const

@@ -286,6 +286,15 @@ void Manager::onNoteDeleted(const evernote::edam::Note& note)
     }
 }
 
+void Manager::onNotebookFetched(const evernote::edam::Notebook& notebook)
+{
+    NotebookItem* item = m_notebooks->get<NotebookItem*>(QString::fromStdString(notebook.guid));
+    if (item) {
+        item->setData(notebook);
+        m_database->saveNotebook(item);
+    }
+}
+
 void Manager::onFileWritten(const QString& guid, const QString &filePath)
 {
     if (m_notes->contains(guid)) {

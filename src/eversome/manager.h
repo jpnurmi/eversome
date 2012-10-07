@@ -76,6 +76,8 @@ private slots:
     void onNoteFetched(const evernote::edam::Note& note);
     void onNoteDeleted(const evernote::edam::Note& note);
 
+    void onNotebookFetched(const evernote::edam::Notebook& notebook);
+
     void onFileWritten(const QString& guid, const QString& filePath);
 
     void onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);

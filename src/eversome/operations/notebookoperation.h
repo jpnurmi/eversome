@@ -25,7 +25,11 @@ public:
     NotebookOperation(const evernote::edam::Notebook& notebook, Mode mode);
     ~NotebookOperation();
 
-    evernote::edam::Notebook notebook() const;
+signals:
+    void notebookCreated(const evernote::edam::Notebook& notebook);
+    void notebookFetched(const evernote::edam::Notebook& notebook);
+    void defaultNotebookFetched(const evernote::edam::Notebook& notebook);
+    void notebookUpdated(const evernote::edam::Notebook& notebook);
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);

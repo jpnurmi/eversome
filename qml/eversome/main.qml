@@ -35,7 +35,7 @@ PageStackWindow {
         QueryDialog {
             id: aboutDialog
             acceptButtonText: qsTr("OK")
-            titleText: qsTr("Eversome v0.0.3") // TODO
+            titleText: qsTr(AppTitle)
             message: qsTr("<h3>Evernote client for Nokia N9</h3>" +
                           "<p>Copyright (C) 2012 J-P Nurmi <a href=\"mailto:jpnurmi@gmail.com\">jpnurmi@gmail.com</a></p>" +
                           "<p>Remember everything.<br/>Capture anything.<br/>Access anywhere.<br/>Find things fast.</p>" +

@@ -35,6 +35,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
 {
     QApplication::setApplicationName("Eversome");
     QApplication::setOrganizationName("Evernote");
+    QApplication::setApplicationVersion("0.0.1");
     QScopedPointer<QApplication> app(createApplication(argc, argv));
 
     // MComponentData instance required by AccountsUI
@@ -77,6 +78,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     Session session(host);
     Manager* manager = new Manager(&session);
     QmlApplicationViewer viewer;
+    viewer.rootContext()->setContextProperty("AppTitle", QString("%1 %2").arg(QApplication::applicationName(), QApplication::applicationVersion()));
     viewer.rootContext()->setContextProperty("Session", &session);
     viewer.rootContext()->setContextProperty("Manager", manager);
     viewer.rootContext()->setContextProperty("Database", manager->database());

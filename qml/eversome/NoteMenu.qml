@@ -25,6 +25,10 @@ ContextMenu {
 
     MenuLayout {
         MenuItem {
+            text: qsTr("Update")
+            onClicked: NoteStore.getNote(note.data())
+        }
+        MenuItem {
             text: qsTr("Edit")
             onClicked: Qt.openUrlExternally("https://www.evernote.com/mobile/EditNote.action?noteGuid=" + note.guid)
         }

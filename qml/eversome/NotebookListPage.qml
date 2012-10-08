@@ -14,11 +14,20 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
 import "UIConstants.js" as UI
+import "components"
 
 CommonPage {
     id: root
 
-    title: qsTr("Notebooks")
+    header: Header {
+        title: qsTr("Notebooks")
+        busy: Manager.isBusy
+        onRefresh: NoteStore.sync()
+    }
+
+    footer: Footer {
+        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
+    }
 
     flickable: ListView {
         model: Notebooks

@@ -14,11 +14,20 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
 import "UIConstants.js" as UI
+import "components"
 
 CommonPage {
     id: root
 
-    title: qsTr("Search")
+    header: Header {
+        title: qsTr("Search")
+        busy: Manager.isBusy
+        onRefresh: NoteStore.sync()
+    }
+
+    footer: Footer {
+        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
+    }
 
     flickable: ListView {
         model: Searches

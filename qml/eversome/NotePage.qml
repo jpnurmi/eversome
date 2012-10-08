@@ -23,7 +23,15 @@ CommonPage {
 
     property Note note
 
-    title: note ? note.title : ""
+    header: Header {
+        title: note ? note.title : ""
+        busy: Manager.isBusy
+        onRefresh: NoteStore.sync()
+    }
+
+    footer: Footer {
+        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
+    }
 
     menu: NoteMenu {
         id: menu

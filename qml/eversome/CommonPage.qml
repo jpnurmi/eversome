@@ -18,14 +18,14 @@ import "components"
 Page {
     id: root
 
-    property alias busy: header.busy
-    property alias title: header.title
     property Menu menu
+    property Header header
+    property Footer footer
     property Flickable flickable
 
     Item {
         id: flickableParent
-        anchors.top: footer.bottom
+        anchors.top: footer ? footer.bottom : header ? header.bottom : root.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -35,18 +35,22 @@ Page {
         }
     }
 
-    Header {
-        id: header
-        busy: Manager.isBusy
-        width: parent.width
-        onRefresh: NoteStore.sync()
+    onHeaderChanged: {
+        if (header) {
+            header.parent = root;
+            header.anchors.top = root.top;
+            header.anchors.left = root.left;
+            header.anchors.right = root.right;
+        }
     }
 
-    Footer {
-        id: footer
-        width: parent.width
-        anchors.top: header.bottom
-        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
+    onFooterChanged: {
+        if (footer) {
+            footer.parent = root;
+            footer.anchors.left = root.left;
+            footer.anchors.right = root.right;
+            footer.anchors.top = function() { return header ? header.bottom : root.top; }
+        }
     }
 
     onFlickableChanged: {

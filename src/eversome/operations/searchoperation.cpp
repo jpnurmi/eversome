@@ -34,15 +34,19 @@ void SearchOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
     Q_ASSERT(mode() == Search);
 
-    edam::NoteList list;
-    edam::NoteFilter filter;
-    filter.words = m_search.query;
-
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
-    client.findNotes(list, token, filter, 0, limits::g_Limits_constants.EDAM_USER_NOTES_MAX);
 
-    qDebug() << "SearchOperation::operate(): searched..." << list.notes.size();
+    edam::NoteFilter filter;
+    edam::NotesMetadataList list;
+    edam::NotesMetadataResultSpec spec;
 
-    emit searched(m_search, QVector<edam::Note>::fromStdVector(list.notes));
+    filter.__isset.words = true; // TODO: why is this needed???
+    filter.words = m_search.query;
+
+    client.findNotesMetadata(list, token, filter, 0, limits::g_Limits_constants.EDAM_USER_NOTES_MAX, spec);
+
+    qDebug() << "SearchOperation::operate(): searched..." << QString::fromStdString(m_search.query) << list.notes.size();
+
+    emit searched(m_search, QVector<edam::NoteMetadata>::fromStdVector(list.notes));
 }

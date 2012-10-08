@@ -16,6 +16,7 @@
 
 #include <QObject>
 #include <Types_types.h>
+#include <NoteStore_types.h>
 
 class Session;
 class NoteStore;
@@ -80,7 +81,7 @@ private slots:
 
     void onFileWritten(const QString& guid, const QString& filePath);
 
-    void onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
+    void onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes);
 
 private:
     void addNotes(const QList<NoteItem*>& notes);

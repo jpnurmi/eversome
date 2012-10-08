@@ -15,6 +15,7 @@
 #define SEARCHOPERATION_H
 
 #include "networkoperation.h"
+#include <NoteStore_types.h>
 #include <Types_types.h>
 #include <QVector>
 
@@ -27,7 +28,7 @@ public:
     ~SearchOperation();
 
 signals:
-    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
+    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes);
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);

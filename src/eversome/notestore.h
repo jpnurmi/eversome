@@ -84,7 +84,7 @@ signals:
     void defaultNotebookFetched(const evernote::edam::Notebook& notebook);
     void notebookUpdated(const evernote::edam::Notebook& notebook);
 
-    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes);
+    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes);
 
 private slots:
     void setUsn(int usn);

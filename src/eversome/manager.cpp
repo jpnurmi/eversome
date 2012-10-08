@@ -59,8 +59,8 @@ Manager::Manager(Session* session) : QObject(session)
                this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
     connect(m_store, SIGNAL(noteDeleted(evernote::edam::Note)),
                this, SLOT(onNoteDeleted(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(m_store, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
-               this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
+               this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
 
     qRegisterMetaType<TagItem*>();
     qRegisterMetaType<NoteItem*>();
@@ -309,12 +309,12 @@ void Manager::onFileWritten(const QString& guid, const QString &filePath)
         qCritical() << "### Manager::onFileWritten(): UNIDENTIFIED FILE:" << filePath;
 }
 
-void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::Note>& notes)
+void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes)
 {
     SearchItem* searchItem = m_searches->get<SearchItem*>(QString::fromStdString(search.guid));
     if (searchItem) {
         QList<NoteItem*> noteItems;
-        foreach (const evernote::edam::Note& note, notes) {
+        foreach (const evernote::edam::NoteMetadata& note, notes) {
             NoteItem* noteItem = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
             if (noteItem)
                 noteItems += noteItem;

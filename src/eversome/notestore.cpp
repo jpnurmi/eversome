@@ -28,6 +28,7 @@
 
 using namespace evernote;
 
+Q_DECLARE_METATYPE(QVector<evernote::edam::NoteMetadata>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::SavedSearch>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Notebook>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
@@ -43,6 +44,7 @@ NoteStore::NoteStore(Session* session) : QObject(session), session(session)
 {
     connect(session, SIGNAL(established()), SLOT(sync()));
 
+    qRegisterMetaType<QVector<evernote::edam::NoteMetadata> >();
     qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
@@ -106,8 +108,8 @@ void NoteStore::cancel()
 void NoteStore::search(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search);
-    connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)),
-                 this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::Note>)));
+    connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
+                 this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)));
     setupOperation(operation);
     qDebug() << "NoteStore::search():" << operation;
     QThreadPool::globalInstance()->start(operation);

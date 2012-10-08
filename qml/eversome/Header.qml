@@ -20,7 +20,9 @@ Image {
 
     property alias title: label.text
     property bool busy
-    property ContextMenu menu
+    property ContextMenu menu // TODO
+
+    signal refresh()
 
     source: "images/header.png"
 
@@ -41,30 +43,24 @@ Image {
 
     Loader {
         id: loader
+        width: 32
         anchors.right: parent.right
         anchors.rightMargin: UI.LARGE_SPACING
         anchors.verticalCenter: parent.verticalCenter
-        sourceComponent: root.busy ? busyIndicator : !!root.menu ? menuIndicator : undefined
+        sourceComponent: root.busy ? busyIndicator : refreshIcon
         Component {
             id: busyIndicator
             BusyIndicator {
-                visible: running
+                running: true
                 style: BusyIndicatorStyle { inverted: true }
             }
         }
         Component {
-            id: menuIndicator
-            Image {
-                source: "images/menu-arrow.png"
-                opacity: mouseArea.pressed ? UI.DISABLED_OPACITY : 1.0
+            id: refreshIcon
+            ToolIcon {
+                iconSource: "image://theme/icon-s-refresh-inverse"
+                onClicked: root.refresh()
             }
         }
-    }
-
-    MouseArea {
-        id: mouseArea
-        enabled: !!menu && !busy
-        anchors.fill: parent
-        onClicked: menu.open()
     }
 }

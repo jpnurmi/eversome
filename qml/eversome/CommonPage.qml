@@ -38,6 +38,7 @@ Page {
         id: header
         busy: Manager.isBusy
         width: parent.width
+        onRefresh: NoteStore.sync()
     }
 
     onFlickableChanged: {

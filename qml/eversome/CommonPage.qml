@@ -25,7 +25,7 @@ Page {
 
     Item {
         id: flickableParent
-        anchors.top: header.bottom
+        anchors.top: footer.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -40,6 +40,13 @@ Page {
         busy: Manager.isBusy
         width: parent.width
         onRefresh: NoteStore.sync()
+    }
+
+    Footer {
+        id: footer
+        width: parent.width
+        anchors.top: header.bottom
+        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
     }
 
     onFlickableChanged: {

@@ -16,7 +16,7 @@ import com.nokia.meego 1.0
 import com.evernote.types 1.0
 import "UIConstants.js" as UI
 
-ContextMenu {
+Menu {
     id: menu
 
     property QtObject container

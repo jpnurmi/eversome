@@ -20,18 +20,6 @@ PageStackWindow {
     id: window
 
     initialPage: MainPage {
-        onMenuRequested: menu.open()
-
-        Menu {
-            id: menu
-            MenuLayout {
-                MenuItem {
-                    text: qsTr("About")
-                    onClicked: aboutDialog.open()
-                }
-            }
-        }
-
         QueryDialog {
             id: aboutDialog
             acceptButtonText: qsTr("OK")

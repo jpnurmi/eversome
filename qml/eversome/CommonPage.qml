@@ -19,7 +19,7 @@ Page {
 
     property alias busy: header.busy
     property alias title: header.title
-    property alias menu: header.menu
+    property Menu menu
     property Flickable flickable
 
     Item {

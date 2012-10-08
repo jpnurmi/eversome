@@ -20,7 +20,6 @@ Image {
 
     property alias title: label.text
     property bool busy
-    property ContextMenu menu // TODO
 
     signal refresh()
 

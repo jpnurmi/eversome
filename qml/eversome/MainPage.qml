@@ -18,8 +18,6 @@ import "UIConstants.js" as UI
 Page {
     id: root
 
-    signal menuRequested()
-
     TabGroup {
         id: tabGroup
         PageStack {
@@ -75,9 +73,35 @@ Page {
             }
         }
         ToolIcon {
+            property Item currentPage: !!tabGroup.currentTab ? tabGroup.currentTab.currentPage : undefined
             iconId: "toolbar-view-menu"
-            onClicked: root.menuRequested()
+            onClicked: !!currentPage && !!currentPage.menu ? currentPage.menu.open() : aboutMenu.open()
         }
+    }
+
+    Menu {
+        id: aboutMenu
+        MenuLayout {
+            MenuItem {
+                text: qsTr("About")
+                onClicked: aboutDialog.open()
+            }
+        }
+    }
+
+    QueryDialog {
+        id: aboutDialog
+        acceptButtonText: qsTr("OK")
+        titleText: qsTr(AppTitle)
+        message: qsTr("<h3>Evernote client for Nokia N9</h3>" +
+                      "<p>Copyright (C) 2012 J-P Nurmi <a href=\"mailto:jpnurmi@gmail.com\">jpnurmi@gmail.com</a></p>" +
+                      "<p>Remember everything.<br/>Capture anything.<br/>Access anywhere.<br/>Find things fast.</p>" +
+                      "<p><img src='%1'/></p>" +
+                      "<p>Use <a href='http://www.evernote.com'>Evernote</a> to save your ideas, things you see, and things you like. Then find them all on any computer, phone or device you use. For free.</p>" +
+                      "<p><small>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</small></p>" +
+                      "<p><small>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</small></p>")
+                      .arg(Qt.resolvedUrl("images/banner.png"))
+        onLinkActivated: Qt.openUrlExternally(link)
     }
 
     Component.onCompleted: {

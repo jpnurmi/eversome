@@ -23,14 +23,14 @@ CommonPage {
     property QtObject container
     property alias title: header.title
 
-    header: Header {
+    pageHeader: PageHeader {
         id: header
         title: qsTr("Notebooks")
         busy: Manager.isBusy
         onRefresh: NoteStore.sync()
     }
 
-    footer: Footer {
+    contentHeader: ContentHeader {
         text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
     }
 

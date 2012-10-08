@@ -23,13 +23,13 @@ CommonPage {
 
     property Note note
 
-    header: Header {
+    pageHeader: PageHeader {
         title: note ? note.title : ""
         busy: Manager.isBusy
         onRefresh: NoteStore.sync()
     }
 
-    footer: Footer {
+    contentHeader: ContentHeader {
         text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
     }
 

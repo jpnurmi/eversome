@@ -19,13 +19,13 @@ Page {
     id: root
 
     property Menu menu
-    property Header header
-    property Footer footer
+    property PageHeader pageHeader
+    property ContentHeader contentHeader
     property Flickable flickable
 
     Item {
         id: flickableParent
-        anchors.top: footer ? footer.bottom : header ? header.bottom : root.top
+        anchors.top: contentHeader ? contentHeader.bottom : pageHeader ? pageHeader.bottom : root.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -35,21 +35,21 @@ Page {
         }
     }
 
-    onHeaderChanged: {
-        if (header) {
-            header.parent = root;
-            header.anchors.top = root.top;
-            header.anchors.left = root.left;
-            header.anchors.right = root.right;
+    onPageHeaderChanged: {
+        if (pageHeader) {
+            pageHeader.parent = root;
+            pageHeader.anchors.top = root.top;
+            pageHeader.anchors.left = root.left;
+            pageHeader.anchors.right = root.right;
         }
     }
 
-    onFooterChanged: {
-        if (footer) {
-            footer.parent = root;
-            footer.anchors.left = root.left;
-            footer.anchors.right = root.right;
-            footer.anchors.top = function() { return header ? header.bottom : root.top; }
+    onContentHeaderChanged: {
+        if (contentHeader) {
+            contentHeader.parent = root;
+            contentHeader.anchors.left = root.left;
+            contentHeader.anchors.right = root.right;
+            contentHeader.anchors.top = function() { return pageHeader ? pageHeader.bottom : root.top; }
         }
     }
 

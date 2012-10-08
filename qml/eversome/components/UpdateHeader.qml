@@ -12,12 +12,21 @@
 * GNU General Public License for more details.
 */
 import QtQuick 1.1
+import "../UIConstants.js" as UI
 
-BorderImage {
+ContentHeader {
     id: root
 
-    source: "image://theme/meegotouch-calendar-eventinvitation-background"
-
-    width: parent.width
-    height: childrenRect.height
+    Text {
+        id: label
+        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
+        anchors.rightMargin: UI.MEDIUM_SPACING
+        font.weight: Font.Light
+        font.family: UI.FONT_FAMILY
+        font.pixelSize: UI.SMALL_FONT
+        textFormat: Text.PlainText
+    }
 }

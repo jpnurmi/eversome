@@ -29,8 +29,8 @@ CommonPage {
         onRefresh: NoteStore.sync()
     }
 
-    contentHeader: ContentHeader {
-        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
+    contentHeader: NoteHeader {
+        note: root.note
     }
 
     menu: NoteMenu {

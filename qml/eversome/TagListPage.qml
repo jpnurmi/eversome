@@ -25,9 +25,7 @@ CommonPage {
         onRefresh: NoteStore.sync()
     }
 
-    contentHeader: ContentHeader {
-        text: qsTr("Last update: %1").arg(Qt.formatDateTime(NoteStore.currentTime).toString())
-    }
+    contentHeader: UpdateHeader { }
 
     flickable: ListView {
         model: Tags

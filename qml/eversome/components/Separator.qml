@@ -12,12 +12,12 @@
 * GNU General Public License for more details.
 */
 import QtQuick 1.1
-import "UIConstants.js" as UI
+import "../UIConstants.js" as UI
 
 Image {
     id: root
 
-    source: "images/separator.png"
+    source: "../images/separator.png"
 
     anchors.left: parent.left
     anchors.right: parent.right

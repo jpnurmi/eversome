@@ -16,6 +16,7 @@ import QtWebKit 1.1
 import com.nokia.meego 1.0
 import com.evernote.types 1.0
 import "UIConstants.js" as UI
+import "components"
 
 CommonPage {
     id: root

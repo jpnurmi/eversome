@@ -13,7 +13,7 @@
 */
 import QtQuick 1.1
 import com.nokia.meego 1.0
-import "UIConstants.js" as UI
+import "../UIConstants.js" as UI
 
 Item {
     id: root
@@ -30,7 +30,7 @@ Item {
 
     Image {
         anchors.fill: parent
-        source: "images/listitem-pressed.png"
+        source: "../images/listitem-pressed.png"
 
         Image {
             id: image
@@ -41,14 +41,14 @@ Item {
 
         Image {
             anchors.centerIn: parent
-            source: image.status == Image.Null ? "images/placeholder.png" : ""
+            source: image.status == Image.Null ? "../images/placeholder.png" : ""
         }
     }
 
     Image {
         anchors.top: parent.top
         anchors.right: parent.right
-        source: "images/external.png"
+        source: "../images/external.png"
         visible: mouseArea.reallyPressed
     }
 }

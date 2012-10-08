@@ -13,7 +13,7 @@
 */
 import QtQuick 1.1
 import com.nokia.meego 1.0
-import "UIConstants.js" as UI
+import "../UIConstants.js" as UI
 
 BorderImage {
     id: root
@@ -23,7 +23,7 @@ BorderImage {
     visible: value != ""
     width: Math.max(label.width + 20, 26)
     height: label.height + 8
-    source: "images/countindicator.png"
+    source: "../images/countindicator.png"
     border { top: 12; left: 12; right: 12; bottom: 12 }
 
     Label {

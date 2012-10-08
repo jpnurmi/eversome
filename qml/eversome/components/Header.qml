@@ -13,7 +13,7 @@
 */
 import QtQuick 1.1
 import com.nokia.meego 1.0
-import "UIConstants.js" as UI
+import "../UIConstants.js" as UI
 
 Image {
     id: root
@@ -23,7 +23,7 @@ Image {
 
     signal refresh()
 
-    source: "images/header.png"
+    source: "../images/header.png"
 
     Text {
         id: label

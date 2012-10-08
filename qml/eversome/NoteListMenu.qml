@@ -23,10 +23,6 @@ Menu {
 
     MenuLayout {
         MenuItem {
-            text: qsTr("Update all")
-            onClicked: NoteStore.sync()
-        }
-        MenuItem {
             text: !!container && container.unread ? qsTr("Mark all as read") : qsTr("Mark all as unread")
             onClicked: {
                 container.unread = !container.unread;

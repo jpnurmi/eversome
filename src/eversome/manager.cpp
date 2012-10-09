@@ -215,8 +215,10 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
     }
 
     QList<NoteItem*> noteItems;
-    foreach (const evernote::edam::Note& note, notes)
-        noteItems += new NoteItem(note, this);
+    foreach (const evernote::edam::Note& note, notes) {
+        if (note.active)
+            noteItems += new NoteItem(note, this);
+    }
     if (m_notes->add(noteItems)) {
         m_notes->sort(titlePropertyLessThan);
         added = true;

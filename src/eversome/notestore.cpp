@@ -149,11 +149,14 @@ void NoteStore::getNote(const edam::Note& note)
 
 void NoteStore::moveNote(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook)
 {
-    evernote::edam::Note tmp;
-    tmp.guid = note.guid;
-    tmp.title = note.title;
-    tmp.notebookGuid = notebook.guid;
-    updateNote(tmp);
+    evernote::edam::Note modified;
+    modified.guid = note.guid;
+    modified.title = note.title;
+    modified.notebookGuid = notebook.guid;
+    modified.__isset.guid = true; // :(
+    modified.__isset.title = true; // :(
+    modified.__isset.notebookGuid = true; // :(
+    updateNote(modified);
 }
 
 void NoteStore::shareNote(const edam::Note& note)

@@ -226,6 +226,16 @@ void NoteStore::updateNotebook(const edam::Notebook& notebook)
     QThreadPool::globalInstance()->start(operation);
 }
 
+void NoteStore::renameNotebook(const evernote::edam::Notebook& notebook)
+{
+    evernote::edam::Notebook modified;
+    modified.guid = notebook.guid;
+    modified.name = notebook.name;
+    modified.__isset.guid = true; // :(
+    modified.__isset.name = true; // :(
+    updateNotebook(modified);
+}
+
 void NoteStore::setUsn(int val)
 {
     int old = usn();

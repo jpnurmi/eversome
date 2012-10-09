@@ -13,11 +13,14 @@
 */
 import QtQuick 1.1
 import com.nokia.meego 1.0
+import com.evernote.types 1.0
 import "UIConstants.js" as UI
 import "components"
 
 CommonPage {
     id: root
+
+    property Notebook notebook
 
     pageHeader: PageHeader {
         title: qsTr("Notebooks")
@@ -27,32 +30,49 @@ CommonPage {
 
     contentHeader: UpdateHeader { }
 
+    menu: NotebookMenu {
+        parent: root
+        notebook: root.notebook
+    }
+
     flickable: ListView {
-        model: Notebooks
-        delegate: NotebookDelegate {
-            id: delegate
-            notebook: modelData
-            onClicked: pageStack.push(notebookPage, {notebook: notebook})
+        model: !!notebook ? notebook.notes : 0
+        delegate: NoteDelegate {
+            note: modelData
+            onClicked: pageStack.push(notePage, {note: modelData})
             onPressAndHold: {
-                var menu = notebookMenu.createObject(root, {notebook: notebook, delegate: delegate});
+                var menu = noteMenu.createObject(root, {note: modelData});
                 menu.open();
             }
         }
     }
 
     Component {
-        id: notebookPage
-        NotebookPage { }
+        id: notePage
+        NotePage { }
     }
 
     Component {
-        id: notebookMenu
-        NotebookMenu {
+        id: noteMenu
+        NoteMenu {
             id: menu
+            onMoving: {
+                var dialog = notebookDialog.createObject(root, {note: note});
+                dialog.open();
+            }
             onStatusChanged: {
                if (status === DialogStatus.Closing)
                     menu.destroy(1000);
             }
+        }
+    }
+
+    Component {
+        id: notebookDialog
+        NotebookDialog {
+            id: dialog
+            onAccepted: dialog.destroy(1000)
+            onRejected: dialog.destroy(1000)
         }
     }
 }

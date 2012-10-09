@@ -53,6 +53,7 @@ public slots:
     void getNotebook(const evernote::edam::Notebook& notebook);
     void getDefaultNotebook(const evernote::edam::Notebook& notebook);
     void updateNotebook(const evernote::edam::Notebook& notebook);
+    void renameNotebook(const evernote::edam::Notebook& notebook);
 
 signals:
     void usnChanged();

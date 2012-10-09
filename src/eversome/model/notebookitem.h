@@ -24,8 +24,8 @@
 class NotebookItem : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY dataChanged)
     Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
-    Q_PROPERTY(QString name READ name NOTIFY dataChanged)
     Q_PROPERTY(bool isDefault READ isDefault NOTIFY dataChanged)
     Q_PROPERTY(bool isPublished READ isPublished NOTIFY dataChanged)
     Q_PROPERTY(QDateTime created READ created NOTIFY dataChanged)
@@ -41,8 +41,10 @@ public:
     Q_INVOKABLE evernote::edam::Notebook data() const;
     void setData(const evernote::edam::Notebook& data);
 
-    QString guid() const;
     QString name() const;
+    void setName(const QString& name);
+
+    QString guid() const;
     bool isDefault() const;
     bool isPublished() const;
     QDateTime created() const;

@@ -39,14 +39,23 @@ void NotebookItem::setData(const evernote::edam::Notebook& data)
     emit dataChanged();
 }
 
-QString NotebookItem::guid() const
-{
-    return QString::fromStdString(m_notebook.guid);
-}
-
 QString NotebookItem::name() const
 {
     return QString::fromStdString(m_notebook.name);
+}
+
+void NotebookItem::setName(const QString& name)
+{
+    std::string str = name.toStdString();
+    if (m_notebook.name != str) {
+        m_notebook.name = str;
+        emit dataChanged();
+    }
+}
+
+QString NotebookItem::guid() const
+{
+    return QString::fromStdString(m_notebook.guid);
 }
 
 bool NotebookItem::isDefault() const

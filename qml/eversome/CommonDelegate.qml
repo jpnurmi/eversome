@@ -25,6 +25,13 @@ BorderImage {
 
     signal clicked()
     signal pressAndHold()
+    signal edited(string text)
+
+    function edit(text) {
+        var editor = editorComponent.createObject(root, {text: text});
+        editor.forceActiveFocus();
+        editor.openSoftwareInputPanel();
+    }
 
     width: parent.width
     height: preferredHeight
@@ -61,5 +68,30 @@ BorderImage {
         anchors.verticalCenter: parent.bottom
         anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING
         anchors.rightMargin: UI.LARGE_SPACING
+    }
+
+    Component {
+        id: editorComponent
+        TextField {
+            id: editor
+            anchors.fill: container
+            Keys.onEnterPressed: {
+                root.edited(text);
+                editor.destroy(10);
+            }
+            Keys.onReturnPressed: {
+                root.edited(text);
+                editor.destroy(10);
+            }
+            Keys.onEscapePressed: {
+                editor.destroy(10);
+            }
+            onActiveFocusChanged: {
+                if (!activeFocus) {
+                    editor.closeSoftwareInputPanel();
+                    editor.destroy(0);
+                }
+            }
+        }
     }
 }

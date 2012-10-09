@@ -24,6 +24,11 @@ CommonDelegate {
 
     highlighted: !!notebook && notebook.unread
 
+    onEdited: {
+        notebook.name = text;
+        NoteStore.renameNotebook(notebook.data());
+    }
+
     Label {
         id: nameLabel
 

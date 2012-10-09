@@ -38,14 +38,23 @@ void NoteItem::setData(const evernote::edam::Note& data)
     emit dataChanged();
 }
 
-QString NoteItem::guid() const
-{
-    return QString::fromStdString(m_note.guid);
-}
-
 QString NoteItem::title() const
 {
     return QString::fromStdString(m_note.title);
+}
+
+void NoteItem::setTitle(const QString& title)
+{
+    std::string str = title.toStdString();
+    if (m_note.title != str) {
+        m_note.title = str;
+        emit dataChanged();
+    }
+}
+
+QString NoteItem::guid() const
+{
+    return QString::fromStdString(m_note.guid);
 }
 
 QString NoteItem::filePath(bool checkExists) const

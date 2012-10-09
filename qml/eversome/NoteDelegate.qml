@@ -26,6 +26,11 @@ CommonDelegate {
     highlighted: !!note && note.unread
     height: visible ? preferredHeight : 0
 
+    onEdited: {
+        note.title = text;
+        NoteStore.renameNote(note.data());
+    }
+
     Label {
         id: nameLabel
 

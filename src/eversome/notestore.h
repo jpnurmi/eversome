@@ -48,6 +48,7 @@ public slots:
     void shareNote(const evernote::edam::Note& note);
     void unshareNote(const evernote::edam::Note& note);
     void updateNote(const evernote::edam::Note& note);
+    void renameNote(const evernote::edam::Note& note);
 
     void createNotebook(const evernote::edam::Notebook& notebook);
     void getNotebook(const evernote::edam::Notebook& notebook);

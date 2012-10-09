@@ -20,6 +20,7 @@ Menu {
     id: menu
 
     property Note note
+    property NoteDelegate delegate
 
     signal moving
 
@@ -27,6 +28,14 @@ Menu {
         MenuItem {
             text: qsTr("Edit")
             onClicked: Qt.openUrlExternally("https://www.evernote.com/mobile/EditNote.action?noteGuid=" + note.guid)
+        }
+        MenuItem {
+            text: qsTr("Rename")
+            enabled: !!delegate
+            onClicked: {
+                if (delegate)
+                    delegate.edit(note.title);
+            }
         }
         MenuItem {
             text: qsTr("Move to")

@@ -186,6 +186,16 @@ void NoteStore::updateNote(const edam::Note& note)
     QThreadPool::globalInstance()->start(operation);
 }
 
+void NoteStore::renameNote(const evernote::edam::Note& note)
+{
+    evernote::edam::Note modified;
+    modified.guid = note.guid;
+    modified.title = note.title;
+    modified.__isset.guid = true; // :(
+    modified.__isset.title = true; // :(
+    updateNote(modified);
+}
+
 void NoteStore::createNotebook(const edam::Notebook& notebook)
 {
     NotebookOperation* operation = new NotebookOperation(notebook, Operation::CreateNotebook);

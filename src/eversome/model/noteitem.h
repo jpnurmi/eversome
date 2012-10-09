@@ -24,8 +24,8 @@
 class NoteItem : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY dataChanged)
     Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
-    Q_PROPERTY(QString title READ title NOTIFY dataChanged)
     Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
     Q_PROPERTY(QDateTime created READ created NOTIFY dataChanged)
     Q_PROPERTY(QDateTime updated READ updated NOTIFY dataChanged)
@@ -44,8 +44,10 @@ public:
     Q_INVOKABLE evernote::edam::Note data() const;
     void setData(const evernote::edam::Note& data);
 
-    QString guid() const;
     QString title() const;
+    void setTitle(const QString& title);
+
+    QString guid() const;
     QString filePath(bool checkExists = true) const;
     QDateTime created() const;
     QDateTime updated() const;

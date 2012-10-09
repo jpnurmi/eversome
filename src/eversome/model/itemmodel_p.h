@@ -114,4 +114,11 @@ bool ItemModel::remove(T item)
     return false;
 }
 
+template <typename LessThan>
+void ItemModel::sort(LessThan lessThan)
+{
+    qSort(m_items.begin(), m_items.end(), lessThan);
+    emit dataChanged(index(0), index(m_items.count() - 1));
+}
+
 #endif // ITEMMODEL_P_H

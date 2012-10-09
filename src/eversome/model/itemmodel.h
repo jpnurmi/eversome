@@ -16,6 +16,7 @@
 
 #include <QHash>
 #include <QMetaType>
+#include <QtAlgorithms>
 #include <QAbstractListModel>
 
 class ItemModel : public QAbstractListModel
@@ -52,6 +53,9 @@ public:
     template <typename T>
     bool remove(T item);
 
+    template <typename LessThan>
+    void sort(LessThan lessThan);
+
 public slots:
     void clear();
 
@@ -69,5 +73,15 @@ private:
 #include "itemmodel_p.h"
 
 Q_DECLARE_METATYPE(ItemModel*)
+
+static bool namePropertyLessThan(const QObject* left, const QObject* right)
+{
+    return left->property("name").toString().localeAwareCompare(right->property("name").toString()) < 0;
+}
+
+static bool titlePropertyLessThan(const QObject* left, const QObject* right)
+{
+    return left->property("title").toString().localeAwareCompare(right->property("title").toString()) < 0;
+}
 
 #endif // ITEMMODEL_H

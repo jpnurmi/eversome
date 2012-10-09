@@ -164,11 +164,23 @@ void Manager::onLoaded(const QList<NotebookItem*>& notebooks,
                        const QList<TagItem*>& tags)
 {
     bool added = false;
-    added |= m_notebooks->add(notebooks);
+    if (m_notebooks->add(notebooks)) {
+        m_notebooks->sort(namePropertyLessThan);
+        added = true;
+    }
     added |= m_resources->add(resources);
-    added |= m_searches->add(searches);
-    added |= m_notes->add(notes);
-    added |= m_tags->add(tags);
+    if (m_searches->add(searches)) {
+        m_searches->sort(namePropertyLessThan);
+        added = true;
+    }
+    if (m_notes->add(notes)) {
+        m_notes->sort(titlePropertyLessThan);
+        added = true;
+    }
+    if (m_tags->add(tags)) {
+        m_tags->sort(namePropertyLessThan);
+        added = true;
+    }
 
     if (added)
         addNotes(m_notes->items<NoteItem*>());
@@ -184,7 +196,10 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
     QList<NotebookItem*> notebookItems;
     foreach (const evernote::edam::Notebook& notebook, notebooks)
         notebookItems += new NotebookItem(notebook, this);
-    added |= m_notebooks->add(notebookItems);
+    if (m_notebooks->add(notebookItems)) {
+        m_notebooks->sort(namePropertyLessThan);
+        added = true;
+    }
 
     QList<ResourceItem*> resourceItems;
     foreach (const evernote::edam::Resource& resource, resources)
@@ -194,17 +209,26 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
     QList<SearchItem*> searchItems;
     foreach (const evernote::edam::SavedSearch& search, searches)
         searchItems += new SearchItem(search, this);
-    added |= m_searches->add(searchItems);
+    if (m_searches->add(searchItems)) {
+        m_searches->sort(namePropertyLessThan);
+        added = true;
+    }
 
     QList<NoteItem*> noteItems;
     foreach (const evernote::edam::Note& note, notes)
         noteItems += new NoteItem(note, this);
-    added |= m_notes->add(noteItems);
+    if (m_notes->add(noteItems)) {
+        m_notes->sort(titlePropertyLessThan);
+        added = true;
+    }
 
     QList<TagItem*> tagItems;
     foreach (const evernote::edam::Tag& tag, tags)
         tagItems += new TagItem(tag, this);
-    added |= m_tags->add(tagItems);
+    if (m_tags->add(tagItems)) {
+        m_tags->sort(namePropertyLessThan);
+        added = true;
+    }
 
     if (added)
         m_database->save(m_notebooks->items<NotebookItem*>(),
@@ -319,7 +343,8 @@ void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVecto
             if (noteItem)
                 noteItems += noteItem;
         }
-        searchItem->notes()->add(noteItems);
+        if (searchItem->notes()->add(noteItems))
+            searchItem->notes()->sort(titlePropertyLessThan);
     }
 }
 
@@ -329,9 +354,10 @@ void Manager::addNotes(const QList<NoteItem*>& notes)
         const evernote::edam::Note& data = note->data();
         QString notebookGuid = QString::fromStdString(data.notebookGuid);
         NotebookItem* notebook = m_notebooks->get<NotebookItem*>(notebookGuid);
-        if (notebook)
-            notebook->notes()->add(note);
-        else
+        if (notebook) {
+            if (notebook->notes()->add(note))
+                notebook->notes()->sort(titlePropertyLessThan);
+        } else
             qCritical() << "### Manager::addNotes(): MISSING NOTEBOOK:" << notebookGuid;
 
         for (uint i = 0; i < data.resources.size(); ++i) {
@@ -347,8 +373,10 @@ void Manager::addNotes(const QList<NoteItem*>& notes)
             QString tagGuid = QString::fromStdString(data.tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);
             if (tag) {
-                note->tags()->add(tag);
-                tag->notes()->add(note);
+                if (note->tags()->add(tag))
+                    note->tags()->sort(namePropertyLessThan);
+                if (tag->notes()->add(note))
+                    tag->notes()->sort(titlePropertyLessThan);
             } else
                 qCritical() << "### Manager::addNotes(): MISSING TAG:" << tagGuid;
         }

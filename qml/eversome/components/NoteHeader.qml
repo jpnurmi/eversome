@@ -21,7 +21,7 @@ ContentHeader {
 
     property Note note
 
-    height: flow.height + 2 * UI.SMALL_SPACING
+    height: Math.max(dateLabel.height, flow.height + 2 * UI.SMALL_SPACING)
 
     Label {
         id: dateLabel

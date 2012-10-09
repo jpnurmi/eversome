@@ -41,17 +41,20 @@ public:
         SaveDatabase,
         RemoveDatabase,
 
-        // note store operations
+        // store operations
         Sync,
         Search,
 
+        // note operations
         CreateNote,
         DeleteNote,
         GetNote,
+        MoveNote,
+        RenameNote,
         ShareNote,
         UnshareNote,
-        UpdateNote,
 
+        // notebook operations
         CreateNotebook,
         GetNotebook,
         GetDefaultNotebook,

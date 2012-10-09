@@ -49,11 +49,20 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
         case GetNote:
             client.getNoteContent(m_note.content, token, m_note.guid);
             emit noteFetched(m_note);
+            // TODO: ResourceOperation
             for (uint i = 0; i < m_note.resources.size(); ++i) {
                 edam::Resource resource = m_note.resources.at(i);
                 client.getResource(resource, token, resource.guid, true, false, false, false);
                 emit resourceFetched(resource);
             }
+            break;
+        case MoveNote:
+            client.updateNote(m_note, token, m_note);
+            emit noteMoved(m_note);
+            break;
+        case RenameNote:
+            client.updateNote(m_note, token, m_note);
+            emit noteRenamed(m_note);
             break;
         case ShareNote:
             client.shareNote(key, token, m_note.guid);
@@ -62,10 +71,6 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
         case UnshareNote:
             client.stopSharingNote(token, m_note.guid);
             emit noteUnshared(m_note);
-            break;
-        case UpdateNote:
-            client.updateNote(m_note, token, m_note);
-            emit noteUpdated(m_note);
             break;
         default:
             Q_ASSERT(false);

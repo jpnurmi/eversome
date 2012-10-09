@@ -76,6 +76,8 @@ private slots:
     void onResourceFetched(const evernote::edam::Resource& resource);
     void onNoteFetched(const evernote::edam::Note& note);
     void onNoteDeleted(const evernote::edam::Note& note);
+    void onNoteMoved(const evernote::edam::Note& note);
+    void onNoteRenamed(const evernote::edam::Note& note);
 
     void onNotebookFetched(const evernote::edam::Notebook& notebook);
 

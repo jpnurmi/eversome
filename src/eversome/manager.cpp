@@ -59,6 +59,10 @@ Manager::Manager(Session* session) : QObject(session)
                this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
     connect(m_store, SIGNAL(noteDeleted(evernote::edam::Note)),
                this, SLOT(onNoteDeleted(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(noteMoved(evernote::edam::Note)),
+               this, SLOT(onNoteMoved(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_store, SIGNAL(noteRenamed(evernote::edam::Note)),
+               this, SLOT(onNoteRenamed(evernote::edam::Note)), Qt::QueuedConnection);
     connect(m_store, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
                this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
 
@@ -312,6 +316,42 @@ void Manager::onNoteDeleted(const evernote::edam::Note& note)
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item) {
         item->setData(note);
+        m_database->saveNote(item);
+    }
+}
+
+void Manager::onNoteMoved(const evernote::edam::Note& note)
+{
+    NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
+    if (item) {
+        foreach (NotebookItem* notebook, m_notebooks->items<NotebookItem*>()) {
+            if (notebook->notes()->remove(item)) {
+                m_database->saveNotebook(notebook);
+                break;
+            }
+        }
+        NotebookItem* notebook = m_notebooks->get<NotebookItem*>(QString::fromStdString(note.notebookGuid));
+        if (notebook && notebook->notes()->add(item)) {
+            notebook->notes()->sort(titlePropertyLessThan);
+            m_database->saveNotebook(notebook);
+        }
+        m_database->saveNote(item);
+    }
+}
+
+void Manager::onNoteRenamed(const evernote::edam::Note& note)
+{
+    NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
+    if (item) {
+        item->setTitle(QString::fromStdString(note.title));
+        NotebookItem* notebook = m_notebooks->get<NotebookItem*>(QString::fromStdString(note.notebookGuid));
+        if (notebook)
+            notebook->notes()->sort(titlePropertyLessThan);
+        for (int i = 0; i < note.tagGuids.size(); ++i) {
+            TagItem* tag = m_tags->get<TagItem*>(QString::fromStdString(note.tagGuids[i]));
+            if (tag)
+                tag->notes()->sort(titlePropertyLessThan);
+        }
         m_database->saveNote(item);
     }
 }

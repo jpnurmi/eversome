@@ -156,7 +156,29 @@ void NoteStore::moveNote(const evernote::edam::Note& note, const evernote::edam:
     modified.__isset.guid = true; // :(
     modified.__isset.title = true; // :(
     modified.__isset.notebookGuid = true; // :(
-    updateNote(modified);
+
+    NoteOperation* operation = new NoteOperation(modified, Operation::MoveNote);
+    connect(operation, SIGNAL(noteMoved(evernote::edam::Note)),
+                 this, SIGNAL(noteMoved(evernote::edam::Note)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::moveNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
+}
+
+void NoteStore::renameNote(const evernote::edam::Note& note)
+{
+    evernote::edam::Note modified;
+    modified.guid = note.guid;
+    modified.title = note.title;
+    modified.__isset.guid = true; // :(
+    modified.__isset.title = true; // :(
+
+    NoteOperation* operation = new NoteOperation(modified, Operation::RenameNote);
+    connect(operation, SIGNAL(noteRenamed(evernote::edam::Note)),
+                 this, SIGNAL(noteRenamed(evernote::edam::Note)));
+    setupOperation(operation);
+    qDebug() << "NoteStore::renameNote():" << operation;
+    QThreadPool::globalInstance()->start(operation);
 }
 
 void NoteStore::shareNote(const edam::Note& note)
@@ -177,26 +199,6 @@ void NoteStore::unshareNote(const edam::Note& note)
     setupOperation(operation);
     qDebug() << "NoteStore::unshareNote():" << operation;
     QThreadPool::globalInstance()->start(operation);
-}
-
-void NoteStore::updateNote(const edam::Note& note)
-{
-    NoteOperation* operation = new NoteOperation(note, Operation::UpdateNote);
-    connect(operation, SIGNAL(noteUpdated(evernote::edam::Note)),
-                 this, SIGNAL(noteUpdated(evernote::edam::Note)));
-    setupOperation(operation);
-    qDebug() << "NoteStore::updateNote():" << operation;
-    QThreadPool::globalInstance()->start(operation);
-}
-
-void NoteStore::renameNote(const evernote::edam::Note& note)
-{
-    evernote::edam::Note modified;
-    modified.guid = note.guid;
-    modified.title = note.title;
-    modified.__isset.guid = true; // :(
-    modified.__isset.title = true; // :(
-    updateNote(modified);
 }
 
 void NoteStore::createNotebook(const edam::Notebook& notebook)

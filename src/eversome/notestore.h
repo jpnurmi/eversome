@@ -45,10 +45,9 @@ public slots:
     void deleteNote(const evernote::edam::Note& note);
     void getNote(const evernote::edam::Note& note);
     void moveNote(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook);
+    void renameNote(const evernote::edam::Note& note);
     void shareNote(const evernote::edam::Note& note);
     void unshareNote(const evernote::edam::Note& note);
-    void updateNote(const evernote::edam::Note& note);
-    void renameNote(const evernote::edam::Note& note);
 
     void createNotebook(const evernote::edam::Notebook& notebook);
     void getNotebook(const evernote::edam::Notebook& notebook);
@@ -76,10 +75,12 @@ signals:
     void noteCreated(const evernote::edam::Note& note);
     void noteDeleted(const evernote::edam::Note& note);
     void noteFetched(const evernote::edam::Note& note);
-    void resourceFetched(const evernote::edam::Resource& resource);
+    void noteMoved(const evernote::edam::Note& note);
+    void noteRenamed(const evernote::edam::Note& note);
     void noteShared(const evernote::edam::Note& note);
     void noteUnshared(const evernote::edam::Note& note);
-    void noteUpdated(const evernote::edam::Note& note);
+
+    void resourceFetched(const evernote::edam::Resource& resource);
 
     void notebookCreated(const evernote::edam::Notebook& notebook);
     void notebookFetched(const evernote::edam::Notebook& notebook);

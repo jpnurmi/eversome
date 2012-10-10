@@ -11,23 +11,32 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-import QtQuick 1.1
-import com.nokia.meego 1.0
-import com.evernote.types 1.0
-import "UIConstants.js" as UI
+#ifndef ABSTRACTSTORE_H
+#define ABSTRACTSTORE_H
 
-SelectionDialog {
-    id: dialog
+#include <QObject>
 
-    property Note note
+class Session;
+class NetworkOperation;
 
-    onAccepted: {
-        if (selectedIndex !== -1)
-            NoteStore.move(note.data(), Notebooks.at(selectedIndex).data())
-    }
+class AbstractStore : public QObject
+{
+    Q_OBJECT
 
-    Component.onCompleted: {
-        for (var i = 0; i < Notebooks.count; ++i)
-            dialog.model.append({name: Notebooks.at(i).name})
-    }
-}
+public:
+    explicit AbstractStore(Session* session);
+    virtual ~AbstractStore();
+
+    Session* session() const;
+
+signals:
+    void activityChanged();
+    void error(const QString& error);
+
+protected:
+    void startOperation(NetworkOperation* operation);
+
+    Session* m_session;
+};
+
+#endif // ABSTRACTSTORE_H

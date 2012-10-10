@@ -19,7 +19,9 @@
 #include <NoteStore_types.h>
 
 class Session;
+class SyncStore;
 class NoteStore;
+class NotebookStore;
 class Database;
 class FileSystem;
 
@@ -41,7 +43,9 @@ public:
 
     bool isBusy() const;
 
+    SyncStore* syncStore() const;
     NoteStore* noteStore() const;
+    NotebookStore* notebookStore() const;
     Database* database() const;
 
     ItemModel* notebookModel() const;
@@ -52,6 +56,7 @@ public:
 
 signals:
     void isBusyChanged();
+    void error(const QString& error);
 
 private slots:
     void onActivityChanged();
@@ -74,12 +79,16 @@ private slots:
                     const QVector<std::string>& tags);
 
     void onResourceFetched(const evernote::edam::Resource& resource);
+
+    void onNoteCreated(const evernote::edam::Note& note);
     void onNoteFetched(const evernote::edam::Note& note);
-    void onNoteDeleted(const evernote::edam::Note& note);
     void onNoteMoved(const evernote::edam::Note& note);
     void onNoteRenamed(const evernote::edam::Note& note);
+    void onNoteTrashed(const evernote::edam::Note& note);
 
+    void onNotebookCreated(const evernote::edam::Notebook& notebook);
     void onNotebookFetched(const evernote::edam::Notebook& notebook);
+    void onNotebookRenamed(const evernote::edam::Notebook& notebook);
 
     void onFileWritten(const QString& guid, const QString& filePath);
 
@@ -89,7 +98,9 @@ private:
     void addNotes(const QList<NoteItem*>& notes);
     void removeNotes(const QList<NoteItem*>& notes);
 
-    NoteStore* m_store;
+    SyncStore* m_syncstore;
+    NoteStore* m_notestore;
+    NotebookStore* m_notebookstore;
     Database* m_database;
     FileSystem* m_files;
 

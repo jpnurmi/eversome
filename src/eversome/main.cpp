@@ -16,7 +16,9 @@
 #include "qmlapplicationviewer.h"
 
 #include "filesystem.h"
+#include "notebookstore.h"
 #include "notestore.h"
+#include "syncstore.h"
 #include "database.h"
 #include "account.h"
 #include "session.h"
@@ -82,7 +84,9 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     viewer.rootContext()->setContextProperty("Session", &session);
     viewer.rootContext()->setContextProperty("Manager", manager);
     viewer.rootContext()->setContextProperty("Database", manager->database());
+    viewer.rootContext()->setContextProperty("SyncStore", manager->syncStore());
     viewer.rootContext()->setContextProperty("NoteStore", manager->noteStore());
+    viewer.rootContext()->setContextProperty("NotebookStore", manager->notebookStore());
     viewer.rootContext()->setContextProperty("Notebooks", manager->notebookModel());
     viewer.rootContext()->setContextProperty("Searches", manager->searchModel());
     viewer.rootContext()->setContextProperty("Tags", manager->tagModel());

@@ -24,9 +24,7 @@ CommonPage {
     property Note note
 
     pageHeader: PageHeader {
-        title: note ? note.title : ""
-        busy: Manager.isBusy
-        onRefresh: NoteStore.sync()
+        title: !!note ? note.title : ""
     }
 
     contentHeader: NoteHeader {
@@ -87,7 +85,7 @@ CommonPage {
     onNoteChanged: {
         if (note) {
             if (!note.filePath)
-                NoteStore.getNote(note.data());
+                NoteStore.fetch(note.data());
             if (note.unread) {
                 note.unread = false;
                 Database.saveNote(note);

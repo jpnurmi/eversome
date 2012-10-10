@@ -11,30 +11,31 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef NOTEBOOKOPERATION_H
-#define NOTEBOOKOPERATION_H
+#ifndef NOTEBOOKSTORE_H
+#define NOTEBOOKSTORE_H
 
-#include "networkoperation.h"
+#include "abstractstore.h"
 #include <Types_types.h>
 
-class NotebookOperation : public NetworkOperation
+class Session;
+
+class NotebookStore : public AbstractStore
 {
     Q_OBJECT
 
 public:
-    NotebookOperation(const evernote::edam::Notebook& notebook, Mode mode);
-    ~NotebookOperation();
+    explicit NotebookStore(Session* session);
+    virtual ~NotebookStore();
+
+public slots:
+    void create(const evernote::edam::Notebook& notebook);
+    void fetch(const evernote::edam::Notebook& notebook);
+    void rename(const evernote::edam::Notebook& notebook);
 
 signals:
     void created(const evernote::edam::Notebook& notebook);
     void fetched(const evernote::edam::Notebook& notebook);
     void renamed(const evernote::edam::Notebook& notebook);
-
-protected:
-    void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
-
-private:
-    evernote::edam::Notebook m_notebook;
 };
 
-#endif // NOTEBOOKOPERATION_H
+#endif // NOTEBOOKSTORE_H

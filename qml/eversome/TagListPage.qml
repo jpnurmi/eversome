@@ -21,8 +21,6 @@ CommonPage {
 
     pageHeader: PageHeader {
         title: qsTr("Tags")
-        busy: Manager.isBusy
-        onRefresh: NoteStore.sync()
     }
 
     contentHeader: UpdateHeader { }

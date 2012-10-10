@@ -47,18 +47,15 @@ public:
 
         // note operations
         CreateNote,
-        DeleteNote,
-        GetNote,
+        FetchNote,
         MoveNote,
         RenameNote,
-        ShareNote,
-        UnshareNote,
+        TrashNote,
 
         // notebook operations
         CreateNotebook,
-        GetNotebook,
-        GetDefaultNotebook,
-        UpdateNotebook
+        FetchNotebook,
+        RenameNotebook
     };
 
     Operation(Mode mode);

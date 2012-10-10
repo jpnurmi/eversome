@@ -19,7 +19,7 @@ Image {
     id: root
 
     property alias title: label.text
-    property bool busy
+    property bool busy: Manager.isBusy
 
     signal refresh()
 
@@ -58,7 +58,7 @@ Image {
             id: refreshIcon
             ToolIcon {
                 iconSource: "image://theme/icon-s-refresh-inverse"
-                onClicked: root.refresh()
+                onClicked: SyncStore.sync();
             }
         }
     }

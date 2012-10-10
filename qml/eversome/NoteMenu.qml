@@ -50,7 +50,7 @@ Menu {
         }
         MenuItem {
             text: qsTr("Delete")
-            onClicked: NoteStore.deleteNote(note.data())
+            onClicked: NoteStore.destroy(note.data())
         }
     }
 }

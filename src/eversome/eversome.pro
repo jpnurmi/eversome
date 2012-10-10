@@ -23,7 +23,6 @@ HEADERS += \
     database.h \
     filesystem.h \
     manager.h \
-    notestore.h \
     session.h
 
 SOURCES += \
@@ -32,11 +31,11 @@ SOURCES += \
     filesystem.cpp \
     main.cpp \
     manager.cpp \
-    notestore.cpp \
     session.cpp
 
 include(model/model.pri)
 include(operations/operations.pri)
+include(store/store.pri)
 
 OTHER_FILES += \
     eversome_harmattan.desktop \

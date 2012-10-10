@@ -23,9 +23,7 @@ CommonPage {
     property Notebook notebook
 
     pageHeader: PageHeader {
-        title: qsTr("Notebooks")
-        busy: Manager.isBusy
-        onRefresh: NoteStore.sync()
+        title: !!notebook ? notebook.name : ""
     }
 
     contentHeader: UpdateHeader { }

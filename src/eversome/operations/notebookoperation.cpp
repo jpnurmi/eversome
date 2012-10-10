@@ -31,26 +31,21 @@ NotebookOperation::~NotebookOperation()
 
 void NotebookOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
-    int usn = 0; // TODO
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
     switch (mode())
     {
         case CreateNotebook:
             client.createNotebook(m_notebook, token, m_notebook);
-            emit notebookCreated(m_notebook);
+            emit created(m_notebook);
             break;
-        case GetNotebook:
+        case FetchNotebook:
             client.getNotebook(m_notebook, token, m_notebook.guid);
-            emit notebookFetched(m_notebook);
+            emit fetched(m_notebook);
             break;
-        case GetDefaultNotebook:
-            client.getDefaultNotebook(m_notebook, token);
-            emit defaultNotebookFetched(m_notebook);
-            break;
-        case UpdateNotebook:
-            usn = client.updateNotebook(token, m_notebook);
-            emit notebookUpdated(m_notebook);
+        case RenameNotebook:
+            client.updateNotebook(token, m_notebook);
+            emit renamed(m_notebook);
             break;
         default:
             Q_ASSERT(false);

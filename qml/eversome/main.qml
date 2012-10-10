@@ -36,7 +36,7 @@ PageStackWindow {
             }
 
             Connections {
-                target: NoteStore
+                target: Manager
                 onError: {
                     banner.text = error;
                     banner.show();

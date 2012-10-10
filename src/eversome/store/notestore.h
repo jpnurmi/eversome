@@ -11,19 +11,31 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef NOTEOPERATION_H
-#define NOTEOPERATION_H
+#ifndef NOTESTORE_H
+#define NOTESTORE_H
 
-#include "networkoperation.h"
+#include "abstractstore.h"
 #include <Types_types.h>
+#include <NoteStore_types.h>
 
-class NoteOperation : public NetworkOperation
+class Session;
+
+class NoteStore : public AbstractStore
 {
     Q_OBJECT
 
 public:
-    NoteOperation(const evernote::edam::Note& note, Mode mode);
-    ~NoteOperation();
+    explicit NoteStore(Session* session);
+    virtual ~NoteStore();
+
+public slots:
+    void search(const evernote::edam::SavedSearch& search);
+
+    void create(const evernote::edam::Note& note);
+    void fetch(const evernote::edam::Note& note);
+    void move(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook);
+    void rename(const evernote::edam::Note& note);
+    void trash(const evernote::edam::Note& note);
 
 signals:
     void created(const evernote::edam::Note& note);
@@ -32,14 +44,9 @@ signals:
     void renamed(const evernote::edam::Note& note);
     void trashed(const evernote::edam::Note& note);
 
-    // TODO: ResourceOperation
     void resourceFetched(const evernote::edam::Resource& resource);
 
-protected:
-    void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
-
-private:
-    evernote::edam::Note m_note;
+    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes);
 };
 
-#endif // NOTEOPERATION_H
+#endif // NOTESTORE_H

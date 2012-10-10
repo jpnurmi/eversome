@@ -31,24 +31,17 @@ NoteOperation::~NoteOperation()
 
 void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
-    int usn = 0; // TODO
-    std::string key; // TODO
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
     switch (mode())
     {
         case CreateNote:
             client.createNote(m_note, token, m_note);
-            emit noteCreated(m_note);
+            emit created(m_note);
             break;
-        case DeleteNote:
-            usn = client.deleteNote(token, m_note.guid);
-            m_note.active = false;
-            emit noteDeleted(m_note);
-            break;
-        case GetNote:
+        case FetchNote:
             client.getNoteContent(m_note.content, token, m_note.guid);
-            emit noteFetched(m_note);
+            emit fetched(m_note);
             // TODO: ResourceOperation
             for (uint i = 0; i < m_note.resources.size(); ++i) {
                 edam::Resource resource = m_note.resources.at(i);
@@ -58,19 +51,16 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
             break;
         case MoveNote:
             client.updateNote(m_note, token, m_note);
-            emit noteMoved(m_note);
+            emit moved(m_note);
             break;
         case RenameNote:
             client.updateNote(m_note, token, m_note);
-            emit noteRenamed(m_note);
+            emit renamed(m_note);
             break;
-        case ShareNote:
-            client.shareNote(key, token, m_note.guid);
-            emit noteShared(m_note);
-            break;
-        case UnshareNote:
-            client.stopSharingNote(token, m_note.guid);
-            emit noteUnshared(m_note);
+        case TrashNote:
+            client.deleteNote(token, m_note.guid);
+            m_note.active = false;
+            emit trashed(m_note);
             break;
         default:
             Q_ASSERT(false);

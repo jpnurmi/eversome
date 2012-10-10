@@ -22,7 +22,7 @@ CommonPage {
     pageHeader: PageHeader {
         title: qsTr("Search")
         busy: Manager.isBusy
-        onRefresh: NoteStore.sync()
+        onRefresh: SyncStore.sync()
     }
 
     contentHeader: UpdateHeader { }

@@ -25,9 +25,6 @@ CommonPage {
 
     pageHeader: PageHeader {
         id: header
-        title: qsTr("Notebooks")
-        busy: Manager.isBusy
-        onRefresh: NoteStore.sync()
     }
 
     contentHeader: UpdateHeader { }

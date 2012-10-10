@@ -28,10 +28,11 @@ CommonPage {
     flickable: ListView {
         model: Tags
         delegate: TagDelegate {
+            id: delegate
             tag: modelData
             onClicked: pageStack.push(noteListPage, {title: tag.name, container: tag})
             onPressAndHold: {
-                var menu = noteListMenu.createObject(root, {container: tag});
+                var menu = noteListMenu.createObject(root, {container: tag, delegate: delegate});
                 menu.open();
             }
         }

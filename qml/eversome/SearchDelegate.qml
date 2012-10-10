@@ -24,6 +24,11 @@ CommonDelegate {
 
     highlighted: !!search && search.unread
 
+    onEdited: {
+        search.name = text;
+        //TODO: SearchStore.rename(search.data());
+    }
+
     Label {
         id: nameLabel
 

@@ -30,13 +30,14 @@ CommonPage {
     flickable: ListView {
         model: Searches
         delegate: SearchDelegate {
+            id: delegate
             search: modelData
             onClicked: {
                 NoteStore.search(search.data());
                 pageStack.push(noteListPage, {title: search.name, container: search})
             }
             onPressAndHold: {
-                var menu = noteListMenu.createObject(root, {container: search});
+                var menu = noteListMenu.createObject(root, {container: search, delegate: delegate});
                 menu.open();
             }
         }

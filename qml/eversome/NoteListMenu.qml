@@ -20,8 +20,17 @@ Menu {
     id: menu
 
     property QtObject container
+    property CommonDelegate delegate
 
     MenuLayout {
+        MenuItem {
+            text: qsTr("Rename")
+            enabled: !!delegate
+            onClicked: {
+                if (delegate)
+                    delegate.edit(container.name);
+            }
+        }
         MenuItem {
             text: !!container && container.unread ? qsTr("Mark all as read") : qsTr("Mark all as unread")
             onClicked: {

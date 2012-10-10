@@ -24,6 +24,11 @@ CommonDelegate {
 
     highlighted: !!tag && tag.unread
 
+    onEdited: {
+        tag.name = text;
+        //TODO: TagStore.rename(tag.data());
+    }
+
     Label {
         id: nameLabel
 

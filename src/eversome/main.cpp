@@ -86,14 +86,15 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     viewer.rootContext()->setContextProperty("Session", &session);
     viewer.rootContext()->setContextProperty("Manager", manager);
     viewer.rootContext()->setContextProperty("Database", manager->database());
-    viewer.rootContext()->setContextProperty("TagStore", manager->tagStore());
     viewer.rootContext()->setContextProperty("SyncStore", manager->syncStore());
-    viewer.rootContext()->setContextProperty("SearchStore", manager->searchStore());
-    viewer.rootContext()->setContextProperty("NoteStore", manager->noteStore());
-    viewer.rootContext()->setContextProperty("NotebookStore", manager->notebookStore());
-    viewer.rootContext()->setContextProperty("Notebooks", manager->notebookModel());
-    viewer.rootContext()->setContextProperty("Searches", manager->searchModel());
-    viewer.rootContext()->setContextProperty("Tags", manager->tagModel());
+    viewer.rootContext()->setContextProperty("TagStore", manager->itemStore(Manager::Tag));
+    viewer.rootContext()->setContextProperty("NoteStore", manager->itemStore(Manager::Note));
+    viewer.rootContext()->setContextProperty("SearchStore", manager->itemStore(Manager::Search));
+    viewer.rootContext()->setContextProperty("NotebookStore", manager->itemStore(Manager::Notebook));
+    viewer.rootContext()->setContextProperty("Notebooks", manager->itemModel(Manager::Notebook));
+    viewer.rootContext()->setContextProperty("Searches", manager->itemModel(Manager::Search));
+    viewer.rootContext()->setContextProperty("Notes", manager->itemModel(Manager::Note));
+    viewer.rootContext()->setContextProperty("Tags", manager->itemModel(Manager::Tag));
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
     viewer.setMainQmlFile(QLatin1String("qml/eversome/main.qml"));
 

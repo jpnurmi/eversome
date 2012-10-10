@@ -14,18 +14,16 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
+#include <QHash>
 #include <QObject>
 #include <Types_types.h>
 #include <NoteStore_types.h>
 
 class Session;
-class SyncStore;
-class NoteStore;
-class NotebookStore;
-class SearchStore;
-class TagStore;
 class Database;
+class SyncStore;
 class FileSystem;
+class AbstractStore;
 
 class ItemModel;
 class NotebookItem;
@@ -46,17 +44,11 @@ public:
     bool isBusy() const;
 
     SyncStore* syncStore() const;
-    NoteStore* noteStore() const;
-    NotebookStore* notebookStore() const;
-    SearchStore* searchStore() const;
-    TagStore* tagStore() const;
     Database* database() const;
 
-    ItemModel* notebookModel() const;
-    ItemModel* resourceModel() const;
-    ItemModel* searchModel() const;
-    ItemModel* noteModel() const;
-    ItemModel* tagModel() const;
+    enum Item { Notebook, Resource, Search, Note, Tag };
+    AbstractStore* itemStore(Item item) const;
+    ItemModel* itemModel(Item item) const;
 
 signals:
     void isBusyChanged();
@@ -110,19 +102,11 @@ private:
     void addNotes(const QList<NoteItem*>& notes);
     void removeNotes(const QList<NoteItem*>& notes);
 
-    SyncStore* m_syncstore;
-    NoteStore* m_notestore;
-    NotebookStore* m_notebookstore;
-    SearchStore* m_searchstore;
-    TagStore* m_tagstore;
-    Database* m_database;
     FileSystem* m_files;
-
-    ItemModel* m_notebooks;
-    ItemModel* m_resources;
-    ItemModel* m_searches;
-    ItemModel* m_notes;
-    ItemModel* m_tags;
+    Database* m_database;
+    SyncStore* m_syncstore;
+    QHash<Item, ItemModel*> m_itemmodels;
+    QHash<Item, AbstractStore*> m_itemstores;
 };
 
 #endif // MANAGER_H

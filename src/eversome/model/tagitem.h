@@ -23,8 +23,8 @@
 class TagItem : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY dataChanged)
     Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
-    Q_PROPERTY(QString name READ name NOTIFY dataChanged)
     Q_PROPERTY(QString parentGuid READ parentGuid NOTIFY dataChanged)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
     Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
@@ -37,8 +37,10 @@ public:
     Q_INVOKABLE evernote::edam::Tag data() const;
     void setData(const evernote::edam::Tag& data);
 
-    QString guid() const;
     QString name() const;
+    void setName(const QString& name);
+
+    QString guid() const;
     QString parentGuid() const;
     ItemModel* notes() const;
     int usn() const;

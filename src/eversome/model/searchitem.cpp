@@ -41,14 +41,23 @@ void SearchItem::setData(const evernote::edam::SavedSearch& data)
     emit dataChanged();
 }
 
-QString SearchItem::guid() const
-{
-    return QString::fromStdString(m_search.guid);
-}
-
 QString SearchItem::name() const
 {
     return QString::fromStdString(m_search.name);
+}
+
+void SearchItem::setName(const QString& name)
+{
+    std::string str = name.toStdString();
+    if (m_search.name != str) {
+        m_search.name = str;
+        emit dataChanged();
+    }
+}
+
+QString SearchItem::guid() const
+{
+    return QString::fromStdString(m_search.guid);
 }
 
 QString SearchItem::query() const

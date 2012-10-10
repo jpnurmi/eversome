@@ -41,14 +41,23 @@ void TagItem::setData(const evernote::edam::Tag& data)
     emit dataChanged();
 }
 
-QString TagItem::guid() const
-{
-    return QString::fromStdString(m_tag.guid);
-}
-
 QString TagItem::name() const
 {
     return QString::fromStdString(m_tag.name);
+}
+
+void TagItem::setName(const QString& name)
+{
+    std::string str = name.toStdString();
+    if (m_tag.name != str) {
+        m_tag.name = str;
+        emit dataChanged();
+    }
+}
+
+QString TagItem::guid() const
+{
+    return QString::fromStdString(m_tag.guid);
 }
 
 QString TagItem::parentGuid() const

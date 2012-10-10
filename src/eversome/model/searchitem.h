@@ -23,8 +23,8 @@
 class SearchItem : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY dataChanged)
     Q_PROPERTY(QString guid READ guid NOTIFY dataChanged)
-    Q_PROPERTY(QString name READ name NOTIFY dataChanged)
     Q_PROPERTY(QString query READ query NOTIFY dataChanged)
     Q_PROPERTY(ItemModel* notes READ notes CONSTANT)
     Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
@@ -37,8 +37,10 @@ public:
     Q_INVOKABLE evernote::edam::SavedSearch data() const;
     void setData(const evernote::edam::SavedSearch& data);
 
-    QString guid() const;
     QString name() const;
+    void setName(const QString& name);
+
+    QString guid() const;
     QString query() const;
     ItemModel* notes() const;
     int usn() const;

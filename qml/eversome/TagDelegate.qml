@@ -26,7 +26,7 @@ CommonDelegate {
 
     onEdited: {
         tag.name = text;
-        //TODO: TagStore.rename(tag.data());
+        TagStore.rename(tag.data());
     }
 
     Label {

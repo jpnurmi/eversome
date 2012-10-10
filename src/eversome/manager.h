@@ -22,6 +22,8 @@ class Session;
 class SyncStore;
 class NoteStore;
 class NotebookStore;
+class SearchStore;
+class TagStore;
 class Database;
 class FileSystem;
 
@@ -46,6 +48,8 @@ public:
     SyncStore* syncStore() const;
     NoteStore* noteStore() const;
     NotebookStore* notebookStore() const;
+    SearchStore* searchStore() const;
+    TagStore* tagStore() const;
     Database* database() const;
 
     ItemModel* notebookModel() const;
@@ -90,9 +94,17 @@ private slots:
     void onNotebookFetched(const evernote::edam::Notebook& notebook);
     void onNotebookRenamed(const evernote::edam::Notebook& notebook);
 
+    void onTagCreated(const evernote::edam::Tag& tag);
+    void onTagFetched(const evernote::edam::Tag& tag);
+    void onTagRenamed(const evernote::edam::Tag& tag);
+
     void onFileWritten(const QString& guid, const QString& filePath);
 
-    void onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes);
+    void onSearchCreated(const evernote::edam::SavedSearch& search);
+    void onSearchFetched(const evernote::edam::SavedSearch& search);
+    void onSearchRenamed(const evernote::edam::SavedSearch& search);
+    void onSearched(const evernote::edam::SavedSearch& search,
+                    const QVector<evernote::edam::NoteMetadata>& notes);
 
 private:
     void addNotes(const QList<NoteItem*>& notes);
@@ -101,6 +113,8 @@ private:
     SyncStore* m_syncstore;
     NoteStore* m_notestore;
     NotebookStore* m_notebookstore;
+    SearchStore* m_searchstore;
+    TagStore* m_tagstore;
     Database* m_database;
     FileSystem* m_files;
 

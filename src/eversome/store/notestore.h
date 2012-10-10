@@ -29,8 +29,6 @@ public:
     virtual ~NoteStore();
 
 public slots:
-    void search(const evernote::edam::SavedSearch& search);
-
     void create(const evernote::edam::Note& note);
     void fetch(const evernote::edam::Note& note);
     void move(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook);
@@ -44,9 +42,8 @@ signals:
     void renamed(const evernote::edam::Note& note);
     void trashed(const evernote::edam::Note& note);
 
+    // TODO:
     void resourceFetched(const evernote::edam::Resource& resource);
-
-    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes);
 };
 
 #endif // NOTESTORE_H

@@ -14,9 +14,11 @@
 #include "manager.h"
 #include "session.h"
 #include "database.h"
+#include "tagstore.h"
 #include "syncstore.h"
 #include "notestore.h"
 #include "filesystem.h"
+#include "searchstore.h"
 #include "notebookstore.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
@@ -62,8 +64,17 @@ Manager::Manager(Session* session) : QObject(session)
     // TODO: ResourceOperation
     connect(m_notestore, SIGNAL(resourceFetched(evernote::edam::Resource)),
                    this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
-    connect(m_notestore, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
-                   this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
+
+    m_searchstore = new SearchStore(session);
+    connect(m_searchstore, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(m_searchstore, SIGNAL(created(evernote::edam::SavedSearch)),
+                     this, SLOT(onSearchCreated(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_searchstore, SIGNAL(fetched(evernote::edam::SavedSearch)),
+                     this, SLOT(onSearchFetched(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_searchstore, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
+                     this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
+    connect(m_searchstore, SIGNAL(renamed(evernote::edam::SavedSearch)),
+                     this, SLOT(onSearchRenamed(evernote::edam::SavedSearch)), Qt::QueuedConnection);
 
     m_notebookstore = new NotebookStore(session);
     connect(m_notebookstore, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
@@ -73,6 +84,15 @@ Manager::Manager(Session* session) : QObject(session)
                        this, SLOT(onNotebookFetched(evernote::edam::Notebook)), Qt::QueuedConnection);
     connect(m_notebookstore, SIGNAL(renamed(evernote::edam::Notebook)),
                        this, SLOT(onNotebookRenamed(evernote::edam::Notebook)), Qt::QueuedConnection);
+
+    m_tagstore = new TagStore(session);
+    connect(m_tagstore, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(m_tagstore, SIGNAL(created(evernote::edam::Tag)),
+                  this, SLOT(onTagCreated(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_tagstore, SIGNAL(fetched(evernote::edam::Tag)),
+                  this, SLOT(onTagFetched(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_tagstore, SIGNAL(renamed(evernote::edam::Tag)),
+                  this, SLOT(onTagRenamed(evernote::edam::Tag)), Qt::QueuedConnection);
 
     m_syncstore = new SyncStore(session);
     connect(m_syncstore, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
@@ -157,6 +177,16 @@ NoteStore* Manager::noteStore() const
 NotebookStore* Manager::notebookStore() const
 {
     return m_notebookstore;
+}
+
+SearchStore* Manager::searchStore() const
+{
+    return m_searchstore;
+}
+
+TagStore* Manager::tagStore() const
+{
+    return m_tagstore;
 }
 
 Database* Manager::database() const
@@ -391,6 +421,34 @@ void Manager::onNotebookRenamed(const evernote::edam::Notebook& notebook)
     }
 }
 
+void Manager::onTagCreated(const evernote::edam::Tag& tag)
+{
+    // TODO: untested
+    TagItem* item = new TagItem(tag, this);
+    m_notebooks->add(item);
+    m_database->saveTag(item);
+}
+
+void Manager::onTagFetched(const evernote::edam::Tag& tag)
+{
+    // TODO: untested
+    TagItem* item = m_notebooks->get<TagItem*>(QString::fromStdString(tag.guid));
+    if (item) {
+        item->setData(tag);
+        m_database->saveTag(item);
+    }
+}
+
+void Manager::onTagRenamed(const evernote::edam::Tag& tag)
+{
+    // TODO: untested
+    TagItem* item = m_notebooks->get<TagItem*>(QString::fromStdString(tag.guid));
+    if (item) {
+        item->setName(QString::fromStdString(tag.name));
+        m_database->saveTag(item);
+    }
+}
+
 void Manager::onFileWritten(const QString& guid, const QString &filePath)
 {
     if (m_notes->contains(guid)) {
@@ -403,6 +461,34 @@ void Manager::onFileWritten(const QString& guid, const QString &filePath)
             resource->update();
     } else
         qCritical() << "### Manager::onFileWritten(): UNIDENTIFIED FILE:" << filePath;
+}
+
+void Manager::onSearchCreated(const evernote::edam::SavedSearch& search)
+{
+    // TODO: untested
+    SearchItem* item = new SearchItem(search, this);
+    m_searches->add(item);
+    m_database->saveSearch(item);
+}
+
+void Manager::onSearchFetched(const evernote::edam::SavedSearch& search)
+{
+    // TODO: untested
+    SearchItem* item = m_searches->get<SearchItem*>(QString::fromStdString(search.guid));
+    if (item) {
+        item->setData(search);
+        m_database->saveSearch(item);
+    }
+}
+
+void Manager::onSearchRenamed(const evernote::edam::SavedSearch& search)
+{
+    // TODO: untested
+    SearchItem* item = m_searches->get<SearchItem*>(QString::fromStdString(search.guid));
+    if (item) {
+        item->setName(QString::fromStdString(search.name));
+        m_database->saveSearch(item);
+    }
 }
 
 void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes)

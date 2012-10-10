@@ -15,46 +15,26 @@
 
 #include "notestore.h"
 #include "noteoperation.h"
-#include "searchoperation.h"
 #include <QMetaType>
 #include <QtDebug>
 
 using namespace evernote;
 
-Q_DECLARE_METATYPE(QVector<evernote::edam::NoteMetadata>)
-Q_DECLARE_METATYPE(QVector<evernote::edam::SavedSearch>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
-Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
-Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
-Q_DECLARE_METATYPE(evernote::edam::Tag)
 
 NoteStore::NoteStore(Session* session) : AbstractStore(session)
 {
-    qRegisterMetaType<QVector<evernote::edam::NoteMetadata> >();
-    qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
     qRegisterMetaType<QVector<evernote::edam::Note> >();
-    qRegisterMetaType<QVector<evernote::edam::Tag> >();
-    qRegisterMetaType<evernote::edam::SavedSearch>();
     qRegisterMetaType<evernote::edam::Resource>();
     qRegisterMetaType<evernote::edam::Note>();
-    qRegisterMetaType<evernote::edam::Tag>();
 }
 
 NoteStore::~NoteStore()
 {
-}
-
-void NoteStore::search(const edam::SavedSearch& search)
-{
-    SearchOperation* operation = new SearchOperation(search);
-    connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
-                 this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)));
-    qDebug() << "NoteStore::search():" << operation;
-    startOperation(operation);
 }
 
 void NoteStore::create(const edam::Note& note)

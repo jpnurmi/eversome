@@ -5,10 +5,12 @@ HEADERS += \
     abstractstore.h \
     notebookstore.h \
     notestore.h \
-    syncstore.h
+    syncstore.h \
+    tagstore.h
 
 SOURCES += \
     abstractstore.cpp \
     notebookstore.cpp \
     notestore.cpp \
-    syncstore.cpp
+    syncstore.cpp \
+    tagstore.cpp

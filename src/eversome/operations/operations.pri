@@ -10,7 +10,8 @@ HEADERS += \
     operation.h \
     operationerror.h \
     searchoperation.h \
-    syncoperation.h
+    syncoperation.h \
+    tagoperation.h
 
 SOURCES += \
     databaseoperation.cpp \
@@ -21,4 +22,5 @@ SOURCES += \
     operation.cpp \
     operationerror.cpp \
     searchoperation.cpp \
-    syncoperation.cpp
+    syncoperation.cpp \
+    tagoperation.cpp

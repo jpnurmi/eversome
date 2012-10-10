@@ -55,7 +55,12 @@ public:
         // notebook operations
         CreateNotebook,
         FetchNotebook,
-        RenameNotebook
+        RenameNotebook,
+
+        // tag operations
+        CreateTag,
+        FetchTag,
+        RenameTag
     };
 
     Operation(Mode mode);

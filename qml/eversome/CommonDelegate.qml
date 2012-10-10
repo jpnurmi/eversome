@@ -74,24 +74,27 @@ BorderImage {
         id: editorComponent
         TextField {
             id: editor
-            anchors.fill: container
+            anchors.left: container.left
+            anchors.right: container.right
+            anchors.verticalCenter: container.verticalCenter
             Keys.onEnterPressed: {
                 root.edited(text);
-                editor.destroy(10);
+                editor.destroy();
             }
             Keys.onReturnPressed: {
                 root.edited(text);
-                editor.destroy(10);
-            }
-            Keys.onEscapePressed: {
-                editor.destroy(10);
+                editor.destroy();
             }
             onActiveFocusChanged: {
-                if (!activeFocus) {
-                    editor.closeSoftwareInputPanel();
-                    editor.destroy(0);
-                }
+                if (!activeFocus)
+                    editor.destroy();
             }
+            Keys.onEscapePressed: editor.destroy()
+            InverseMouseArea {
+                anchors.fill: parent
+                onPressedOutside: editor.destroy()
+            }
+            Component.onDestruction: editor.closeSoftwareInputPanel()
         }
     }
 }

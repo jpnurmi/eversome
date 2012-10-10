@@ -24,11 +24,15 @@ class SearchOperation : public NetworkOperation
     Q_OBJECT
 
 public:
-    SearchOperation(const evernote::edam::SavedSearch& search);
+    SearchOperation(const evernote::edam::SavedSearch& search, Mode mode);
     ~SearchOperation();
 
 signals:
-    void searched(const evernote::edam::SavedSearch& search, const QVector<evernote::edam::NoteMetadata>& notes);
+    void created(const evernote::edam::SavedSearch& search);
+    void fetched(const evernote::edam::SavedSearch& search);
+    void searched(const evernote::edam::SavedSearch& search,
+                  const QVector<evernote::edam::NoteMetadata>& notes);
+    void renamed(const evernote::edam::SavedSearch& search);
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);

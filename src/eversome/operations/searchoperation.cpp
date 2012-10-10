@@ -21,8 +21,8 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-SearchOperation::SearchOperation(const edam::SavedSearch& search) :
-    NetworkOperation(Search), m_search(search)
+SearchOperation::SearchOperation(const edam::SavedSearch& search, Mode mode) :
+    NetworkOperation(mode), m_search(search)
 {
 }
 
@@ -32,21 +32,34 @@ SearchOperation::~SearchOperation()
 
 void SearchOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
 {
-    Q_ASSERT(mode() == Search);
-
     edam::NoteStoreClient client(protocol);
     std::string token = authToken().toStdString();
-
-    edam::NoteFilter filter;
-    edam::NotesMetadataList list;
-    edam::NotesMetadataResultSpec spec;
-
-    filter.__isset.words = true; // TODO: why is this needed???
-    filter.words = m_search.query;
-
-    client.findNotesMetadata(list, token, filter, 0, limits::g_Limits_constants.EDAM_USER_NOTES_MAX, spec);
-
-    qDebug() << "SearchOperation::operate(): searched..." << QString::fromStdString(m_search.query) << list.notes.size();
-
-    emit searched(m_search, QVector<edam::NoteMetadata>::fromStdVector(list.notes));
+    switch (mode())
+    {
+        case CreateTag:
+            client.createSearch(m_search, token, m_search);
+            emit created(m_search);
+            break;
+        case FetchTag:
+            client.getSearch(m_search, token, m_search.guid);
+            emit fetched(m_search);
+            break;
+        case PerformSearch:
+        {
+            edam::NoteFilter filter;
+            edam::NotesMetadataList list;
+            edam::NotesMetadataResultSpec spec;
+            filter.__isset.words = true; // :(
+            filter.words = m_search.query;
+            client.findNotesMetadata(list, token, filter, 0, limits::g_Limits_constants.EDAM_USER_NOTES_MAX, spec);
+            emit searched(m_search, QVector<edam::NoteMetadata>::fromStdVector(list.notes));
+        }
+        case RenameSearch:
+            client.updateSearch(token, m_search);
+            emit renamed(m_search);
+            break;
+        default:
+            Q_ASSERT(false);
+            break;
+    }
 }

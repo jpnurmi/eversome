@@ -43,7 +43,12 @@ public:
 
         // store operations
         Sync,
-        Search,
+
+        // search operations
+        CreateSearch,
+        FetchSearch,
+        PerformSearch,
+        RenameSearch,
 
         // note operations
         CreateNote,

@@ -18,6 +18,8 @@ SearchItem::SearchItem(evernote::edam::SavedSearch search, QObject* parent)
     : QObject(parent), m_search(search)
 {
     m_notes = new ItemModel(this);
+    m_notes->setSortProperty("title");
+
     connect(m_notes, SIGNAL(countChanged()), this, SIGNAL(unreadChanged()));
     connect(m_notes, SIGNAL(added(QObject*)), this, SLOT(onNoteAdded(QObject*)));
     connect(m_notes, SIGNAL(added(QObjectList)), this, SLOT(onNotesAdded(QObjectList)));

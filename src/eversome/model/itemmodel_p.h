@@ -41,11 +41,13 @@ bool ItemModel::add(T item)
     if (!m_guids.contains(item->guid())) {
         const int row = rowCount();
         beginInsertRows(QModelIndex(), row, row);
+        connect(item, SIGNAL(dataChanged()), this, SLOT(sort()));
         m_guids.insert(item->guid(), item);
         m_items += item;
         endInsertRows();
         emit countChanged();
         emit added(item);
+        sort();
         return true;
     } else {
         replace(item);
@@ -64,6 +66,7 @@ bool ItemModel::add(const QList<T>& items)
         } else {
             unique += item;
             m_guids.insert(guid, item);
+            connect(item, SIGNAL(dataChanged()), this, SLOT(sort()));
         }
     }
 
@@ -75,6 +78,7 @@ bool ItemModel::add(const QList<T>& items)
         endInsertRows();
         emit countChanged();
         emit added(unique);
+        sort();
         return true;
     }
     return false;
@@ -87,11 +91,14 @@ bool ItemModel::replace(T item)
     if (m_guids.contains(guid)) {
         T old = qobject_cast<T>(m_guids.value(guid));
         int idx = m_items.indexOf(old);
+        connect(item, SIGNAL(dataChanged()), this, SLOT(sort()));
+        disconnect(m_items.at(idx), SIGNAL(dataChanged()), this, SLOT(sort()));
         m_items.replace(idx, item);
         emit dataChanged(index(idx), index(idx));
         emit removed(old);
         emit added(item);
         old->deleteLater();
+        sort();
         return true;
     }
     return false;
@@ -104,6 +111,7 @@ bool ItemModel::remove(T item)
     if (m_guids.contains(guid)) {
         int idx = m_items.indexOf(item);
         beginRemoveRows(QModelIndex(), idx, idx);
+        disconnect(item, SIGNAL(dataChanged()), this, SLOT(sort()));
         m_guids.remove(guid);
         m_items.removeAt(idx);
         endRemoveRows();
@@ -112,13 +120,6 @@ bool ItemModel::remove(T item)
         return true;
     }
     return false;
-}
-
-template <typename LessThan>
-void ItemModel::sort(LessThan lessThan)
-{
-    qSort(m_items.begin(), m_items.end(), lessThan);
-    emit dataChanged(index(0), index(m_items.count() - 1));
 }
 
 #endif // ITEMMODEL_P_H

@@ -14,6 +14,25 @@
 #include "itemmodel.h"
 #include <QDebug>
 
+class PropertySorter
+{
+public:
+    PropertySorter(const QByteArray& property, Qt::SortOrder order)
+        : property(property), order(order) { }
+
+    bool operator() (const QObject* left, const QObject* right) const
+    {
+        QString l = left->property(property).toString();
+        QString r = right->property(property).toString();
+        if (order == Qt::DescendingOrder) qSwap(l, r);
+        return l.localeAwareCompare(r) < 0;
+    }
+
+private:
+    QByteArray property;
+    Qt::SortOrder order;
+};
+
 ItemModel::ItemModel(QObject *parent) : QAbstractListModel(parent)
 {
     qRegisterMetaType<ItemModel*>();
@@ -45,9 +64,33 @@ QVariant ItemModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
+void ItemModel::sort(int column, Qt::SortOrder order)
+{
+    Q_UNUSED(column);
+    if (!m_sortProperty.isEmpty())
+    {
+        emit layoutAboutToBeChanged();
+
+        PropertySorter sorter(m_sortProperty, order);
+        qSort(m_items.begin(), m_items.end(), sorter);
+
+        emit layoutChanged();
+    }
+}
+
 bool ItemModel::contains(const QString& guid) const
 {
     return m_guids.contains(guid);
+}
+
+QByteArray ItemModel::sortProperty() const
+{
+    return m_sortProperty;
+}
+
+void ItemModel::setSortProperty(const QByteArray& property)
+{
+    m_sortProperty = property;
 }
 
 void ItemModel::clear()

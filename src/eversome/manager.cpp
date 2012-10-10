@@ -121,6 +121,11 @@ Manager::Manager(Session* session) : QObject(session)
     m_searches = new ItemModel(this);
     m_notes = new ItemModel(this);
     m_tags = new ItemModel(this);
+
+    m_notebooks->setSortProperty("name");
+    m_searches->setSortProperty("name");
+    m_notes->setSortProperty("title");
+    m_tags->setSortProperty("name");
 }
 
 Manager::~Manager()
@@ -196,23 +201,11 @@ void Manager::onLoaded(const QList<NotebookItem*>& notebooks,
                        const QList<TagItem*>& tags)
 {
     bool added = false;
-    if (m_notebooks->add(notebooks)) {
-        m_notebooks->sort(namePropertyLessThan);
-        added = true;
-    }
+    added |= m_notebooks->add(notebooks);
     added |= m_resources->add(resources);
-    if (m_searches->add(searches)) {
-        m_searches->sort(namePropertyLessThan);
-        added = true;
-    }
-    if (m_notes->add(notes)) {
-        m_notes->sort(titlePropertyLessThan);
-        added = true;
-    }
-    if (m_tags->add(tags)) {
-        m_tags->sort(namePropertyLessThan);
-        added = true;
-    }
+    added |= m_searches->add(searches);
+    added |= m_notes->add(notes);
+    added |= m_tags->add(tags);
 
     if (added)
         addNotes(m_notes->items<NoteItem*>());
@@ -228,10 +221,7 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
     QList<NotebookItem*> notebookItems;
     foreach (const evernote::edam::Notebook& notebook, notebooks)
         notebookItems += new NotebookItem(notebook, this);
-    if (m_notebooks->add(notebookItems)) {
-        m_notebooks->sort(namePropertyLessThan);
-        added = true;
-    }
+    added |= m_notebooks->add(notebookItems);
 
     QList<ResourceItem*> resourceItems;
     foreach (const evernote::edam::Resource& resource, resources)
@@ -241,10 +231,7 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
     QList<SearchItem*> searchItems;
     foreach (const evernote::edam::SavedSearch& search, searches)
         searchItems += new SearchItem(search, this);
-    if (m_searches->add(searchItems)) {
-        m_searches->sort(namePropertyLessThan);
-        added = true;
-    }
+    added |= m_searches->add(searchItems);
 
     QList<NoteItem*> noteItems;
     foreach (const evernote::edam::Note& note, notes) {
@@ -255,18 +242,12 @@ void Manager::onSynced(const QVector<evernote::edam::Notebook>& notebooks,
             m_notes->remove(noteItem);
         }
     }
-    if (m_notes->add(noteItems)) {
-        m_notes->sort(titlePropertyLessThan);
-        added = true;
-    }
+    added |= m_notes->add(noteItems);
 
     QList<TagItem*> tagItems;
     foreach (const evernote::edam::Tag& tag, tags)
         tagItems += new TagItem(tag, this);
-    if (m_tags->add(tagItems)) {
-        m_tags->sort(namePropertyLessThan);
-        added = true;
-    }
+    added |= m_tags->add(tagItems);
 
     if (added)
         m_database->save(m_notebooks->items<NotebookItem*>(),
@@ -359,10 +340,8 @@ void Manager::onNoteMoved(const evernote::edam::Note& note)
             }
         }
         NotebookItem* notebook = m_notebooks->get<NotebookItem*>(QString::fromStdString(note.notebookGuid));
-        if (notebook && notebook->notes()->add(item)) {
-            notebook->notes()->sort(titlePropertyLessThan);
+        if (notebook && notebook->notes()->add(item))
             m_database->saveNotebook(notebook);
-        }
         m_database->saveNote(item);
     }
 }
@@ -372,14 +351,6 @@ void Manager::onNoteRenamed(const evernote::edam::Note& note)
     NoteItem* item = m_notes->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item) {
         item->setTitle(QString::fromStdString(note.title));
-        NotebookItem* notebook = m_notebooks->get<NotebookItem*>(QString::fromStdString(note.notebookGuid));
-        if (notebook)
-            notebook->notes()->sort(titlePropertyLessThan);
-        for (uint i = 0; i < note.tagGuids.size(); ++i) {
-            TagItem* tag = m_tags->get<TagItem*>(QString::fromStdString(note.tagGuids[i]));
-            if (tag)
-                tag->notes()->sort(titlePropertyLessThan);
-        }
         m_database->saveNote(item);
     }
 }
@@ -398,7 +369,6 @@ void Manager::onNotebookCreated(const evernote::edam::Notebook& notebook)
     // TODO: untested
     NotebookItem* item = new NotebookItem(notebook, this);
     m_notebooks->add(item);
-    m_notebooks->sort(namePropertyLessThan);
     m_database->saveNotebook(item);
 }
 
@@ -407,7 +377,6 @@ void Manager::onNotebookFetched(const evernote::edam::Notebook& notebook)
     NotebookItem* item = m_notebooks->get<NotebookItem*>(QString::fromStdString(notebook.guid));
     if (item) {
         item->setData(notebook);
-        m_notebooks->sort(namePropertyLessThan);
         m_database->saveNotebook(item);
     }
 }
@@ -418,7 +387,6 @@ void Manager::onNotebookRenamed(const evernote::edam::Notebook& notebook)
     NotebookItem* item = m_notebooks->get<NotebookItem*>(QString::fromStdString(notebook.guid));
     if (item) {
         item->setName(QString::fromStdString(notebook.name));
-        m_notebooks->sort(namePropertyLessThan);
         m_database->saveNotebook(item);
     }
 }
@@ -447,8 +415,7 @@ void Manager::onSearched(const evernote::edam::SavedSearch& search, const QVecto
             if (noteItem)
                 noteItems += noteItem;
         }
-        if (searchItem->notes()->add(noteItems))
-            searchItem->notes()->sort(titlePropertyLessThan);
+        searchItem->notes()->add(noteItems);
     }
 }
 
@@ -458,10 +425,9 @@ void Manager::addNotes(const QList<NoteItem*>& notes)
         const evernote::edam::Note& data = note->data();
         QString notebookGuid = QString::fromStdString(data.notebookGuid);
         NotebookItem* notebook = m_notebooks->get<NotebookItem*>(notebookGuid);
-        if (notebook) {
-            if (notebook->notes()->add(note))
-                notebook->notes()->sort(titlePropertyLessThan);
-        } else
+        if (notebook)
+            notebook->notes()->add(note);
+        else
             qCritical() << "### Manager::addNotes(): MISSING NOTEBOOK:" << notebookGuid;
 
         for (uint i = 0; i < data.resources.size(); ++i) {
@@ -477,10 +443,8 @@ void Manager::addNotes(const QList<NoteItem*>& notes)
             QString tagGuid = QString::fromStdString(data.tagGuids.at(i));
             TagItem* tag = m_tags->get<TagItem*>(tagGuid);
             if (tag) {
-                if (note->tags()->add(tag))
-                    note->tags()->sort(namePropertyLessThan);
-                if (tag->notes()->add(note))
-                    tag->notes()->sort(titlePropertyLessThan);
+                note->tags()->add(tag);
+                tag->notes()->add(note);
             } else
                 qCritical() << "### Manager::addNotes(): MISSING TAG:" << tagGuid;
         }

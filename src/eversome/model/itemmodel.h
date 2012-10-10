@@ -23,6 +23,7 @@ class ItemModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
+    Q_PROPERTY(QByteArray sortProperty READ sortProperty WRITE setSortProperty)
 
 public:
     explicit ItemModel(QObject* parent = 0);
@@ -53,11 +54,12 @@ public:
     template <typename T>
     bool remove(T item);
 
-    template <typename LessThan>
-    void sort(LessThan lessThan);
+    QByteArray sortProperty() const;
+    void setSortProperty(const QByteArray& property);
 
 public slots:
     void clear();
+    void sort(int column = 0, Qt::SortOrder order = Qt::AscendingOrder);
 
 signals:
     void countChanged();
@@ -66,6 +68,7 @@ signals:
     void removed(QObject* item);
 
 private:
+    QByteArray m_sortProperty;
     QList<QObject*> m_items;
     QHash<QString, QObject*> m_guids;
 };
@@ -73,15 +76,5 @@ private:
 #include "itemmodel_p.h"
 
 Q_DECLARE_METATYPE(ItemModel*)
-
-static bool namePropertyLessThan(const QObject* left, const QObject* right)
-{
-    return left->property("name").toString().localeAwareCompare(right->property("name").toString()) < 0;
-}
-
-static bool titlePropertyLessThan(const QObject* left, const QObject* right)
-{
-    return left->property("title").toString().localeAwareCompare(right->property("title").toString()) < 0;
-}
 
 #endif // ITEMMODEL_H

@@ -18,6 +18,8 @@ TagItem::TagItem(evernote::edam::Tag tag, QObject* parent)
     : QObject(parent), m_tag(tag)
 {
     m_notes = new ItemModel(this);
+    m_notes->setSortProperty("title");
+
     connect(m_notes, SIGNAL(countChanged()), this, SIGNAL(unreadChanged()));
     connect(m_notes, SIGNAL(added(QObject*)), this, SLOT(onNoteAdded(QObject*)));
     connect(m_notes, SIGNAL(added(QObjectList)), this, SLOT(onNotesAdded(QObjectList)));

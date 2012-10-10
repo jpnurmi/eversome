@@ -19,8 +19,9 @@
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     : QObject(parent), m_empty(false), m_unread(true), m_note(note)
 {
-    m_tags = new ItemModel(this);
     m_resources = new ItemModel(this);
+    m_tags = new ItemModel(this);
+    m_tags->setSortProperty("title");
 }
 
 NoteItem::~NoteItem()

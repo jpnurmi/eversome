@@ -45,7 +45,9 @@ CommonPage {
 
     Component {
         id: noteListPage
-        NoteListPage { }
+        NoteListPage {
+            store: SearchStore
+        }
     }
 
     Component {

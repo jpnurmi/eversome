@@ -24,7 +24,12 @@ CommonPage {
     property Note note
 
     pageHeader: PageHeader {
+        id: header
         title: !!note ? note.title : ""
+        onEdited: {
+            note.title = text;
+            NoteStore.rename(note.data());
+        }
     }
 
     contentHeader: NoteHeader {
@@ -35,6 +40,7 @@ CommonPage {
         id: menu
         parent: root
         note: root.note
+        header: header
         onMoving: {
             var dialog = notebookDialog.createObject(root, {note: note});
             dialog.open();

@@ -40,7 +40,9 @@ CommonPage {
 
     Component {
         id: noteListPage
-        NoteListPage { }
+        NoteListPage {
+            store: TagStore
+        }
     }
 
     Component {

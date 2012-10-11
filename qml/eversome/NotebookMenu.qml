@@ -15,20 +15,24 @@ import QtQuick 1.1
 import com.nokia.meego 1.0
 import com.evernote.types 1.0
 import "UIConstants.js" as UI
+import "components"
 
 Menu {
     id: menu
 
     property Notebook notebook
     property NotebookDelegate delegate
+    property PageHeader header
 
     MenuLayout {
         MenuItem {
             text: qsTr("Rename")
-            enabled: !!delegate
+            enabled: !!delegate || !!header
             onClicked: {
                 if (delegate)
                     delegate.edit(notebook.name);
+                else if (header)
+                    header.edit(notebook.name);
             }
         }
         MenuItem {

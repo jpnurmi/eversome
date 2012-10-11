@@ -20,11 +20,16 @@ import "components"
 CommonPage {
     id: root
 
+    property QtObject store
     property QtObject container
     property alias title: header.title
 
     pageHeader: PageHeader {
         id: header
+        onEdited: {
+            container.name = text;
+            store.rename(container.data());
+        }
     }
 
     contentHeader: UpdateHeader { }
@@ -32,6 +37,7 @@ CommonPage {
     menu: NoteListMenu {
         id: menu
         parent: root
+        header: header
         container: root.container
     }
 

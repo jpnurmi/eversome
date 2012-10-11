@@ -23,13 +23,19 @@ CommonPage {
     property Notebook notebook
 
     pageHeader: PageHeader {
+        id: header
         title: !!notebook ? notebook.name : ""
+        onEdited: {
+            notebook.name = text;
+            NotebookStore.rename(notebook.data());
+        }
     }
 
     contentHeader: UpdateHeader { }
 
     menu: NotebookMenu {
         parent: root
+        header: header
         notebook: root.notebook
     }
 

@@ -15,12 +15,14 @@ import QtQuick 1.1
 import com.nokia.meego 1.0
 import com.evernote.types 1.0
 import "UIConstants.js" as UI
+import "components"
 
 Menu {
     id: menu
 
     property Note note
     property NoteDelegate delegate
+    property PageHeader header
 
     signal moving
 
@@ -31,10 +33,12 @@ Menu {
         }
         MenuItem {
             text: qsTr("Rename")
-            enabled: !!delegate
+            enabled: !!delegate || !!header
             onClicked: {
                 if (delegate)
                     delegate.edit(note.title);
+                else if (header)
+                    header.edit(note.title);
             }
         }
         MenuItem {

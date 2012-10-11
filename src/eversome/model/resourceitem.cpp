@@ -87,6 +87,16 @@ QByteArray ResourceItem::hash() const
     return QByteArray(m_resource.data.bodyHash.c_str(), evernote::limits::g_Limits_constants.EDAM_HASH_LEN).toHex();
 }
 
+bool ResourceItem::isAttachment() const
+{
+    return m_resource.attributes.attachment;
+}
+
+QString ResourceItem::fileName() const
+{
+    return QString::fromStdString(m_resource.attributes.fileName);
+}
+
 static QString dataFilePath(const QByteArray& hash, const QString& ext)
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));

@@ -45,7 +45,7 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
             // TODO: ResourceOperation
             for (uint i = 0; i < m_note.resources.size(); ++i) {
                 edam::Resource resource = m_note.resources.at(i);
-                client.getResource(resource, token, resource.guid, true, false, false, false);
+                client.getResource(resource, token, resource.guid, true, false, true, false);
                 emit resourceFetched(resource);
             }
             break;

@@ -25,9 +25,8 @@ Image {
     signal edited(string text)
 
     function edit(text) {
-        var editor = editorComponent.createObject(root, {text: text});
-        editor.forceActiveFocus();
-        editor.openSoftwareInputPanel();
+        var editor = editorComponent.createObject(root);
+        editor.edit(text);
     }
 
     source: "../images/header.png"
@@ -72,29 +71,10 @@ Image {
 
     Component {
         id: editorComponent
-        TextField {
-            id: editor
+        InlineEditor {
             anchors.left: label.left
             anchors.right: loader.right
             anchors.verticalCenter: parent.verticalCenter
-            Keys.onEnterPressed: {
-                root.edited(text);
-                editor.destroy();
-            }
-            Keys.onReturnPressed: {
-                root.edited(text);
-                editor.destroy();
-            }
-            onActiveFocusChanged: {
-                if (!activeFocus)
-                    editor.destroy();
-            }
-            Keys.onEscapePressed: editor.destroy()
-            InverseMouseArea {
-                anchors.fill: parent
-                onPressedOutside: editor.destroy()
-            }
-            Component.onDestruction: editor.closeSoftwareInputPanel()
         }
     }
 }

@@ -28,9 +28,8 @@ BorderImage {
     signal edited(string text)
 
     function edit(text) {
-        var editor = editorComponent.createObject(root, {text: text});
-        editor.forceActiveFocus();
-        editor.openSoftwareInputPanel();
+        var editor = editorComponent.createObject(root);
+        editor.edit(text);
     }
 
     width: parent.width
@@ -72,29 +71,10 @@ BorderImage {
 
     Component {
         id: editorComponent
-        TextField {
-            id: editor
+        InlineEditor {
             anchors.left: container.left
             anchors.right: container.right
             anchors.verticalCenter: container.verticalCenter
-            Keys.onEnterPressed: {
-                root.edited(text);
-                editor.destroy();
-            }
-            Keys.onReturnPressed: {
-                root.edited(text);
-                editor.destroy();
-            }
-            onActiveFocusChanged: {
-                if (!activeFocus)
-                    editor.destroy();
-            }
-            Keys.onEscapePressed: editor.destroy()
-            InverseMouseArea {
-                anchors.fill: parent
-                onPressedOutside: editor.destroy()
-            }
-            Component.onDestruction: editor.closeSoftwareInputPanel()
         }
     }
 }

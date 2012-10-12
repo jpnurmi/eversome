@@ -117,7 +117,8 @@ Manager::Manager(Session* session) : QObject(session)
 
     m_files = new FileSystem(this);
     connect(m_files, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(m_files, SIGNAL(writingDone(QString,QString)), SLOT(onFileWritten(QString,QString)), Qt::QueuedConnection);
+    connect(m_files, SIGNAL(wrote(QString,QString)), SLOT(onFileWritten(QString,QString)), Qt::QueuedConnection);
+    connect(m_files, SIGNAL(generated(QString,QString)), SLOT(onThumbnailGenerated(QString,QString)), Qt::QueuedConnection);
 
     m_database = new Database(this);
     connect(m_database, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
@@ -423,10 +424,21 @@ void Manager::onFileWritten(const QString& guid, const QString &filePath)
             note->update();
     } else if (m_itemmodels.value(Resource)->contains(guid)) {
         ResourceItem* resource = m_itemmodels.value(Resource)->get<ResourceItem*>(guid);
-        if (resource)
+        if (resource) {
+            m_files->generate(resource->guid(), resource->filePath(false));
             resource->update();
+        }
     } else
         qCritical() << "### Manager::onFileWritten(): UNIDENTIFIED FILE:" << filePath;
+}
+
+void Manager::onThumbnailGenerated(const QString& guid, const QString& thumbnail)
+{
+    ResourceItem* resource = m_itemmodels.value(Resource)->get<ResourceItem*>(guid);
+    if (resource)
+        resource->update();
+    else
+        qCritical() << "### Manager::onThumbnailGenerated(): UNIDENTIFIED THUMBNAIL:" << thumbnail;
 }
 
 void Manager::onSearchCreated(const evernote::edam::SavedSearch& search)

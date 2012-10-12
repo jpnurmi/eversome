@@ -91,6 +91,7 @@ private slots:
     void onTagRenamed(const evernote::edam::Tag& tag);
 
     void onFileWritten(const QString& guid, const QString& filePath);
+    void onThumbnailGenerated(const QString& guid, const QString& filePath);
 
     void onSearchCreated(const evernote::edam::SavedSearch& search);
     void onSearchFetched(const evernote::edam::SavedSearch& search);

@@ -36,9 +36,9 @@ public:
 signals:
     void activityChanged();
     void error(const QString& error);
-    void readingDone(const QString& guid, const QString& filePath, const QByteArray& data);
-    void writingDone(const QString& guid, const QString& filePath);
-    void generatingDone(const QString& guid, const QString& filePath);
+    void read(const QString& guid, const QString& filePath, const QByteArray& data);
+    void wrote(const QString& guid, const QString& filePath);
+    void generated(const QString& guid, const QString& filePath);
 
 private:
     void setupOperation(Operation* operation);

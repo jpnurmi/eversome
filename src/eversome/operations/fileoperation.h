@@ -27,9 +27,9 @@ public:
     bool isValid() const;
 
 signals:
-    void readingDone(const QString& guid, const QString& filePath, const QByteArray& data);
-    void writingDone(const QString& guid, const QString& filePath);
-    void generatingDone(const QString& guid, const QString& filePath);
+    void read(const QString& guid, const QString& filePath, const QByteArray& data);
+    void wrote(const QString& guid, const QString& filePath);
+    void generated(const QString& guid, const QString& filePath);
 
 protected:
     void operate();

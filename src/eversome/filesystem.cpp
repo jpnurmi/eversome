@@ -46,7 +46,7 @@ bool FileSystem::removeDir(const QDir& dir)
 void FileSystem::read(const QString& guid, const QString& filePath)
 {
     FileOperation* operation = new FileOperation(Operation::ReadFile, guid, filePath);
-    connect(operation, SIGNAL(readingDone(QString,QString,QByteArray)), this, SIGNAL(readingDone(QString,QString,QByteArray)));
+    connect(operation, SIGNAL(read(QString,QString,QByteArray)), this, SIGNAL(read(QString,QString,QByteArray)));
     setupOperation(operation);
     qDebug() << "FileSystem::read():" << operation;
     QThreadPool::globalInstance()->start(operation);
@@ -55,7 +55,7 @@ void FileSystem::read(const QString& guid, const QString& filePath)
 void FileSystem::write(const QString& guid, const QString& filePath, const QByteArray& data)
 {
     FileOperation* operation = new FileOperation(Operation::WriteFile, guid, filePath, data);
-    connect(operation, SIGNAL(writingDone(QString,QString)), this, SIGNAL(writingDone(QString,QString)));
+    connect(operation, SIGNAL(wrote(QString,QString)), this, SIGNAL(wrote(QString,QString)));
     setupOperation(operation);
     qDebug() << "FileSystem::write():" << operation;
     QThreadPool::globalInstance()->start(operation);
@@ -64,7 +64,7 @@ void FileSystem::write(const QString& guid, const QString& filePath, const QByte
 void FileSystem::generate(const QString& guid, const QString& filePath)
 {
     FileOperation* operation = new FileOperation(Operation::GenerateThumbnail, guid, filePath);
-    connect(operation, SIGNAL(generatingDone(QString,QString)), this, SIGNAL(generatingDone(QString,QString)));
+    connect(operation, SIGNAL(generated(QString,QString)), this, SIGNAL(generated(QString,QString)));
     setupOperation(operation);
     qDebug() << "FileSystem::generateThumbnail():" << operation;
     QThreadPool::globalInstance()->start(operation);

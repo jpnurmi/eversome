@@ -53,7 +53,7 @@ void FileOperation::operate()
                 if (fileError != QFile::NoError)
                     emit error(OperationError::toString(fileError));
                 else
-                    emit readingDone(m_guid, m_filePath, m_data);
+                    emit read(m_guid, m_filePath, m_data);
             }
             break;
         case WriteFile:
@@ -68,25 +68,23 @@ void FileOperation::operate()
                 if (fileError != QFile::NoError)
                     emit error(OperationError::toString(fileError));
                 else
-                    emit writingDone(m_guid, m_filePath);
+                    emit wrote(m_guid, m_filePath);
             }
             break;
         case GenerateThumbnail:
             if (QDir().mkpath(info.absolutePath())) {
-                QString thumbnail = info.baseName().replace('.', '-') + "-thumb.png";
-                QStringList args = QStringList() << "-geometry" << "128x128" << info.fileName()+"[0]" << thumbnail;
+                QStringList args = QStringList() << "-geometry" << "128x128" << info.fileName()+"[0]" << "thumb.png";
 
                 QProcess process;
                 process.setWorkingDirectory(info.absolutePath());
                 process.start("/usr/bin/convert", args);
-
                 if (!process.waitForFinished())
                     emit error(OperationError::toString(process.error()));
                 else
-                    emit generatingDone(m_guid, QDir(info.absolutePath()).filePath(thumbnail));
-                qDebug() << "FileOperation::operate(): generated..."
+                    emit generated(m_guid, QDir(info.absolutePath()).filePath("thumb.png"));
+                qDebug() << "FileOperation::operate(): generated thumb for..."
                          << (process.error() == QProcess::UnknownError ? "OK" : "FAIL!")
-                         << qPrintable("("+thumbnail+")");
+                         << qPrintable("("+info.fileName()+")");
                 break;
             }
         default:

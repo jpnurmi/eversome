@@ -94,19 +94,20 @@ bool ResourceItem::isAttachment() const
 
 QString ResourceItem::fileName() const
 {
-    return QString::fromStdString(m_resource.attributes.fileName);
+    if (!m_resource.attributes.fileName.empty())
+        return QString::fromStdString(m_resource.attributes.fileName);
+    return "noname" + file_extensions()->value(mime());
 }
 
-static QString dataFilePath(const QByteArray& hash, const QString& ext)
+static QString dataFilePath(const QByteArray& hash, const QString& fileName)
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
-    return dir.absoluteFilePath(hash + ext);
+    return dir.absoluteFilePath(hash + "/" + fileName);
 }
 
 QString ResourceItem::filePath(bool checkExists) const
 {
-    QString ext = file_extensions()->value(QString::fromStdString(m_resource.mime));
-    QFileInfo file(dataFilePath(hash(), ext));
+    QFileInfo file(dataFilePath(hash(), fileName().isEmpty() ? guid() : fileName()));
     if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
@@ -114,7 +115,7 @@ QString ResourceItem::filePath(bool checkExists) const
 
 QString ResourceItem::thumbnail(bool checkExists) const
 {
-    QFileInfo file(dataFilePath(hash(), "-thumb.png"));
+    QFileInfo file(dataFilePath(hash(), "thumb.png"));
     if (checkExists && (m_empty || !file.exists() || file.size() == 0))
         return QString();
     return file.filePath();

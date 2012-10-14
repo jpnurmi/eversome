@@ -87,7 +87,7 @@ void DatabaseOperation::operate()
         {
             QStringList queries;
             queries += "CREATE TABLE IF NOT EXISTS Notebooks(guid TEXT PRIMARY KEY, name TEXT, isDefault INTEGER, isPublished INTEGER, created INTEGER, updated INTEGER, usn INTEGER)";
-            queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT, hash TEXT, usn INTEGER)";
+            queries += "CREATE TABLE IF NOT EXISTS Resources(guid TEXT PRIMARY KEY, mime TEXT, hash TEXT, fileName TEXT, attachment INTEGER, usn INTEGER)";
             queries += "CREATE TABLE IF NOT EXISTS Searches(guid TEXT PRIMARY KEY, name TEXT, query TEXT, usn INTEGER)";
             queries += "CREATE TABLE IF NOT EXISTS Notes(guid TEXT PRIMARY KEY, title TEXT, created INTEGER, updated INTEGER, deleted INTEGER, isActive INTEGER, notebookGuid TEXT, tagGuids TEXT, resourceGuids TEXT, unread INTEGER, usn INTEGER)";
             queries += "CREATE TABLE IF NOT EXISTS Tags(guid TEXT PRIMARY KEY, name TEXT, parentGuid TEXT, usn INTEGER)";
@@ -236,6 +236,8 @@ QList<ResourceItem*> DatabaseOperation::loadResources(QSqlDatabase db)
             resource.guid = record.value("guid").toString().toStdString();
             resource.mime = record.value("mime").toString().toStdString();
             resource.data.bodyHash = QByteArray::fromHex(record.value("hash").toByteArray()).constData();
+            resource.attributes.fileName = record.value("fileName").toString().toStdString();
+            resource.attributes.attachment = record.value("attachment").toBool();
             resource.updateSequenceNum = record.value("usn").toInt();
 
             ResourceItem* item = new ResourceItem(resource);
@@ -248,18 +250,22 @@ QList<ResourceItem*> DatabaseOperation::loadResources(QSqlDatabase db)
 
 bool DatabaseOperation::saveResources(const QList<ResourceItem*>& resources, QSqlDatabase db)
 {
-    QVariantList guids, mimes, hashes, usns;
+    QVariantList guids, mimes, hashes, fileNames, attachments, usns;
     foreach (ResourceItem* resource, resources) {
         guids += resource->guid();
         mimes += resource->mime();
         hashes += resource->hash();
+        fileNames += resource->fileName();
+        attachments += resource->isAttachment();
         usns += resource->usn();
     }
 
-    QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?,?,?)", db);
+    QSqlQuery query("INSERT OR REPLACE INTO Resources VALUES(?,?,?,?,?,?)", db);
     query.addBindValue(guids);
     query.addBindValue(mimes);
     query.addBindValue(hashes);
+    query.addBindValue(fileNames);
+    query.addBindValue(attachments);
     query.addBindValue(usns);
     return query.execBatch();
 }

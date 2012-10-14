@@ -30,6 +30,7 @@ Session::~Session()
 QUrl Session::url() const
 {
     QUrl url;
+    url.setScheme("http");
     url.setHost(m_host);
     url.setPort(EDAM_PORT);
     QString uid = m_data.getProperty("Uid").toString();

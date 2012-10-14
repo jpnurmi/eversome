@@ -52,16 +52,15 @@ public:
     QString thumbnail(bool checkExists = true) const;
     int usn() const;
 
-    void update();
-
 signals:
     void dataChanged();
     void filePathChanged();
     void thumbnailChanged();
 
 private:
-    bool m_empty;
     evernote::edam::Resource m_resource;
+
+    friend class Manager;
 };
 
 Q_DECLARE_METATYPE(ResourceItem*)

@@ -61,19 +61,18 @@ public:
     bool isUnread() const;
     void setUnread(bool unread);
 
-    void update();
-
 signals:
     void dataChanged();
     void filePathChanged();
     void unreadChanged();
 
 private:
-    bool m_empty;
     bool m_unread;
     ItemModel* m_tags;
     ItemModel* m_resources;
     evernote::edam::Note m_note;
+
+    friend class Manager;
 };
 
 Q_DECLARE_METATYPE(NoteItem*)

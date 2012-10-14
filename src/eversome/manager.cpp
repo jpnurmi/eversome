@@ -421,12 +421,12 @@ void Manager::onFileWritten(const QString& guid, const QString &filePath)
     if (m_itemmodels.value(Note)->contains(guid)) {
         NoteItem* note = m_itemmodels.value(Note)->get<NoteItem*>(guid);
         if (note)
-            note->update();
+            emit note->filePathChanged();
     } else if (m_itemmodels.value(Resource)->contains(guid)) {
         ResourceItem* resource = m_itemmodels.value(Resource)->get<ResourceItem*>(guid);
         if (resource) {
             m_files->generate(resource->guid(), resource->filePath(false));
-            resource->update();
+            emit resource->filePathChanged();
         }
     } else
         qCritical() << "### Manager::onFileWritten(): UNIDENTIFIED FILE:" << filePath;
@@ -436,7 +436,7 @@ void Manager::onThumbnailGenerated(const QString& guid, const QString& thumbnail
 {
     ResourceItem* resource = m_itemmodels.value(Resource)->get<ResourceItem*>(guid);
     if (resource)
-        resource->update();
+        emit resource->thumbnailChanged();
     else
         qCritical() << "### Manager::onThumbnailGenerated(): UNIDENTIFIED THUMBNAIL:" << thumbnail;
 }

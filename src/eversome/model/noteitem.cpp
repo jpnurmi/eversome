@@ -17,7 +17,7 @@
 #include <QDir>
 
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
-    : QObject(parent), m_empty(false), m_unread(true), m_note(note)
+    : QObject(parent), m_unread(true), m_note(note)
 {
     m_resources = new ItemModel(this);
     m_tags = new ItemModel(this);
@@ -62,7 +62,7 @@ QString NoteItem::filePath(bool checkExists) const
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
     QFileInfo file(dir.filePath(guid() + ".html"));
-    if (checkExists && (m_empty || !file.exists() || file.size() == 0))
+    if (checkExists && (!file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
 }
@@ -127,14 +127,6 @@ void NoteItem::setUnread(bool unread)
         m_unread = unread;
         emit unreadChanged();
     }
-}
-
-void NoteItem::update()
-{
-    m_empty = true;
-    emit filePathChanged();
-    m_empty = false;
-    emit filePathChanged();
 }
 
 QDebug operator<<(QDebug debug, const NoteItem* item)

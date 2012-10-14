@@ -47,7 +47,7 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(TypeHash, file_types, {
 })
 
 ResourceItem::ResourceItem(evernote::edam::Resource resource, QObject* parent)
-    : QObject(parent), m_empty(false), m_resource(resource)
+    : QObject(parent), m_resource(resource)
 {
 }
 
@@ -108,7 +108,7 @@ static QString dataFilePath(const QByteArray& hash, const QString& fileName)
 QString ResourceItem::filePath(bool checkExists) const
 {
     QFileInfo file(dataFilePath(hash(), fileName().isEmpty() ? guid() : fileName()));
-    if (checkExists && (m_empty || !file.exists() || file.size() == 0))
+    if (checkExists && (!file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
 }
@@ -116,7 +116,7 @@ QString ResourceItem::filePath(bool checkExists) const
 QString ResourceItem::thumbnail(bool checkExists) const
 {
     QFileInfo file(dataFilePath(hash(), "thumb.png"));
-    if (checkExists && (m_empty || !file.exists() || file.size() == 0))
+    if (checkExists && (!file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
 }
@@ -124,17 +124,6 @@ QString ResourceItem::thumbnail(bool checkExists) const
 int ResourceItem::usn() const
 {
     return m_resource.updateSequenceNum;
-}
-
-void ResourceItem::update()
-{
-    m_empty = true;
-    emit filePathChanged();
-    emit thumbnailChanged();
-
-    m_empty = false;
-    emit filePathChanged();
-    emit thumbnailChanged();
 }
 
 QDebug operator<<(QDebug debug, const ResourceItem* item)

@@ -108,11 +108,13 @@ QString NoteItem::html() const
         "<html>"
         "   <head>"
         "       <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>"
-        "       <script src='%1' type='text/javascript' language='JavaScript'></script>"
+        "       <link href='%1' rel='stylesheet' type='text/css'>"
+        "       <script src='%2' type='text/javascript' language='JavaScript'></script>"
         "   </head>"
-        "   <body>%2</body>"
+        "   <body>%3</body>"
         "</html>";
-    return str.arg("/opt/eversome/qml/eversome/script/note.js") // TODO
+    return str.arg("/opt/eversome/qml/eversome/note/note.css") // TODO
+              .arg("/opt/eversome/qml/eversome/note/note.js") // TODO
               .arg(QString::fromStdString(m_note.content));
 }
 

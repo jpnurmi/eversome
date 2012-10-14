@@ -1,0 +1,24 @@
+div.resource {
+    width: 100%;
+    height: 132px;
+    vertical-align: middle;
+    border-style: solid;
+    border-color: green;
+    border-width: 1px;
+}
+
+img.resource {
+    top: 2px;
+    left: 2px;
+    width: 128px;
+    height: 128px;
+    position: absolute;
+    border-style: solid;
+    border-color: red;
+    border-width: 1px;
+}
+
+a.resource {
+    left: 132px;
+    position: absolute;
+}

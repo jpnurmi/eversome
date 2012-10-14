@@ -30,6 +30,7 @@ CommonPage {
             note.title = text;
             NoteStore.rename(note.data());
         }
+        onRefresh: NoteStore.fetch(note.data())
     }
 
     contentHeader: NoteHeader {
@@ -78,12 +79,24 @@ CommonPage {
     Repeater {
         model: note ? note.resources : null
         Item {
+            id: resource
+            function update() {
+                if (note.filePath && modelData.filePath && modelData.hash && modelData.fileName)
+                    flickable.webView.evaluateJavaScript("handleResource('" + modelData.fileName + "', '" + modelData.hash + "', '" + modelData.filePath + "', '" + modelData.thumbnail + "')");
+            }
             Connections {
                 target: modelData
-                onFilePathChanged: {
-                    if (modelData.filePath)
-                        flickable.webView.evaluateJavaScript("handleResource('foobar', '" + modelData.hash + "', '" + modelData.filePath + "')");
-                }
+                onFileNameChanged: resource.update()
+                onFilePathChanged: resource.update()
+                onThumbnailChanged: resource.update()
+            }
+            Connections {
+                target: note
+                onFilePathChanged: resource.update()
+            }
+            Connections {
+                target: flickable.webView
+                onLoadFinished: resource.update()
             }
         }
     }

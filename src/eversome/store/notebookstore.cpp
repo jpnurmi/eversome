@@ -38,7 +38,6 @@ void NotebookStore::create(const edam::Notebook& notebook)
     NotebookOperation* operation = new NotebookOperation(notebook, Operation::CreateNotebook);
     connect(operation, SIGNAL(created(evernote::edam::Notebook)),
                  this, SIGNAL(created(evernote::edam::Notebook)));
-    qDebug() << "NotebookStore::create():" << operation;
     startOperation(operation);
 }
 
@@ -47,7 +46,6 @@ void NotebookStore::fetch(const evernote::edam::Notebook& notebook)
     NotebookOperation* operation = new NotebookOperation(notebook, Operation::FetchNotebook);
     connect(operation, SIGNAL(fetched(evernote::edam::Notebook)),
                  this, SIGNAL(fetched(evernote::edam::Notebook)));
-    qDebug() << "NotebookStore::fetch():" << operation;
     startOperation(operation);
 }
 
@@ -62,6 +60,5 @@ void NotebookStore::rename(const evernote::edam::Notebook& notebook)
     NotebookOperation* operation = new NotebookOperation(modified, Operation::RenameNotebook);
     connect(operation, SIGNAL(renamed(evernote::edam::Notebook)),
                  this, SIGNAL(renamed(evernote::edam::Notebook)));
-    qDebug() << "NotebookStore::rename():" << operation;
     startOperation(operation);
 }

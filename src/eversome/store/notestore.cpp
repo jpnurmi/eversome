@@ -42,7 +42,6 @@ void NoteStore::create(const edam::Note& note)
     NoteOperation* operation = new NoteOperation(note, Operation::CreateNote);
     connect(operation, SIGNAL(created(evernote::edam::Note)),
                  this, SIGNAL(created(evernote::edam::Note)));
-    qDebug() << "NoteStore::create():" << operation;
     startOperation(operation);
 }
 
@@ -54,7 +53,6 @@ void NoteStore::fetch(const edam::Note& note)
     // TODO: ResourceOperation
     connect(operation, SIGNAL(resourceFetched(evernote::edam::Resource)),
                  this, SIGNAL(resourceFetched(evernote::edam::Resource)));
-    qDebug() << "NoteStore::fetch():" << operation;
     startOperation(operation);
 }
 
@@ -71,7 +69,6 @@ void NoteStore::move(const evernote::edam::Note& note, const evernote::edam::Not
     NoteOperation* operation = new NoteOperation(modified, Operation::MoveNote);
     connect(operation, SIGNAL(moved(evernote::edam::Note)),
                  this, SIGNAL(moved(evernote::edam::Note)));
-    qDebug() << "NoteStore::move():" << operation;
     startOperation(operation);
 }
 
@@ -86,7 +83,6 @@ void NoteStore::rename(const evernote::edam::Note& note)
     NoteOperation* operation = new NoteOperation(modified, Operation::RenameNote);
     connect(operation, SIGNAL(renamed(evernote::edam::Note)),
                  this, SIGNAL(renamed(evernote::edam::Note)));
-    qDebug() << "NoteStore::rename():" << operation;
     startOperation(operation);
 }
 
@@ -95,6 +91,5 @@ void NoteStore::trash(const edam::Note& note)
     NoteOperation* operation = new NoteOperation(note, Operation::TrashNote);
     connect(operation, SIGNAL(trashed(evernote::edam::Note)),
                  this, SIGNAL(trashed(evernote::edam::Note)));
-    qDebug() << "NoteStore::trash():" << operation;
     startOperation(operation);
 }

@@ -38,7 +38,6 @@ void TagStore::create(const edam::Tag& tag)
     TagOperation* operation = new TagOperation(tag, Operation::CreateTag);
     connect(operation, SIGNAL(created(evernote::edam::Tag)),
                  this, SIGNAL(created(evernote::edam::Tag)));
-    qDebug() << "TagStore::create():" << operation;
     startOperation(operation);
 }
 
@@ -47,7 +46,6 @@ void TagStore::fetch(const edam::Tag& tag)
     TagOperation* operation = new TagOperation(tag, Operation::FetchTag);
     connect(operation, SIGNAL(fetched(evernote::edam::Tag)),
                  this, SIGNAL(fetched(evernote::edam::Tag)));
-    qDebug() << "TagStore::fetch():" << operation;
     startOperation(operation);
 }
 
@@ -62,6 +60,5 @@ void TagStore::rename(const evernote::edam::Tag& tag)
     TagOperation* operation = new TagOperation(modified, Operation::RenameTag);
     connect(operation, SIGNAL(renamed(evernote::edam::Tag)),
                  this, SIGNAL(renamed(evernote::edam::Tag)));
-    qDebug() << "TagStore::rename():" << operation;
     startOperation(operation);
 }

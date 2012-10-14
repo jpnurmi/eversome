@@ -85,6 +85,5 @@ void SyncStore::sync()
                                        QVector<std::string>,
                                        QVector<std::string>,
                                        QVector<std::string>)));
-    qDebug() << "SyncStore::sync():" << operation;
     startOperation(operation);
 }

@@ -18,18 +18,18 @@ function handleResource(fileName, hash, filePath, thumbnail)
 function createResource(type, fileName, hash, filePath, thumbnail)
 {
     var image = document.createElement("img");
-    image.setAttribute("id", "resource");
+    image.setAttribute("class", "resource");
     image.setAttribute("alt", fileName);
     image.setAttribute("src", thumbnail);
 
     var anchor = document.createElement("a");
-    image.setAttribute("id", "resource");
+    image.setAttribute("class", "resource");
     anchor.setAttribute("href", "#");
     anchor.setAttribute("onclick", "window.qml.openUrlExternally('" + filePath + "');");
     anchor.innerHTML = fileName;
 
     var div = document.createElement("div");
-    div.setAttribute("id", "resource");
+    div.setAttribute("class", "resource");
     div.setAttribute("onclick", "window.qml.openUrlExternally('" + filePath + "');");
     div.appendChild(image);
     div.appendChild(anchor);

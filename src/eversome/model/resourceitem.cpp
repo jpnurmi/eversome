@@ -99,6 +99,22 @@ QString ResourceItem::fileName() const
     return "noname" + file_extensions()->value(mime());
 }
 
+QString ResourceItem::fileSize() const
+{
+    qint64 bytes = QFileInfo(filePath()).size();
+    if (bytes >= 10*1024*1024)
+        return tr("%1MB").arg(bytes / 1024*1024);
+    if (bytes >= 1024*1024)
+        return tr("%1MB").arg(bytes / double(1024*1024), 0, 'f', 1);
+    if (bytes >= 10*1024)
+        return tr("%1KB").arg(bytes / 1024);
+    if (bytes >= 1024)
+        return tr("%1KB").arg(bytes / double(1024), 0, 'f', 1);
+    if (bytes > 0)
+        return tr("%1B").arg(bytes);
+    return QString();
+}
+
 static QString dataFilePath(const QByteArray& hash, const QString& fileName)
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));

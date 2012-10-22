@@ -28,6 +28,7 @@ class ResourceItem : public QObject
     Q_PROPERTY(QByteArray hash READ hash NOTIFY dataChanged)
     Q_PROPERTY(bool attachment READ isAttachment NOTIFY dataChanged)
     Q_PROPERTY(QString fileName READ fileName NOTIFY dataChanged)
+    Q_PROPERTY(QString fileSize READ fileSize NOTIFY filePathChanged)
     Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
     Q_PROPERTY(QString thumbnail READ thumbnail NOTIFY thumbnailChanged)
     Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
@@ -48,6 +49,7 @@ public:
     QByteArray hash() const;
     bool isAttachment() const;
     QString fileName() const;
+    QString fileSize() const;
     QString filePath(bool checkExists = true) const;
     QString thumbnail(bool checkExists = true) const;
     int usn() const;

@@ -321,7 +321,7 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
     NoteItem* item = m_itemmodels.value(Note)->get<NoteItem*>(QString::fromStdString(note.guid));
     if (item) {
         item->setData(note);
-        m_files->write(item->guid(), item->filePath(false), item->html().toUtf8());
+        m_files->write(item->guid(), item->filePath(false), item->content());
         m_database->saveNote(item);
     }
 }

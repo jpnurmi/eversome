@@ -34,7 +34,7 @@ class NoteItem : public QObject
     Q_PROPERTY(ItemModel* tags READ tags CONSTANT)
     Q_PROPERTY(ItemModel* resources READ resources CONSTANT)
     Q_PROPERTY(int usn READ usn NOTIFY dataChanged)
-    Q_PROPERTY(QString html READ html NOTIFY dataChanged)
+    Q_PROPERTY(QByteArray content READ content NOTIFY dataChanged)
     Q_PROPERTY(bool unread READ isUnread WRITE setUnread NOTIFY unreadChanged)
 
 public:
@@ -56,7 +56,7 @@ public:
     ItemModel* tags() const;
     ItemModel* resources() const;
     int usn() const;
-    QString html() const;
+    QByteArray content() const;
 
     bool isUnread() const;
     void setUnread(bool unread);

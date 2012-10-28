@@ -61,7 +61,7 @@ QString NoteItem::guid() const
 QString NoteItem::filePath(bool checkExists) const
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
-    QFileInfo file(dir.filePath(guid() + ".html"));
+    QFileInfo file(dir.filePath(guid() + ".xml"));
     if (checkExists && (!file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
@@ -102,20 +102,9 @@ int NoteItem::usn() const
     return m_note.updateSequenceNum;
 }
 
-QString NoteItem::html() const
+QByteArray NoteItem::content() const
 {
-    QString str =
-        "<html>"
-        "   <head>"
-        "       <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>"
-        "       <link href='%1' rel='stylesheet' type='text/css'>"
-        "       <script src='%2' type='text/javascript' language='JavaScript'></script>"
-        "   </head>"
-        "   <body>%3</body>"
-        "</html>";
-    return str.arg("/opt/eversome/qml/eversome/note/note.css") // TODO
-              .arg("/opt/eversome/qml/eversome/note/note.js") // TODO
-              .arg(QString::fromStdString(m_note.content));
+    return QByteArray(m_note.content.c_str(), m_note.content.size());
 }
 
 bool NoteItem::isUnread() const

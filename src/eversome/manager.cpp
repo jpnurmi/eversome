@@ -19,6 +19,7 @@
 #include "notestore.h"
 #include "filesystem.h"
 #include "searchstore.h"
+#include "resourcestore.h"
 #include "notebookstore.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
@@ -97,6 +98,12 @@ Manager::Manager(Session* session) : QObject(session)
              this, SLOT(onTagFetched(evernote::edam::Tag)), Qt::QueuedConnection);
     connect(store, SIGNAL(renamed(evernote::edam::Tag)),
              this, SLOT(onTagRenamed(evernote::edam::Tag)), Qt::QueuedConnection);
+
+    store = new ResourceStore(session);
+    m_itemstores[Resource] = store;
+    connect(store, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(store, SIGNAL(fetched(evernote::edam::Resource)),
+             this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
 
     m_syncstore = new SyncStore(session);
     connect(m_syncstore, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
@@ -323,6 +330,10 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
         item->setData(note);
         m_files->write(item->guid(), item->filePath(false), item->content());
         m_database->saveNote(item);
+
+        ResourceStore* store = static_cast<ResourceStore*>(itemStore(Resource));
+        for (uint i = 0; i < note.resources.size(); ++i)
+            store->fetch(note.resources.at(i));
     }
 }
 

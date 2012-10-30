@@ -65,7 +65,10 @@ public:
         // tag operations
         CreateTag,
         FetchTag,
-        RenameTag
+        RenameTag,
+
+        // resource operations
+        FetchResource
     };
 
     Operation(Mode mode);

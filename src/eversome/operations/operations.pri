@@ -9,6 +9,7 @@ HEADERS += \
     noteoperation.h \
     operation.h \
     operationerror.h \
+    resourceoperation.h \
     searchoperation.h \
     syncoperation.h \
     tagoperation.h
@@ -21,6 +22,7 @@ SOURCES += \
     noteoperation.cpp \
     operation.cpp \
     operationerror.cpp \
+    resourceoperation.cpp \
     searchoperation.cpp \
     syncoperation.cpp \
     tagoperation.cpp

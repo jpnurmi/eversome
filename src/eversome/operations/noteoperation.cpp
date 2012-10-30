@@ -42,12 +42,6 @@ void NoteOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
         case FetchNote:
             client.getNoteContent(m_note.content, token, m_note.guid);
             emit fetched(m_note);
-            // TODO: ResourceOperation
-            for (uint i = 0; i < m_note.resources.size(); ++i) {
-                edam::Resource resource = m_note.resources.at(i);
-                client.getResource(resource, token, resource.guid, true, false, true, false);
-                emit resourceFetched(resource);
-            }
             break;
         case MoveNote:
             client.updateNote(m_note, token, m_note);

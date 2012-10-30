@@ -11,32 +11,28 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef NOTEOPERATION_H
-#define NOTEOPERATION_H
+#ifndef RESOURCEOPERATION_H
+#define RESOURCEOPERATION_H
 
 #include "networkoperation.h"
 #include <Types_types.h>
 
-class NoteOperation : public NetworkOperation
+class ResourceOperation : public NetworkOperation
 {
     Q_OBJECT
 
 public:
-    NoteOperation(const evernote::edam::Note& note, Mode mode);
-    ~NoteOperation();
+    ResourceOperation(const evernote::edam::Resource& resource, Mode mode);
+    ~ResourceOperation();
 
 signals:
-    void created(const evernote::edam::Note& note);
-    void fetched(const evernote::edam::Note& note);
-    void moved(const evernote::edam::Note& note);
-    void renamed(const evernote::edam::Note& note);
-    void trashed(const evernote::edam::Note& note);
+    void fetched(const evernote::edam::Resource& resource);
 
 protected:
     void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol);
 
 private:
-    evernote::edam::Note m_note;
+    evernote::edam::Resource m_resource;
 };
 
-#endif // NOTEOPERATION_H
+#endif // RESOURCEOPERATION_H

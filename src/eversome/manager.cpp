@@ -63,9 +63,6 @@ Manager::Manager(Session* session) : QObject(session)
              this, SLOT(onNoteRenamed(evernote::edam::Note)), Qt::QueuedConnection);
     connect(store, SIGNAL(trashed(evernote::edam::Note)),
              this, SLOT(onNoteTrashed(evernote::edam::Note)), Qt::QueuedConnection);
-    // TODO: ResourceOperation
-    connect(store, SIGNAL(resourceFetched(evernote::edam::Resource)),
-             this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
 
     store = new SearchStore(session);
     m_itemstores[Search] = store;

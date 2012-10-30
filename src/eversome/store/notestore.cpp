@@ -20,16 +20,12 @@
 
 using namespace evernote;
 
-Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
-Q_DECLARE_METATYPE(evernote::edam::Resource)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
 NoteStore::NoteStore(Session* session) : AbstractStore(session)
 {
-    qRegisterMetaType<QVector<evernote::edam::Resource> >();
     qRegisterMetaType<QVector<evernote::edam::Note> >();
-    qRegisterMetaType<evernote::edam::Resource>();
     qRegisterMetaType<evernote::edam::Note>();
 }
 
@@ -50,9 +46,6 @@ void NoteStore::fetch(const edam::Note& note)
     NoteOperation* operation = new NoteOperation(note, Operation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::Note)),
                  this, SIGNAL(fetched(evernote::edam::Note)));
-    // TODO: ResourceOperation
-    connect(operation, SIGNAL(resourceFetched(evernote::edam::Resource)),
-                 this, SIGNAL(resourceFetched(evernote::edam::Resource)));
     startOperation(operation);
 }
 

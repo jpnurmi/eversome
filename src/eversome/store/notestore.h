@@ -41,9 +41,6 @@ signals:
     void moved(const evernote::edam::Note& note);
     void renamed(const evernote::edam::Note& note);
     void trashed(const evernote::edam::Note& note);
-
-    // TODO:
-    void resourceFetched(const evernote::edam::Resource& resource);
 };
 
 #endif // NOTESTORE_H

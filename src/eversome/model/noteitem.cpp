@@ -104,7 +104,11 @@ int NoteItem::usn() const
 
 QByteArray NoteItem::content() const
 {
-    return QByteArray(m_note.content.c_str(), m_note.content.size());
+    QByteArray content(m_note.content.c_str(), m_note.content.size());
+    int idx = content.indexOf("<en-note");
+    if (idx != -1) // TODO: cleanup the path
+        content.insert(idx, "<?xml-stylesheet href='/opt/eversome/qml/eversome/note/note.xsl'?>\n");
+    return content;
 }
 
 bool NoteItem::isUnread() const

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="html" encoding="utf-8" omit-xml-declaration="yes" media-type="text/html" doctype-public="" doctype-system=""/>
 
 <xsl:template match="/">
     <html>
@@ -48,6 +49,10 @@
         <option value="decrypt">&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;</option>
         <option value="decrypt">Decrypt...</option>
     </select>
+</xsl:template>
+
+<xsl:template match="*">
+    <xsl:copy-of select="."/>
 </xsl:template>
 
 </xsl:stylesheet>

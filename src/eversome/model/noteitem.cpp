@@ -14,6 +14,7 @@
 #include "noteitem.h"
 #include <QDesktopServices>
 #include <QFileInfo>
+#include <QXmlQuery>
 #include <QDir>
 
 NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
@@ -61,7 +62,7 @@ QString NoteItem::guid() const
 QString NoteItem::filePath(bool checkExists) const
 {
     QDir dir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
-    QFileInfo file(dir.filePath(guid() + ".xml"));
+    QFileInfo file(dir.filePath(guid() + ".html"));
     if (checkExists && (!file.exists() || file.size() == 0))
         return QString();
     return file.filePath();
@@ -104,11 +105,12 @@ int NoteItem::usn() const
 
 QByteArray NoteItem::content() const
 {
-    QByteArray content(m_note.content.c_str(), m_note.content.size());
-    int idx = content.indexOf("<en-note");
-    if (idx != -1) // TODO: cleanup the path
-        content.insert(idx, "<?xml-stylesheet href='/opt/eversome/qml/eversome/note/note.xsl'?>\n");
-    return content;
+    QString html;
+    QXmlQuery query(QXmlQuery::XSLT20);
+    query.setFocus(QString::fromUtf8(m_note.content.c_str(), m_note.content.size()));
+    query.setQuery(QUrl::fromLocalFile("/opt/eversome/qml/eversome/note/note.xsl")); // TODO
+    query.evaluateTo(&html);
+    return html.toUtf8();
 }
 
 bool NoteItem::isUnread() const

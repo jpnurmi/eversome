@@ -39,6 +39,6 @@ void AbstractStore::startOperation(NetworkOperation* operation)
     connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     operation->setUrl(m_session->url());
     operation->setAuthToken(m_session->authToken());
-    QThreadPool::globalInstance()->start(operation);
     qDebug().nospace() << metaObject()->className() << "::startOperation(): " << operation;
+    QThreadPool::globalInstance()->start(operation);
 }

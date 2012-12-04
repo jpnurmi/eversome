@@ -65,6 +65,12 @@ signals:
     void dataChanged();
     void filePathChanged();
     void unreadChanged();
+    void resourcesChanged();
+
+private slots:
+    void onResourceAdded(QObject* item);
+    void onResourcesAdded(const QObjectList& items);
+    void onResourceRemoved(QObject* item);
 
 private:
     bool m_unread;

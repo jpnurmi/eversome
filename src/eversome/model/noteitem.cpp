@@ -23,6 +23,10 @@ NoteItem::NoteItem(evernote::edam::Note note, QObject* parent)
     m_resources = new ItemModel(this);
     m_tags = new ItemModel(this);
     m_tags->setSortProperty("title");
+
+    connect(m_resources, SIGNAL(added(QObject*)), this, SLOT(onResourceAdded(QObject*)));
+    connect(m_resources, SIGNAL(added(QObjectList)), this, SLOT(onResourcesAdded(QObjectList)));
+    connect(m_resources, SIGNAL(removed(QObject*)), this, SLOT(onResourceRemoved(QObject*)));
 }
 
 NoteItem::~NoteItem()
@@ -124,6 +128,26 @@ void NoteItem::setUnread(bool unread)
         m_unread = unread;
         emit unreadChanged();
     }
+}
+
+void NoteItem::onResourceAdded(QObject* resource)
+{
+    connect(resource, SIGNAL(filePathChanged()), this, SIGNAL(resourcesChanged()));
+    connect(resource, SIGNAL(thumbnailChanged()), this, SIGNAL(resourcesChanged()));
+}
+
+void NoteItem::onResourcesAdded(const QObjectList& resources)
+{
+    foreach (QObject* resource, resources) {
+        connect(resource, SIGNAL(filePathChanged()), this, SIGNAL(resourcesChanged()));
+        connect(resource, SIGNAL(thumbnailChanged()), this, SIGNAL(resourcesChanged()));
+    }
+}
+
+void NoteItem::onResourceRemoved(QObject* resource)
+{
+    disconnect(resource, SIGNAL(filePathChanged()), this, SIGNAL(resourcesChanged()));
+    disconnect(resource, SIGNAL(thumbnailChanged()), this, SIGNAL(resourcesChanged()));
 }
 
 QDebug operator<<(QDebug debug, const NoteItem* item)

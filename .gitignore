@@ -42,3 +42,4 @@ build-stamp
 configure-stamp
 /debian
 .directory
+src/eversome/eversome

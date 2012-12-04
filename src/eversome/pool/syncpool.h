@@ -11,25 +11,25 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef SYNCSTORE_H
-#define SYNCSTORE_H
+#ifndef SYNCPOOL_H
+#define SYNCPOOL_H
 
-#include "abstractstore.h"
+#include "abstractpool.h"
 #include <QDateTime>
 #include <Types_types.h>
 
 class Session;
 class NetworkOperation;
 
-class SyncStore : public AbstractStore
+class SyncPool : public AbstractPool
 {
     Q_OBJECT
     Q_PROPERTY(int usn READ usn NOTIFY usnChanged)
     Q_PROPERTY(QDateTime currentTime READ currentTime NOTIFY currentTimeChanged)
 
 public:
-    explicit SyncStore(Session* session);
-    virtual ~SyncStore();
+    explicit SyncPool(Session* session);
+    virtual ~SyncPool();
 
     int usn() const;
     QDateTime currentTime() const;
@@ -57,4 +57,4 @@ private slots:
     void setCurrentTime(const QDateTime& time);
 };
 
-#endif // SYNCSTORE_H
+#endif // SYNCPOOL_H

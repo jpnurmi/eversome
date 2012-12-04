@@ -21,9 +21,9 @@
 
 class Session;
 class Database;
-class SyncStore;
+class SyncPool;
 class FileSystem;
-class AbstractStore;
+class AbstractPool;
 
 class ItemModel;
 class NotebookItem;
@@ -43,11 +43,11 @@ public:
 
     bool isBusy() const;
 
-    SyncStore* syncStore() const;
+    SyncPool* syncPool() const;
     Database* database() const;
 
     enum Item { Notebook, Resource, Search, Note, Tag };
-    AbstractStore* itemStore(Item item) const;
+    AbstractPool* itemPool(Item item) const;
     ItemModel* itemModel(Item item) const;
 
 signals:
@@ -105,9 +105,9 @@ private:
 
     FileSystem* m_files;
     Database* m_database;
-    SyncStore* m_syncstore;
+    SyncPool* m_syncpool;
     QHash<Item, ItemModel*> m_itemmodels;
-    QHash<Item, AbstractStore*> m_itemstores;
+    QHash<Item, AbstractPool*> m_itempools;
 };
 
 #endif // MANAGER_H

@@ -11,32 +11,31 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef TAGSTORE_H
-#define TAGSTORE_H
+#ifndef NOTEBOOKPOOL_H
+#define NOTEBOOKPOOL_H
 
-#include "abstractstore.h"
+#include "abstractpool.h"
 #include <Types_types.h>
-#include <NoteStore_types.h>
 
 class Session;
 
-class TagStore : public AbstractStore
+class NotebookPool : public AbstractPool
 {
     Q_OBJECT
 
 public:
-    explicit TagStore(Session* session);
-    virtual ~TagStore();
+    explicit NotebookPool(Session* session);
+    virtual ~NotebookPool();
 
 public slots:
-    void create(const evernote::edam::Tag& tag);
-    void fetch(const evernote::edam::Tag& tag);
-    void rename(const evernote::edam::Tag& tag);
+    void create(const evernote::edam::Notebook& notebook);
+    void fetch(const evernote::edam::Notebook& notebook);
+    void rename(const evernote::edam::Notebook& notebook);
 
 signals:
-    void created(const evernote::edam::Tag& tag);
-    void fetched(const evernote::edam::Tag& tag);
-    void renamed(const evernote::edam::Tag& tag);
+    void created(const evernote::edam::Notebook& notebook);
+    void fetched(const evernote::edam::Notebook& notebook);
+    void renamed(const evernote::edam::Notebook& notebook);
 };
 
-#endif // TAGSTORE_H
+#endif // NOTEBOOKPOOL_H

@@ -28,9 +28,9 @@ CommonPage {
         title: !!note ? note.title : ""
         onEdited: {
             note.title = text;
-            NoteStore.rename(note.data());
+            NotePool.rename(note.data());
         }
-        onRefresh: NoteStore.fetch(note.data())
+        onRefresh: NotePool.fetch(note.data())
     }
 
     contentHeader: NoteHeader {
@@ -104,7 +104,7 @@ CommonPage {
     onNoteChanged: {
         if (note) {
             if (!note.filePath)
-                NoteStore.fetch(note.data());
+                NotePool.fetch(note.data());
             if (note.unread) {
                 note.unread = false;
                 Database.saveNote(note);

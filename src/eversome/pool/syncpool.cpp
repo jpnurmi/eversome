@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "syncstore.h"
+#include "syncpool.h"
 #include "session.h"
 #include "syncoperation.h"
 #include <QSettings>
@@ -23,23 +23,23 @@ using namespace evernote;
 
 Q_DECLARE_METATYPE(QVector<std::string>)
 
-SyncStore::SyncStore(Session* session) : AbstractStore(session)
+SyncPool::SyncPool(Session* session) : AbstractPool(session)
 {
     connect(session, SIGNAL(established()), SLOT(sync()));
 
     qRegisterMetaType<QVector<std::string> >();
 }
 
-SyncStore::~SyncStore()
+SyncPool::~SyncPool()
 {
 }
 
-int SyncStore::usn() const
+int SyncPool::usn() const
 {
     return QSettings().value("usn").toInt();
 }
 
-void SyncStore::setUsn(int val)
+void SyncPool::setUsn(int val)
 {
     int old = usn();
     if (old != val) {
@@ -48,12 +48,12 @@ void SyncStore::setUsn(int val)
     }
 }
 
-QDateTime SyncStore::currentTime() const
+QDateTime SyncPool::currentTime() const
 {
     return QSettings().value("time").toDateTime();
 }
 
-void SyncStore::setCurrentTime(const QDateTime& val)
+void SyncPool::setCurrentTime(const QDateTime& val)
 {
     QDateTime old = currentTime();
     if (old != val) {
@@ -62,7 +62,7 @@ void SyncStore::setCurrentTime(const QDateTime& val)
     }
 }
 
-void SyncStore::sync()
+void SyncPool::sync()
 {
     SyncOperation* operation = new SyncOperation(usn());
     connect(operation, SIGNAL(usnChanged(int)), this, SLOT(setUsn(int)));

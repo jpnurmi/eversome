@@ -19,7 +19,7 @@ ContentHeader {
 
     Text {
         id: label
-        text: qsTr("Last update: %1").arg(Qt.formatDateTime(SyncStore.currentTime).toString())
+        text: qsTr("Last update: %1").arg(Qt.formatDateTime(SyncPool.currentTime).toString())
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: UI.PAGE_MARGIN + UI.LARGE_SPACING

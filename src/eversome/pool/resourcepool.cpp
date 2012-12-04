@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "resourcestore.h"
+#include "resourcepool.h"
 #include "resourceoperation.h"
 #include <QMetaType>
 #include <QtDebug>
@@ -23,17 +23,17 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 
-ResourceStore::ResourceStore(Session* session) : AbstractStore(session)
+ResourcePool::ResourcePool(Session* session) : AbstractPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
     qRegisterMetaType<evernote::edam::Resource>();
 }
 
-ResourceStore::~ResourceStore()
+ResourcePool::~ResourcePool()
 {
 }
 
-void ResourceStore::fetch(const edam::Resource& resource)
+void ResourcePool::fetch(const edam::Resource& resource)
 {
     ResourceOperation* operation = new ResourceOperation(resource, Operation::FetchResource);
     connect(operation, SIGNAL(fetched(evernote::edam::Resource)),

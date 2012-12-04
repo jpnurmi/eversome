@@ -11,22 +11,22 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef NOTESTORE_H
-#define NOTESTORE_H
+#ifndef NOTEPOOL_H
+#define NOTEPOOL_H
 
-#include "abstractstore.h"
+#include "abstractpool.h"
 #include <Types_types.h>
 #include <NoteStore_types.h>
 
 class Session;
 
-class NoteStore : public AbstractStore
+class NotePool : public AbstractPool
 {
     Q_OBJECT
 
 public:
-    explicit NoteStore(Session* session);
-    virtual ~NoteStore();
+    explicit NotePool(Session* session);
+    virtual ~NotePool();
 
 public slots:
     void create(const evernote::edam::Note& note);
@@ -43,4 +43,4 @@ signals:
     void trashed(const evernote::edam::Note& note);
 };
 
-#endif // NOTESTORE_H
+#endif // NOTEPOOL_H

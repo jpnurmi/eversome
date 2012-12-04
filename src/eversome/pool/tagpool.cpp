@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "tagstore.h"
+#include "tagpool.h"
 #include "tagoperation.h"
 #include <QMetaType>
 #include <QtDebug>
@@ -23,17 +23,17 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
 Q_DECLARE_METATYPE(evernote::edam::Tag)
 
-TagStore::TagStore(Session* session) : AbstractStore(session)
+TagPool::TagPool(Session* session) : AbstractPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Tag> >();
     qRegisterMetaType<evernote::edam::Tag>();
 }
 
-TagStore::~TagStore()
+TagPool::~TagPool()
 {
 }
 
-void TagStore::create(const edam::Tag& tag)
+void TagPool::create(const edam::Tag& tag)
 {
     TagOperation* operation = new TagOperation(tag, Operation::CreateTag);
     connect(operation, SIGNAL(created(evernote::edam::Tag)),
@@ -41,7 +41,7 @@ void TagStore::create(const edam::Tag& tag)
     startOperation(operation);
 }
 
-void TagStore::fetch(const edam::Tag& tag)
+void TagPool::fetch(const edam::Tag& tag)
 {
     TagOperation* operation = new TagOperation(tag, Operation::FetchTag);
     connect(operation, SIGNAL(fetched(evernote::edam::Tag)),
@@ -49,7 +49,7 @@ void TagStore::fetch(const edam::Tag& tag)
     startOperation(operation);
 }
 
-void TagStore::rename(const evernote::edam::Tag& tag)
+void TagPool::rename(const evernote::edam::Tag& tag)
 {
     evernote::edam::Tag modified;
     modified.guid = tag.guid;

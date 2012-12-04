@@ -13,26 +13,26 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "abstractstore.h"
+#include "abstractpool.h"
 #include "networkoperation.h"
 #include "session.h"
 #include <QThreadPool>
 #include <QtDebug>
 
-AbstractStore::AbstractStore(Session* session) : QObject(session), m_session(session)
+AbstractPool::AbstractPool(Session* session) : QObject(session), m_session(session)
 {
 }
 
-AbstractStore::~AbstractStore()
+AbstractPool::~AbstractPool()
 {
 }
 
-Session* AbstractStore::session() const
+Session* AbstractPool::session() const
 {
     return m_session;
 }
 
-void AbstractStore::startOperation(NetworkOperation* operation)
+void AbstractPool::startOperation(NetworkOperation* operation)
 {
     connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));

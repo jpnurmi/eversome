@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "searchstore.h"
+#include "searchpool.h"
 #include "searchoperation.h"
 #include <QMetaType>
 #include <QtDebug>
@@ -25,7 +25,7 @@ Q_DECLARE_METATYPE(QVector<evernote::edam::SavedSearch>)
 Q_DECLARE_METATYPE(evernote::edam::NoteMetadata)
 Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
 
-SearchStore::SearchStore(Session* session) : AbstractStore(session)
+SearchPool::SearchPool(Session* session) : AbstractPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::NoteMetadata> >();
     qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
@@ -33,11 +33,11 @@ SearchStore::SearchStore(Session* session) : AbstractStore(session)
     qRegisterMetaType<evernote::edam::SavedSearch>();
 }
 
-SearchStore::~SearchStore()
+SearchPool::~SearchPool()
 {
 }
 
-void SearchStore::create(const edam::SavedSearch& search)
+void SearchPool::create(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, Operation::CreateSearch);
     connect(operation, SIGNAL(created(evernote::edam::SavedSearch)),
@@ -45,7 +45,7 @@ void SearchStore::create(const edam::SavedSearch& search)
     startOperation(operation);
 }
 
-void SearchStore::fetch(const edam::SavedSearch& search)
+void SearchPool::fetch(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, Operation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::SavedSearch)),
@@ -53,7 +53,7 @@ void SearchStore::fetch(const edam::SavedSearch& search)
     startOperation(operation);
 }
 
-void SearchStore::search(const edam::SavedSearch& search)
+void SearchPool::search(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, Operation::PerformSearch);
     connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)),
@@ -61,7 +61,7 @@ void SearchStore::search(const edam::SavedSearch& search)
     startOperation(operation);
 }
 
-void SearchStore::rename(const evernote::edam::SavedSearch& search)
+void SearchPool::rename(const evernote::edam::SavedSearch& search)
 {
     evernote::edam::SavedSearch modified;
     modified.guid = search.guid;

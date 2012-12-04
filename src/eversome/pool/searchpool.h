@@ -11,22 +11,22 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef SEARCHSTORE_H
-#define SEARCHSTORE_H
+#ifndef SEARCHPOOL_H
+#define SEARCHPOOL_H
 
-#include "abstractstore.h"
+#include "abstractpool.h"
 #include <Types_types.h>
 #include <NoteStore_types.h>
 
 class Session;
 
-class SearchStore : public AbstractStore
+class SearchPool : public AbstractPool
 {
     Q_OBJECT
 
 public:
-    explicit SearchStore(Session* session);
-    virtual ~SearchStore();
+    explicit SearchPool(Session* session);
+    virtual ~SearchPool();
 
 public slots:
     void create(const evernote::edam::SavedSearch& search);
@@ -42,4 +42,4 @@ signals:
     void renamed(const evernote::edam::SavedSearch& search);
 };
 
-#endif // SEARCHSTORE_H
+#endif // SEARCHPOOL_H

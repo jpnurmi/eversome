@@ -23,7 +23,7 @@ SelectionDialog {
 
     onAccepted: {
         if (selectedIndex !== -1)
-            NoteStore.move(note.data(), Notebooks.at(selectedIndex).data())
+            NotePool.move(note.data(), Notebooks.at(selectedIndex).data())
     }
 
     Component.onCompleted: {

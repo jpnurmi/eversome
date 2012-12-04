@@ -14,13 +14,13 @@
 #include "manager.h"
 #include "session.h"
 #include "database.h"
-#include "tagstore.h"
-#include "syncstore.h"
-#include "notestore.h"
+#include "tagpool.h"
+#include "syncpool.h"
+#include "notepool.h"
 #include "filesystem.h"
-#include "searchstore.h"
-#include "resourcestore.h"
-#include "notebookstore.h"
+#include "searchpool.h"
+#include "resourcepool.h"
+#include "notebookpool.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "searchitem.h"
@@ -50,61 +50,61 @@ Manager::Manager(Session* session) : QObject(session)
     qRegisterMetaType<QList<ResourceItem*> >();
     qRegisterMetaType<QList<NotebookItem*> >();
 
-    AbstractStore* store = new NoteStore(session);
-    m_itemstores[Note] = store;
-    connect(store, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(store, SIGNAL(created(evernote::edam::Note)),
+    AbstractPool* pool = new NotePool(session);
+    m_itempools[Note] = pool;
+    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(pool, SIGNAL(created(evernote::edam::Note)),
              this, SLOT(onNoteCreated(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(store, SIGNAL(fetched(evernote::edam::Note)),
+    connect(pool, SIGNAL(fetched(evernote::edam::Note)),
              this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(store, SIGNAL(moved(evernote::edam::Note)),
+    connect(pool, SIGNAL(moved(evernote::edam::Note)),
              this, SLOT(onNoteMoved(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(store, SIGNAL(renamed(evernote::edam::Note)),
+    connect(pool, SIGNAL(renamed(evernote::edam::Note)),
              this, SLOT(onNoteRenamed(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(store, SIGNAL(trashed(evernote::edam::Note)),
+    connect(pool, SIGNAL(trashed(evernote::edam::Note)),
              this, SLOT(onNoteTrashed(evernote::edam::Note)), Qt::QueuedConnection);
 
-    store = new SearchStore(session);
-    m_itemstores[Search] = store;
-    connect(store, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(store, SIGNAL(created(evernote::edam::SavedSearch)),
+    pool = new SearchPool(session);
+    m_itempools[Search] = pool;
+    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(pool, SIGNAL(created(evernote::edam::SavedSearch)),
              this, SLOT(onSearchCreated(evernote::edam::SavedSearch)), Qt::QueuedConnection);
-    connect(store, SIGNAL(fetched(evernote::edam::SavedSearch)),
+    connect(pool, SIGNAL(fetched(evernote::edam::SavedSearch)),
              this, SLOT(onSearchFetched(evernote::edam::SavedSearch)), Qt::QueuedConnection);
-    connect(store, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
+    connect(pool, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
              this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
-    connect(store, SIGNAL(renamed(evernote::edam::SavedSearch)),
+    connect(pool, SIGNAL(renamed(evernote::edam::SavedSearch)),
              this, SLOT(onSearchRenamed(evernote::edam::SavedSearch)), Qt::QueuedConnection);
 
-    store = new NotebookStore(session);
-    m_itemstores[Notebook] = store;
-    connect(store, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(store, SIGNAL(created(evernote::edam::Notebook)),
+    pool = new NotebookPool(session);
+    m_itempools[Notebook] = pool;
+    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(pool, SIGNAL(created(evernote::edam::Notebook)),
              this, SLOT(onNotebookCreated(evernote::edam::Notebook)), Qt::QueuedConnection);
-    connect(store, SIGNAL(fetched(evernote::edam::Notebook)),
+    connect(pool, SIGNAL(fetched(evernote::edam::Notebook)),
              this, SLOT(onNotebookFetched(evernote::edam::Notebook)), Qt::QueuedConnection);
-    connect(store, SIGNAL(renamed(evernote::edam::Notebook)),
+    connect(pool, SIGNAL(renamed(evernote::edam::Notebook)),
              this, SLOT(onNotebookRenamed(evernote::edam::Notebook)), Qt::QueuedConnection);
 
-    store = new TagStore(session);
-    m_itemstores[Tag] = store;
-    connect(store, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(store, SIGNAL(created(evernote::edam::Tag)),
+    pool = new TagPool(session);
+    m_itempools[Tag] = pool;
+    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(pool, SIGNAL(created(evernote::edam::Tag)),
              this, SLOT(onTagCreated(evernote::edam::Tag)), Qt::QueuedConnection);
-    connect(store, SIGNAL(fetched(evernote::edam::Tag)),
+    connect(pool, SIGNAL(fetched(evernote::edam::Tag)),
              this, SLOT(onTagFetched(evernote::edam::Tag)), Qt::QueuedConnection);
-    connect(store, SIGNAL(renamed(evernote::edam::Tag)),
+    connect(pool, SIGNAL(renamed(evernote::edam::Tag)),
              this, SLOT(onTagRenamed(evernote::edam::Tag)), Qt::QueuedConnection);
 
-    store = new ResourceStore(session);
-    m_itemstores[Resource] = store;
-    connect(store, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(store, SIGNAL(fetched(evernote::edam::Resource)),
+    pool = new ResourcePool(session);
+    m_itempools[Resource] = pool;
+    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(pool, SIGNAL(fetched(evernote::edam::Resource)),
              this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
 
-    m_syncstore = new SyncStore(session);
-    connect(m_syncstore, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(m_syncstore, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+    m_syncpool = new SyncPool(session);
+    connect(m_syncpool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(m_syncpool, SIGNAL(synced(QVector<evernote::edam::Notebook>,
                                        QVector<evernote::edam::Resource>,
                                        QVector<evernote::edam::SavedSearch>,
                                        QVector<evernote::edam::Note>,
@@ -114,7 +114,7 @@ Manager::Manager(Session* session) : QObject(session)
                                        QVector<evernote::edam::SavedSearch>,
                                        QVector<evernote::edam::Note>,
                                        QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
-    connect(m_syncstore, SIGNAL(expunged(QVector<std::string>,QVector<std::string>,
+    connect(m_syncpool, SIGNAL(expunged(QVector<std::string>,QVector<std::string>,
                                          QVector<std::string>,QVector<std::string>)),
                    this, SLOT(onExpunged(QVector<std::string>,QVector<std::string>,
                                          QVector<std::string>,QVector<std::string>)), Qt::QueuedConnection);
@@ -139,11 +139,11 @@ Manager::Manager(Session* session) : QObject(session)
     m_database->open();
     m_database->load(this);
 
-    connect(m_syncstore, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
+    connect(m_syncpool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_files, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_database, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
-    foreach (AbstractStore* store, m_itemstores)
-        connect(store, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
+    foreach (AbstractPool* pool, m_itempools)
+        connect(pool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
 
     m_itemmodels[Notebook] = new ItemModel(this);
     m_itemmodels[Resource] = new ItemModel(this);
@@ -170,9 +170,9 @@ bool Manager::isBusy() const
     return QThreadPool::globalInstance()->activeThreadCount();
 }
 
-SyncStore* Manager::syncStore() const
+SyncPool* Manager::syncPool() const
 {
-    return m_syncstore;
+    return m_syncpool;
 }
 
 Database* Manager::database() const
@@ -180,9 +180,9 @@ Database* Manager::database() const
     return m_database;
 }
 
-AbstractStore* Manager::itemStore(Manager::Item item) const
+AbstractPool* Manager::itemPool(Manager::Item item) const
 {
-    return m_itemstores.value(item);
+    return m_itempools.value(item);
 }
 
 ItemModel* Manager::itemModel(Manager::Item item) const
@@ -328,9 +328,9 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
         m_files->write(item->guid(), item->filePath(false), item->content());
         m_database->saveNote(item);
 
-        ResourceStore* store = static_cast<ResourceStore*>(itemStore(Resource));
+        ResourcePool* pool = static_cast<ResourcePool*>(itemPool(Resource));
         for (uint i = 0; i < note.resources.size(); ++i)
-            store->fetch(note.resources.at(i));
+            pool->fetch(note.resources.at(i));
     }
 }
 

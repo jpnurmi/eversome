@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "notestore.h"
+#include "notepool.h"
 #include "noteoperation.h"
 #include <QMetaType>
 #include <QtDebug>
@@ -23,17 +23,17 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
-NoteStore::NoteStore(Session* session) : AbstractStore(session)
+NotePool::NotePool(Session* session) : AbstractPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Note> >();
     qRegisterMetaType<evernote::edam::Note>();
 }
 
-NoteStore::~NoteStore()
+NotePool::~NotePool()
 {
 }
 
-void NoteStore::create(const edam::Note& note)
+void NotePool::create(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, Operation::CreateNote);
     connect(operation, SIGNAL(created(evernote::edam::Note)),
@@ -41,7 +41,7 @@ void NoteStore::create(const edam::Note& note)
     startOperation(operation);
 }
 
-void NoteStore::fetch(const edam::Note& note)
+void NotePool::fetch(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, Operation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::Note)),
@@ -49,7 +49,7 @@ void NoteStore::fetch(const edam::Note& note)
     startOperation(operation);
 }
 
-void NoteStore::move(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook)
+void NotePool::move(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook)
 {
     evernote::edam::Note modified;
     modified.guid = note.guid;
@@ -65,7 +65,7 @@ void NoteStore::move(const evernote::edam::Note& note, const evernote::edam::Not
     startOperation(operation);
 }
 
-void NoteStore::rename(const evernote::edam::Note& note)
+void NotePool::rename(const evernote::edam::Note& note)
 {
     evernote::edam::Note modified;
     modified.guid = note.guid;
@@ -79,7 +79,7 @@ void NoteStore::rename(const evernote::edam::Note& note)
     startOperation(operation);
 }
 
-void NoteStore::trash(const edam::Note& note)
+void NotePool::trash(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, Operation::TrashNote);
     connect(operation, SIGNAL(trashed(evernote::edam::Note)),

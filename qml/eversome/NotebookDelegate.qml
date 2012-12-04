@@ -26,7 +26,7 @@ CommonDelegate {
 
     onEdited: {
         notebook.name = text;
-        NotebookStore.rename(notebook.data());
+        NotebookPool.rename(notebook.data());
     }
 
     Label {

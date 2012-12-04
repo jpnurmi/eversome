@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "notebookstore.h"
+#include "notebookpool.h"
 #include "notebookoperation.h"
 #include <QMetaType>
 #include <QtDebug>
@@ -23,17 +23,17 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Notebook>)
 Q_DECLARE_METATYPE(evernote::edam::Notebook)
 
-NotebookStore::NotebookStore(Session* session) : AbstractStore(session)
+NotebookPool::NotebookPool(Session* session) : AbstractPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
     qRegisterMetaType<evernote::edam::Notebook>();
 }
 
-NotebookStore::~NotebookStore()
+NotebookPool::~NotebookPool()
 {
 }
 
-void NotebookStore::create(const edam::Notebook& notebook)
+void NotebookPool::create(const edam::Notebook& notebook)
 {
     NotebookOperation* operation = new NotebookOperation(notebook, Operation::CreateNotebook);
     connect(operation, SIGNAL(created(evernote::edam::Notebook)),
@@ -41,7 +41,7 @@ void NotebookStore::create(const edam::Notebook& notebook)
     startOperation(operation);
 }
 
-void NotebookStore::fetch(const evernote::edam::Notebook& notebook)
+void NotebookPool::fetch(const evernote::edam::Notebook& notebook)
 {
     NotebookOperation* operation = new NotebookOperation(notebook, Operation::FetchNotebook);
     connect(operation, SIGNAL(fetched(evernote::edam::Notebook)),
@@ -49,7 +49,7 @@ void NotebookStore::fetch(const evernote::edam::Notebook& notebook)
     startOperation(operation);
 }
 
-void NotebookStore::rename(const evernote::edam::Notebook& notebook)
+void NotebookPool::rename(const evernote::edam::Notebook& notebook)
 {
     evernote::edam::Notebook modified;
     modified.guid = notebook.guid;

@@ -11,28 +11,32 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef RESOURCESTORE_H
-#define RESOURCESTORE_H
+#ifndef ABSTRACTPOOL_H
+#define ABSTRACTPOOL_H
 
-#include "abstractstore.h"
-#include <Types_types.h>
-#include <NoteStore_types.h>
+#include <QObject>
 
 class Session;
+class NetworkOperation;
 
-class ResourceStore : public AbstractStore
+class AbstractPool : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ResourceStore(Session* session);
-    virtual ~ResourceStore();
+    explicit AbstractPool(Session* session);
+    virtual ~AbstractPool();
 
-public slots:
-    void fetch(const evernote::edam::Resource& resource);
+    Session* session() const;
 
 signals:
-    void fetched(const evernote::edam::Resource& resource);
+    void activityChanged();
+    void error(const QString& error);
+
+protected:
+    void startOperation(NetworkOperation* operation);
+
+    Session* m_session;
 };
 
-#endif // RESOURCESTORE_H
+#endif // ABSTRACTPOOL_H

@@ -6,7 +6,9 @@ PKGCONFIG += accounts-qt NAccountsUI libsignon-qt
 
 qmlfolder.source = ../../qml/eversome
 qmlfolder.target = qml
-DEPLOYMENTFOLDERS = qmlfolder
+resfolder.source = ../../resources
+resfolder.target = .
+DEPLOYMENTFOLDERS = qmlfolder resfolder
 
 include(qmlapplicationviewer/qmlapplicationviewer.pri)
 qtcAddDeployment()

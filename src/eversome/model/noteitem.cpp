@@ -112,7 +112,7 @@ QByteArray NoteItem::content() const
     QString html;
     QXmlQuery query(QXmlQuery::XSLT20);
     query.setFocus(QString::fromUtf8(m_note.content.c_str(), m_note.content.size()));
-    query.setQuery(QUrl::fromLocalFile("/opt/eversome/qml/eversome/note/note.xsl")); // TODO
+    query.setQuery(QUrl::fromLocalFile("/opt/eversome/resources/note.xsl")); // TODO
     query.evaluateTo(&html);
     return html.toUtf8();
 }

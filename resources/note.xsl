@@ -25,12 +25,11 @@
         <xsl:attribute name="style">
             <xsl:value-of select="@style" />
         </xsl:attribute>
-        <xsl:attribute name="hash">
-            <xsl:value-of select="@hash" />
-        </xsl:attribute>
         <xsl:attribute name="type">
             <xsl:value-of select="@type" />
         </xsl:attribute>
+        <xsl:variable name="hash" select="@hash" />
+        <img src="{$dataPath}/{$hash}/thumb.png" />
     </div>
 </xsl:template>
 

@@ -76,29 +76,34 @@ CommonPage {
         webView.settings.defaultFontSize: UI.MEDIUM_FONT
     }
 
-    Repeater {
-        model: note ? note.resources : null
-        Item {
-            id: resource
-            function update() {
-                if (note.filePath && modelData.filePath && modelData.hash && modelData.fileName)
-                    flickable.webView.evaluateJavaScript("handleResource('" + modelData.fileName + "', '" + modelData.hash + "', '" + modelData.filePath + "', '" + modelData.thumbnail + "')");
-            }
-            Connections {
-                target: modelData
-                onFileNameChanged: resource.update()
-                onFilePathChanged: resource.update()
-                onThumbnailChanged: resource.update()
-            }
-            Connections {
-                target: note
-                onFilePathChanged: resource.update()
-            }
-            Connections {
-                target: flickable.webView
-                onLoadFinished: resource.update()
-            }
-        }
+//    Repeater {
+//        model: note ? note.resources : null
+//        Item {
+//            id: resource
+//            function update() {
+//                if (note.filePath && modelData.filePath && modelData.hash && modelData.fileName)
+//                    flickable.webView.evaluateJavaScript("handleResource('" + modelData.fileName + "', '" + modelData.hash + "', '" + modelData.filePath + "', '" + modelData.thumbnail + "')");
+//            }
+//            Connections {
+//                target: modelData
+//                onFileNameChanged: resource.update()
+//                onFilePathChanged: resource.update()
+//                onThumbnailChanged: resource.update()
+//            }
+//            Connections {
+//                target: note
+//                onFilePathChanged: resource.update()
+//            }
+//            Connections {
+//                target: flickable.webView
+//                onLoadFinished: resource.update()
+//            }
+//        }
+//    }
+
+    Connections {
+        target: note
+        onResourcesChanged: flickable.webView.reload.trigger()
     }
 
     onNoteChanged: {

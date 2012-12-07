@@ -1,17 +1,8 @@
-div.resource {
-    margin: 2px;
+button.en-media {
     display: inline-block;
-    border: 1px solid gray;
 }
 
-img.resource {
+img.en-media {
     width: 96px;
     height: 96px;
-    padding: 2px;
-}
-
-a.resource {
-    left: 100px;
-    margin: 2px;
-    vertical-align: middle;
 }

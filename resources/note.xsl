@@ -6,6 +6,7 @@
     <html>
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+            <link rel="stylesheet" href="/opt/eversome/resources/note.css"/>
         </head>
         <xsl:apply-templates/>
     </html>
@@ -29,7 +30,7 @@
             <xsl:value-of select="@type" />
         </xsl:attribute>
         <xsl:variable name="hash" select="@hash" />
-        <img src="{$dataPath}/{$hash}/thumb.png" />
+        <img class="en-media" src="{$dataPath}/{$hash}/thumb.png" />
     </button>
 </xsl:template>
 

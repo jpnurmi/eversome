@@ -21,7 +21,7 @@
 </xsl:template>
 
 <xsl:template match="en-media">
-    <div class="en-media">
+    <button class="en-media">
         <xsl:attribute name="style">
             <xsl:value-of select="@style" />
         </xsl:attribute>
@@ -30,7 +30,7 @@
         </xsl:attribute>
         <xsl:variable name="hash" select="@hash" />
         <img src="{$dataPath}/{$hash}/thumb.png" />
-    </div>
+    </button>
 </xsl:template>
 
 <xsl:template match="en-todo">

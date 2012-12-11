@@ -22,7 +22,10 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/copyright \
     qtc_packaging/debian_harmattan/control \
     qtc_packaging/debian_harmattan/compat \
-    qtc_packaging/debian_harmattan/changelog
+    qtc_packaging/debian_harmattan/changelog \
+    resources/note.css \
+    resources/note.js \
+    resources/note.xsl
 
 THRIFT = $$files(src/3rdparty/thrift/*)
 isEmpty(THRIFT):error(The thrift submodule is missing.  \

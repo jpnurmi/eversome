@@ -1,8 +1,14 @@
 button.en-media {
     display: inline-block;
+    width: 460px;
 }
 
 img.en-media {
     width: 96px;
     height: 96px;
+    margin: 11px;
+}
+
+span.en-media {
+    vertical-align: middle;
 }

@@ -31,6 +31,7 @@
         </xsl:attribute>
         <xsl:variable name="hash" select="@hash" />
         <img class="en-media" src="{$dataPath}/{$hash}/thumb.png" />
+        <span class="en-media" hash="{$hash}"><!-- filename --></span>
     </button>
 </xsl:template>
 

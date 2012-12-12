@@ -23,7 +23,7 @@ class Session;
 class Database;
 class SyncPool;
 class FileSystem;
-class AbstractPool;
+class NetworkPool;
 
 class ItemModel;
 class NotebookItem;
@@ -45,9 +45,9 @@ public:
 
     SyncPool* syncPool() const;
     Database* database() const;
+    NetworkPool* networkPool() const;
 
-    enum Item { Notebook, Resource, Search, Note, Tag, Thumbnail };
-    AbstractPool* itemPool(Item item) const;
+    enum Item { Notebook, Resource, Search, Note, Tag };
     ItemModel* itemModel(Item item) const;
 
 signals:
@@ -106,8 +106,8 @@ private:
     FileSystem* m_files;
     Database* m_database;
     SyncPool* m_syncpool;
+    NetworkPool* m_networkpool;
     QHash<Item, ItemModel*> m_itemmodels;
-    QHash<Item, AbstractPool*> m_itempools;
 };
 
 #endif // MANAGER_H

@@ -14,21 +14,15 @@
 #include "manager.h"
 #include "session.h"
 #include "database.h"
-#include "tagpool.h"
 #include "syncpool.h"
-#include "notepool.h"
 #include "filesystem.h"
-#include "searchpool.h"
-#include "resourcepool.h"
-#include "notebookpool.h"
-#include "thumbnailpool.h"
+#include "networkpool.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "searchitem.h"
 #include "itemmodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
-#include <QThreadPool>
 #include <QVector>
 #include <QTimer>
 #include <QDebug>
@@ -48,62 +42,46 @@ Manager::Manager(Session* session) : QObject(session)
     qRegisterMetaType<QList<ResourceItem*> >();
     qRegisterMetaType<QList<NotebookItem*> >();
 
-    AbstractPool* pool = new NotePool(session);
-    m_itempools[Note] = pool;
-    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(pool, SIGNAL(created(evernote::edam::Note)),
-             this, SLOT(onNoteCreated(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(fetched(evernote::edam::Note)),
-             this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(moved(evernote::edam::Note)),
-             this, SLOT(onNoteMoved(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(renamed(evernote::edam::Note)),
-             this, SLOT(onNoteRenamed(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(trashed(evernote::edam::Note)),
-             this, SLOT(onNoteTrashed(evernote::edam::Note)), Qt::QueuedConnection);
+    m_networkpool = new NetworkPool(session);
+    connect(m_networkpool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
 
-    pool = new SearchPool(session);
-    m_itempools[Search] = pool;
-    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(pool, SIGNAL(created(evernote::edam::SavedSearch)),
-             this, SLOT(onSearchCreated(evernote::edam::SavedSearch)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(fetched(evernote::edam::SavedSearch)),
-             this, SLOT(onSearchFetched(evernote::edam::SavedSearch)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
-             this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(renamed(evernote::edam::SavedSearch)),
-             this, SLOT(onSearchRenamed(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(noteCreated(evernote::edam::Note)),
+            this, SLOT(onNoteCreated(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(noteFetched(evernote::edam::Note)),
+            this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(noteMoved(evernote::edam::Note)),
+            this, SLOT(onNoteMoved(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(noteRenamed(evernote::edam::Note)),
+            this, SLOT(onNoteRenamed(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(noteTrashed(evernote::edam::Note)),
+            this, SLOT(onNoteTrashed(evernote::edam::Note)), Qt::QueuedConnection);
 
-    pool = new NotebookPool(session);
-    m_itempools[Notebook] = pool;
-    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(pool, SIGNAL(created(evernote::edam::Notebook)),
-             this, SLOT(onNotebookCreated(evernote::edam::Notebook)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(fetched(evernote::edam::Notebook)),
-             this, SLOT(onNotebookFetched(evernote::edam::Notebook)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(renamed(evernote::edam::Notebook)),
-             this, SLOT(onNotebookRenamed(evernote::edam::Notebook)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(searchCreated(evernote::edam::SavedSearch)),
+            this, SLOT(onSearchCreated(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(searchFetched(evernote::edam::SavedSearch)),
+            this, SLOT(onSearchFetched(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
+            this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(searchRenamed(evernote::edam::SavedSearch)),
+            this, SLOT(onSearchRenamed(evernote::edam::SavedSearch)), Qt::QueuedConnection);
 
-    pool = new TagPool(session);
-    m_itempools[Tag] = pool;
-    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(pool, SIGNAL(created(evernote::edam::Tag)),
-             this, SLOT(onTagCreated(evernote::edam::Tag)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(fetched(evernote::edam::Tag)),
-             this, SLOT(onTagFetched(evernote::edam::Tag)), Qt::QueuedConnection);
-    connect(pool, SIGNAL(renamed(evernote::edam::Tag)),
-             this, SLOT(onTagRenamed(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(notebookCreated(evernote::edam::Notebook)),
+            this, SLOT(onNotebookCreated(evernote::edam::Notebook)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(notebookFetched(evernote::edam::Notebook)),
+            this, SLOT(onNotebookFetched(evernote::edam::Notebook)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(notebookRenamed(evernote::edam::Notebook)),
+            this, SLOT(onNotebookRenamed(evernote::edam::Notebook)), Qt::QueuedConnection);
 
-    pool = new ResourcePool(session);
-    m_itempools[Resource] = pool;
-    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(pool, SIGNAL(fetched(evernote::edam::Resource)),
-             this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(tagCreated(evernote::edam::Tag)),
+            this, SLOT(onTagCreated(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(tagFetched(evernote::edam::Tag)),
+            this, SLOT(onTagFetched(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(tagRenamed(evernote::edam::Tag)),
+            this, SLOT(onTagRenamed(evernote::edam::Tag)), Qt::QueuedConnection);
 
-    pool = new ThumbnailPool(session);
-    m_itempools[Thumbnail] = pool;
-    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(pool, SIGNAL(fetched(const QString& guid, const QByteArray& data)),
+    connect(m_networkpool, SIGNAL(resourceFetched(evernote::edam::Resource)),
+            this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
+    connect(m_networkpool, SIGNAL(thumbnailFetched(const QString& guid, const QByteArray& data)),
             this, SLOT(onThumbnailFetched(const QString& guid, const QByteArray& data)), Qt::QueuedConnection);
 
     m_syncpool = new SyncPool(session);
@@ -145,8 +123,7 @@ Manager::Manager(Session* session) : QObject(session)
     connect(m_syncpool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_files, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_database, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
-    foreach (AbstractPool* pool, m_itempools)
-        connect(pool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
+    connect(m_networkpool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
 
     m_itemmodels[Notebook] = new ItemModel(this);
     m_itemmodels[Resource] = new ItemModel(this);
@@ -166,22 +143,15 @@ Manager::~Manager()
     m_files->waitForDone();
     m_database->close();
     m_database->waitForDone();
-    foreach (AbstractPool* pool, m_itempools)
-        pool->waitForDone();
+    m_networkpool->waitForDone();
     foreach (ItemModel* model, m_itemmodels)
         model->clear();
 }
 
-// TODO: get rid of - present more precise busy info
 bool Manager::isBusy() const
 {
-    if (m_syncpool->activeThreadCount() || m_files->activeThreadCount() || m_database->activeThreadCount())
-        return true;
-    foreach (AbstractPool* pool, m_itempools) {
-        if (pool->activeThreadCount())
-            return true;
-    }
-    return false;
+    return m_syncpool->activeThreadCount() || m_files->activeThreadCount() ||
+           m_database->activeThreadCount() || m_networkpool->activeThreadCount();
 }
 
 SyncPool* Manager::syncPool() const
@@ -194,9 +164,9 @@ Database* Manager::database() const
     return m_database;
 }
 
-AbstractPool* Manager::itemPool(Manager::Item item) const
+NetworkPool* Manager::networkPool() const
 {
-    return m_itempools.value(item);
+    return m_networkpool;
 }
 
 ItemModel* Manager::itemModel(Manager::Item item) const
@@ -342,9 +312,8 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
         m_files->write(item->guid(), item->filePath(false), item->content());
         m_database->saveNote(item);
 
-        ResourcePool* pool = static_cast<ResourcePool*>(itemPool(Resource));
         for (uint i = 0; i < note.resources.size(); ++i)
-            pool->fetch(note.resources.at(i));
+            m_networkpool->fetchResource(note.resources.at(i));
     }
 }
 

@@ -16,12 +16,8 @@
 #include "qmlapplicationviewer.h"
 
 #include "filesystem.h"
-#include "searchpool.h"
-#include "thumbnailpool.h"
-#include "notebookpool.h"
-#include "notepool.h"
+#include "networkpool.h"
 #include "syncpool.h"
-#include "tagpool.h"
 #include "database.h"
 #include "account.h"
 #include "session.h"
@@ -87,12 +83,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     viewer.rootContext()->setContextProperty("Session", &session);
     viewer.rootContext()->setContextProperty("Manager", manager);
     viewer.rootContext()->setContextProperty("Database", manager->database());
-    viewer.rootContext()->setContextProperty("SyncPool", manager->syncPool());
-    viewer.rootContext()->setContextProperty("TagPool", manager->itemPool(Manager::Tag));
-    viewer.rootContext()->setContextProperty("NotePool", manager->itemPool(Manager::Note));
-    viewer.rootContext()->setContextProperty("SearchPool", manager->itemPool(Manager::Search));
-    viewer.rootContext()->setContextProperty("NotebookPool", manager->itemPool(Manager::Notebook));
-    viewer.rootContext()->setContextProperty("ThumbnailPool", manager->itemPool(Manager::Thumbnail));
+    viewer.rootContext()->setContextProperty("NetworkPool", manager->networkPool());
     viewer.rootContext()->setContextProperty("Notebooks", manager->itemModel(Manager::Notebook));
     viewer.rootContext()->setContextProperty("Searches", manager->itemModel(Manager::Search));
     viewer.rootContext()->setContextProperty("Notes", manager->itemModel(Manager::Note));

@@ -14,14 +14,13 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "thumbnailoperation.h"
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QEventLoop>
 
-ThumbnailOperation::ThumbnailOperation(const evernote::edam::Note& note) :
-    NetworkOperation(Operation::FetchNoteThumbnail), m_note(note)
-{
-}
-
-ThumbnailOperation::ThumbnailOperation(const evernote::edam::Resource& resource) :
-    NetworkOperation(Operation::FetchResourceThumbnail), m_resource(resource)
+ThumbnailOperation::ThumbnailOperation(const QString& guid) :
+    NetworkOperation(Operation::FetchThumbnail), m_guid(guid)
 {
 }
 
@@ -36,11 +35,19 @@ bool ThumbnailOperation::isValid() const
 
 void ThumbnailOperation::operate()
 {
-    // TODO:
-    // - https://host.evernote.com/shard/shardId/thm/note/GUID.png
-    // - https://host.evernote.com/shard/shardId/thm/res/GUID.png
+    QNetworkAccessManager manager;
+    QNetworkRequest request;
+    request.setUrl(url());
+    QByteArray data = QString("size=96&auth=%1").arg(authToken()).toUtf8();
+    QNetworkReply* reply = manager.post(request, data);
 
-    qDebug() << url() << authToken();
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->isReadable())
+        emit fetched(m_guid, reply->readAll());
 
     /*
     if (operation)

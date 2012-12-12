@@ -15,29 +15,25 @@
 #define THUMBNAILOPERATION_H
 
 #include "networkoperation.h"
-#include <Types_types.h>
 
 class ThumbnailOperation : public NetworkOperation
 {
     Q_OBJECT
 
 public:
-    ThumbnailOperation(const evernote::edam::Note& note);
-    ThumbnailOperation(const evernote::edam::Resource& resource);
+    ThumbnailOperation(const QString& guid);
     ~ThumbnailOperation();
 
     bool isValid() const;
 
 signals:
-    void fetched(const evernote::edam::Note& note);
-    void fetched(const evernote::edam::Resource& resource);
+    void fetched(const QString& guid, const QByteArray& data);
 
 protected:
     void operate();
 
 private:
-    evernote::edam::Note m_note;
-    evernote::edam::Resource m_resource;
+    QString m_guid;
 };
 
 #endif // THUMBNAILOPERATION_H

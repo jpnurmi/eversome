@@ -1,5 +1,5 @@
 #CONFIG += qdeclarative-boostable
-QT += sql xmlpatterns
+QT += network sql xmlpatterns
 
 CONFIG += link_pkgconfig
 PKGCONFIG += accounts-qt NAccountsUI libsignon-qt

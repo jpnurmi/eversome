@@ -29,7 +29,6 @@ public:
 signals:
     void read(const QString& guid, const QString& filePath, const QByteArray& data);
     void wrote(const QString& guid, const QString& filePath);
-    void generated(const QString& guid, const QString& filePath);
 
 protected:
     void operate();

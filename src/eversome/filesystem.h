@@ -31,14 +31,12 @@ public:
 
     void read(const QString& guid, const QString& filePath);
     void write(const QString& guid, const QString& filePath, const QByteArray& data);
-    void generate(const QString& guid, const QString& filePath);
 
 signals:
     void activityChanged();
     void error(const QString& error);
     void read(const QString& guid, const QString& filePath, const QByteArray& data);
     void wrote(const QString& guid, const QString& filePath);
-    void generated(const QString& guid, const QString& filePath);
 
 private:
     void setupOperation(Operation* operation);

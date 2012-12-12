@@ -61,15 +61,6 @@ void FileSystem::write(const QString& guid, const QString& filePath, const QByte
     QThreadPool::globalInstance()->start(operation);
 }
 
-void FileSystem::generate(const QString& guid, const QString& filePath)
-{
-    FileOperation* operation = new FileOperation(Operation::GenerateThumbnail, guid, filePath);
-    connect(operation, SIGNAL(generated(QString,QString)), this, SIGNAL(generated(QString,QString)));
-    setupOperation(operation);
-    qDebug() << "FileSystem::generateThumbnail():" << operation;
-    QThreadPool::globalInstance()->start(operation);
-}
-
 void FileSystem::setupOperation(Operation *operation)
 {
     connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));

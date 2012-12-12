@@ -71,23 +71,6 @@ void FileOperation::operate()
                     emit wrote(m_guid, m_filePath);
             }
             break;
-        case GenerateThumbnail:
-            if (QDir().mkpath(info.absolutePath())) {
-                QStringList args = QStringList() << "-geometry" << "128x128" << info.fileName()+"[0]" << "thumb.png";
-
-                QProcess process;
-                process.setWorkingDirectory(info.absolutePath());
-                process.start("/usr/bin/convert", args);
-                if (!process.waitForFinished())
-                    emit error(OperationError::toString(process.error()));
-                else if (QFileInfo(info.absoluteDir().filePath("thumb.png")).exists()) {
-                    emit generated(m_guid, QDir(info.absolutePath()).filePath("thumb.png"));
-                    qDebug() << "FileOperation::operate(): generated thumb for..."
-                             << (process.error() == QProcess::UnknownError ? "OK" : "FAIL!")
-                             << qPrintable("("+info.fileName()+")");
-                }
-                break;
-            }
         default:
             Q_ASSERT(false);
             break;

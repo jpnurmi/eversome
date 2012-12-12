@@ -32,8 +32,7 @@ public slots:
     void fetch(const evernote::edam::Resource& resource);
 
 signals:
-    void fetched(const evernote::edam::Note& note);
-    void fetched(const evernote::edam::Resource& resource);
+    void fetched(const QString& guid, const QByteArray& data);
 };
 
 #endif // THUMBNAILPOOL_H

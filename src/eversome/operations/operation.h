@@ -31,7 +31,6 @@ public:
         // file operations
         ReadFile,
         WriteFile,
-        GenerateThumbnail,
 
         // database operations
         OpenDatabase,
@@ -71,8 +70,7 @@ public:
         FetchResource,
 
         // thumbnail operations
-        FetchNoteThumbnail,
-        FetchResourceThumbnail
+        FetchThumbnail
     };
 
     Operation(Mode mode);

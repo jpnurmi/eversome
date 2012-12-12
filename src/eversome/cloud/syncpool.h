@@ -14,14 +14,14 @@
 #ifndef SYNCPOOL_H
 #define SYNCPOOL_H
 
-#include "abstractpool.h"
+#include "networkpool.h"
 #include <QDateTime>
 #include <Types_types.h>
 
 class Session;
 class NetworkOperation;
 
-class SyncPool : public AbstractPool
+class SyncPool : public NetworkPool
 {
     Q_OBJECT
     Q_PROPERTY(int usn READ usn NOTIFY usnChanged)

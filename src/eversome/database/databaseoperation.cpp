@@ -52,12 +52,17 @@ static QSqlDatabase currentDatabase()
     return db;
 }
 
-DatabaseOperation::DatabaseOperation(Mode mode) : Operation(mode)
+DatabaseOperation::DatabaseOperation(Mode mode) : AbstractOperation(), m_mode(mode)
 {
 }
 
 DatabaseOperation::~DatabaseOperation()
 {
+}
+
+DatabaseOperation::Mode DatabaseOperation::mode() const
+{
+    return m_mode;
 }
 
 bool DatabaseOperation::isValid() const

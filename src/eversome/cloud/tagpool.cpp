@@ -23,7 +23,7 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Tag>)
 Q_DECLARE_METATYPE(evernote::edam::Tag)
 
-TagPool::TagPool(Session* session) : AbstractPool(session)
+TagPool::TagPool(Session* session) : NetworkPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Tag> >();
     qRegisterMetaType<evernote::edam::Tag>();
@@ -35,7 +35,7 @@ TagPool::~TagPool()
 
 void TagPool::create(const edam::Tag& tag)
 {
-    TagOperation* operation = new TagOperation(tag, Operation::CreateTag);
+    TagOperation* operation = new TagOperation(tag, NetworkOperation::CreateTag);
     connect(operation, SIGNAL(created(evernote::edam::Tag)),
                  this, SIGNAL(created(evernote::edam::Tag)));
     startOperation(operation, "notestore");
@@ -43,7 +43,7 @@ void TagPool::create(const edam::Tag& tag)
 
 void TagPool::fetch(const edam::Tag& tag)
 {
-    TagOperation* operation = new TagOperation(tag, Operation::FetchTag);
+    TagOperation* operation = new TagOperation(tag, NetworkOperation::FetchTag);
     connect(operation, SIGNAL(fetched(evernote::edam::Tag)),
                  this, SIGNAL(fetched(evernote::edam::Tag)));
     startOperation(operation, "notestore");
@@ -57,7 +57,7 @@ void TagPool::rename(const evernote::edam::Tag& tag)
     modified.__isset.guid = true; // :(
     modified.__isset.name = true; // :(
 
-    TagOperation* operation = new TagOperation(modified, Operation::RenameTag);
+    TagOperation* operation = new TagOperation(modified, NetworkOperation::RenameTag);
     connect(operation, SIGNAL(renamed(evernote::edam::Tag)),
                  this, SIGNAL(renamed(evernote::edam::Tag)));
     startOperation(operation, "notestore");

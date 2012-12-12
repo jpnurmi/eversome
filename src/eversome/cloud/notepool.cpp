@@ -23,7 +23,7 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Note>)
 Q_DECLARE_METATYPE(evernote::edam::Note)
 
-NotePool::NotePool(Session* session) : AbstractPool(session)
+NotePool::NotePool(Session* session) : NetworkPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Note> >();
     qRegisterMetaType<evernote::edam::Note>();
@@ -35,7 +35,7 @@ NotePool::~NotePool()
 
 void NotePool::create(const edam::Note& note)
 {
-    NoteOperation* operation = new NoteOperation(note, Operation::CreateNote);
+    NoteOperation* operation = new NoteOperation(note, NetworkOperation::CreateNote);
     connect(operation, SIGNAL(created(evernote::edam::Note)),
                  this, SIGNAL(created(evernote::edam::Note)));
     startOperation(operation, "notestore");
@@ -43,7 +43,7 @@ void NotePool::create(const edam::Note& note)
 
 void NotePool::fetch(const edam::Note& note)
 {
-    NoteOperation* operation = new NoteOperation(note, Operation::FetchNote);
+    NoteOperation* operation = new NoteOperation(note, NetworkOperation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::Note)),
                  this, SIGNAL(fetched(evernote::edam::Note)));
     startOperation(operation, "notestore");
@@ -59,7 +59,7 @@ void NotePool::move(const evernote::edam::Note& note, const evernote::edam::Note
     modified.__isset.title = true; // :(
     modified.__isset.notebookGuid = true; // :(
 
-    NoteOperation* operation = new NoteOperation(modified, Operation::MoveNote);
+    NoteOperation* operation = new NoteOperation(modified, NetworkOperation::MoveNote);
     connect(operation, SIGNAL(moved(evernote::edam::Note)),
                  this, SIGNAL(moved(evernote::edam::Note)));
     startOperation(operation, "notestore");
@@ -73,7 +73,7 @@ void NotePool::rename(const evernote::edam::Note& note)
     modified.__isset.guid = true; // :(
     modified.__isset.title = true; // :(
 
-    NoteOperation* operation = new NoteOperation(modified, Operation::RenameNote);
+    NoteOperation* operation = new NoteOperation(modified, NetworkOperation::RenameNote);
     connect(operation, SIGNAL(renamed(evernote::edam::Note)),
                  this, SIGNAL(renamed(evernote::edam::Note)));
     startOperation(operation, "notestore");
@@ -81,7 +81,7 @@ void NotePool::rename(const evernote::edam::Note& note)
 
 void NotePool::trash(const edam::Note& note)
 {
-    NoteOperation* operation = new NoteOperation(note, Operation::TrashNote);
+    NoteOperation* operation = new NoteOperation(note, NetworkOperation::TrashNote);
     connect(operation, SIGNAL(trashed(evernote::edam::Note)),
                  this, SIGNAL(trashed(evernote::edam::Note)));
     startOperation(operation, "notestore");

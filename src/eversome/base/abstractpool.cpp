@@ -19,6 +19,8 @@
 
 AbstractPool::AbstractPool(QObject* parent) : QThreadPool(parent)
 {
+    // thread(s) do not expire -> one thread per pool
+    setExpiryTimeout(-1);
 }
 
 AbstractPool::~AbstractPool()

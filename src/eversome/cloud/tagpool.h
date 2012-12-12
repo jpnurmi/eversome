@@ -14,13 +14,13 @@
 #ifndef TAGPOOL_H
 #define TAGPOOL_H
 
-#include "abstractpool.h"
+#include "networkpool.h"
 #include <Types_types.h>
 #include <NoteStore_types.h>
 
 class Session;
 
-class TagPool : public AbstractPool
+class TagPool : public NetworkPool
 {
     Q_OBJECT
 

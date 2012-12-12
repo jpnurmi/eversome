@@ -14,16 +14,24 @@
 #ifndef FILEOPERATION_H
 #define FILEOPERATION_H
 
-#include "operation.h"
+#include "abstractoperation.h"
 
-class FileOperation : public Operation
+class FileOperation : public AbstractOperation
 {
     Q_OBJECT
+    Q_ENUMS(mode)
 
 public:
+    enum Mode
+    {
+        ReadFile,
+        WriteFile
+    };
+
     FileOperation(Mode mode, const QString& guid, const QString& filePath, const QByteArray& data = QByteArray());
     ~FileOperation();
 
+    Mode mode() const;
     bool isValid() const;
 
 signals:
@@ -34,6 +42,7 @@ protected:
     void operate();
 
 private:
+    Mode m_mode;
     QString m_guid;
     QByteArray m_data;
     QString m_filePath;

@@ -23,7 +23,7 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Notebook>)
 Q_DECLARE_METATYPE(evernote::edam::Notebook)
 
-NotebookPool::NotebookPool(Session* session) : AbstractPool(session)
+NotebookPool::NotebookPool(Session* session) : NetworkPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
     qRegisterMetaType<evernote::edam::Notebook>();
@@ -35,7 +35,7 @@ NotebookPool::~NotebookPool()
 
 void NotebookPool::create(const edam::Notebook& notebook)
 {
-    NotebookOperation* operation = new NotebookOperation(notebook, Operation::CreateNotebook);
+    NotebookOperation* operation = new NotebookOperation(notebook, NetworkOperation::CreateNotebook);
     connect(operation, SIGNAL(created(evernote::edam::Notebook)),
                  this, SIGNAL(created(evernote::edam::Notebook)));
     startOperation(operation, "notestore");
@@ -43,7 +43,7 @@ void NotebookPool::create(const edam::Notebook& notebook)
 
 void NotebookPool::fetch(const evernote::edam::Notebook& notebook)
 {
-    NotebookOperation* operation = new NotebookOperation(notebook, Operation::FetchNotebook);
+    NotebookOperation* operation = new NotebookOperation(notebook, NetworkOperation::FetchNotebook);
     connect(operation, SIGNAL(fetched(evernote::edam::Notebook)),
                  this, SIGNAL(fetched(evernote::edam::Notebook)));
     startOperation(operation, "notestore");
@@ -57,7 +57,7 @@ void NotebookPool::rename(const evernote::edam::Notebook& notebook)
     modified.__isset.guid = true; // :(
     modified.__isset.name = true; // :(
 
-    NotebookOperation* operation = new NotebookOperation(modified, Operation::RenameNotebook);
+    NotebookOperation* operation = new NotebookOperation(modified, NetworkOperation::RenameNotebook);
     connect(operation, SIGNAL(renamed(evernote::edam::Notebook)),
                  this, SIGNAL(renamed(evernote::edam::Notebook)));
     startOperation(operation, "notestore");

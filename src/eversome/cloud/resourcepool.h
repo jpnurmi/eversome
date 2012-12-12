@@ -14,13 +14,13 @@
 #ifndef RESOURCEPOOL_H
 #define RESOURCEPOOL_H
 
-#include "abstractpool.h"
+#include "networkpool.h"
 #include <Types_types.h>
 #include <NoteStore_types.h>
 
 class Session;
 
-class ResourcePool : public AbstractPool
+class ResourcePool : public NetworkPool
 {
     Q_OBJECT
 

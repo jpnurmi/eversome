@@ -15,9 +15,8 @@
 
 #include "filesystem.h"
 #include "fileoperation.h"
-#include <QThreadPool>
 
-FileSystem::FileSystem(QObject* parent) : QObject(parent)
+FileSystem::FileSystem(QObject* parent) : AbstractPool(parent)
 {
 }
 
@@ -45,25 +44,16 @@ bool FileSystem::removeDir(const QDir& dir)
 
 void FileSystem::read(const QString& guid, const QString& filePath)
 {
-    FileOperation* operation = new FileOperation(Operation::ReadFile, guid, filePath);
+    FileOperation* operation = new FileOperation(FileOperation::ReadFile, guid, filePath);
     connect(operation, SIGNAL(read(QString,QString,QByteArray)), this, SIGNAL(read(QString,QString,QByteArray)));
-    setupOperation(operation);
     qDebug() << "FileSystem::read():" << operation;
-    QThreadPool::globalInstance()->start(operation);
+    startOperation(operation);
 }
 
 void FileSystem::write(const QString& guid, const QString& filePath, const QByteArray& data)
 {
-    FileOperation* operation = new FileOperation(Operation::WriteFile, guid, filePath, data);
+    FileOperation* operation = new FileOperation(FileOperation::WriteFile, guid, filePath, data);
     connect(operation, SIGNAL(wrote(QString,QString)), this, SIGNAL(wrote(QString,QString)));
-    setupOperation(operation);
     qDebug() << "FileSystem::write():" << operation;
-    QThreadPool::globalInstance()->start(operation);
-}
-
-void FileSystem::setupOperation(Operation *operation)
-{
-    connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    startOperation(operation);
 }

@@ -25,7 +25,7 @@ Q_DECLARE_METATYPE(QVector<evernote::edam::SavedSearch>)
 Q_DECLARE_METATYPE(evernote::edam::NoteMetadata)
 Q_DECLARE_METATYPE(evernote::edam::SavedSearch)
 
-SearchPool::SearchPool(Session* session) : AbstractPool(session)
+SearchPool::SearchPool(Session* session) : NetworkPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::NoteMetadata> >();
     qRegisterMetaType<QVector<evernote::edam::SavedSearch> >();
@@ -39,7 +39,7 @@ SearchPool::~SearchPool()
 
 void SearchPool::create(const edam::SavedSearch& search)
 {
-    SearchOperation* operation = new SearchOperation(search, Operation::CreateSearch);
+    SearchOperation* operation = new SearchOperation(search, NetworkOperation::CreateSearch);
     connect(operation, SIGNAL(created(evernote::edam::SavedSearch)),
                  this, SIGNAL(created(evernote::edam::SavedSearch)));
     startOperation(operation, "notestore");
@@ -47,7 +47,7 @@ void SearchPool::create(const edam::SavedSearch& search)
 
 void SearchPool::fetch(const edam::SavedSearch& search)
 {
-    SearchOperation* operation = new SearchOperation(search, Operation::FetchNote);
+    SearchOperation* operation = new SearchOperation(search, NetworkOperation::FetchSearch);
     connect(operation, SIGNAL(fetched(evernote::edam::SavedSearch)),
                  this, SIGNAL(fetched(evernote::edam::SavedSearch)));
     startOperation(operation, "notestore");
@@ -55,7 +55,7 @@ void SearchPool::fetch(const edam::SavedSearch& search)
 
 void SearchPool::search(const edam::SavedSearch& search)
 {
-    SearchOperation* operation = new SearchOperation(search, Operation::PerformSearch);
+    SearchOperation* operation = new SearchOperation(search, NetworkOperation::PerformSearch);
     connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)),
                  this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)));
     startOperation(operation, "notestore");
@@ -69,7 +69,7 @@ void SearchPool::rename(const evernote::edam::SavedSearch& search)
     modified.__isset.guid = true; // :(
     modified.__isset.name = true; // :(
 
-    SearchOperation* operation = new SearchOperation(modified, Operation::RenameNote);
+    SearchOperation* operation = new SearchOperation(modified, NetworkOperation::RenameSearch);
     connect(operation, SIGNAL(renamed(evernote::edam::SavedSearch)),
                  this, SIGNAL(renamed(evernote::edam::SavedSearch)));
     startOperation(operation, "notestore");

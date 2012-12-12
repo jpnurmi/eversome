@@ -25,12 +25,17 @@ using namespace boost;
 using namespace apache;
 using namespace evernote;
 
-NetworkOperation::NetworkOperation(Mode mode) : Operation(mode)
+NetworkOperation::NetworkOperation(Mode mode) : AbstractOperation(), m_mode(mode)
 {
 }
 
 NetworkOperation::~NetworkOperation()
 {
+}
+
+NetworkOperation::Mode NetworkOperation::mode() const
+{
+    return m_mode;
 }
 
 bool NetworkOperation::isValid() const

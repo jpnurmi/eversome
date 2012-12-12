@@ -14,12 +14,10 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#include <QObject>
 #include <QDir>
+#include "abstractpool.h"
 
-class Operation;
-
-class FileSystem : public QObject
+class FileSystem : public AbstractPool
 {
     Q_OBJECT
 
@@ -33,13 +31,8 @@ public:
     void write(const QString& guid, const QString& filePath, const QByteArray& data);
 
 signals:
-    void activityChanged();
-    void error(const QString& error);
     void read(const QString& guid, const QString& filePath, const QByteArray& data);
     void wrote(const QString& guid, const QString& filePath);
-
-private:
-    void setupOperation(Operation* operation);
 };
 
 #endif // FILESYSTEM_H

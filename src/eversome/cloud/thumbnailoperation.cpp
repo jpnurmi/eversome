@@ -20,7 +20,7 @@
 #include <QEventLoop>
 
 ThumbnailOperation::ThumbnailOperation(const QString& guid) :
-    NetworkOperation(Operation::FetchThumbnail), m_guid(guid)
+    NetworkOperation(NetworkOperation::FetchThumbnail), m_guid(guid)
 {
 }
 

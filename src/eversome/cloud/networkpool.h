@@ -30,6 +30,7 @@ public:
     Session* session() const;
 
 protected:
+    using AbstractPool::startOperation;
     void startOperation(NetworkOperation* operation, const QString& path);
 
     Session* m_session;

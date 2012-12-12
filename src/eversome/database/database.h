@@ -15,17 +15,16 @@
 #define DATABASE_H
 
 #include <QList>
-#include <QObject>
-#include "operation.h"
+#include "abstractpool.h"
+#include "databaseoperation.h"
 
 class TagItem;
 class NoteItem;
 class SearchItem;
 class ResourceItem;
 class NotebookItem;
-class DatabaseOperation;
 
-class Database : public QObject
+class Database : public AbstractPool
 {
     Q_OBJECT
 
@@ -61,16 +60,11 @@ public slots:
     void reset();
 
 signals:
-    void activityChanged();
-    void error(const QString& error);
     void loaded(const QList<NotebookItem*>& notebooks,
                 const QList<ResourceItem*>& resources,
                 const QList<SearchItem*>& searches,
                 const QList<NoteItem*>& notes,
                 const QList<TagItem*>& tags);
-
-private:
-    DatabaseOperation* createOperation(Operation::Mode mode);
 };
 
 #endif // DATABASE_H

@@ -22,12 +22,17 @@
 #include <QDir>
 
 FileOperation::FileOperation(Mode mode, const QString& guid, const QString& filePath, const QByteArray& data) :
-    Operation(mode), m_guid(guid), m_data(data), m_filePath(filePath)
+    AbstractOperation(), m_mode(mode), m_guid(guid), m_data(data), m_filePath(filePath)
 {
 }
 
 FileOperation::~FileOperation()
 {
+}
+
+FileOperation::Mode FileOperation::mode() const
+{
+    return m_mode;
 }
 
 bool FileOperation::isValid() const

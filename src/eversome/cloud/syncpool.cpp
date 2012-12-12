@@ -23,7 +23,7 @@ using namespace evernote;
 
 Q_DECLARE_METATYPE(QVector<std::string>)
 
-SyncPool::SyncPool(Session* session) : AbstractPool(session)
+SyncPool::SyncPool(Session* session) : NetworkPool(session)
 {
     connect(session, SIGNAL(established()), SLOT(sync()));
 

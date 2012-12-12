@@ -23,7 +23,7 @@ using namespace evernote;
 Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 
-ResourcePool::ResourcePool(Session* session) : AbstractPool(session)
+ResourcePool::ResourcePool(Session* session) : NetworkPool(session)
 {
     qRegisterMetaType<QVector<evernote::edam::Resource> >();
     qRegisterMetaType<evernote::edam::Resource>();
@@ -35,7 +35,7 @@ ResourcePool::~ResourcePool()
 
 void ResourcePool::fetch(const edam::Resource& resource)
 {
-    ResourceOperation* operation = new ResourceOperation(resource, Operation::FetchResource);
+    ResourceOperation* operation = new ResourceOperation(resource, NetworkOperation::FetchResource);
     connect(operation, SIGNAL(fetched(evernote::edam::Resource)),
                  this, SIGNAL(fetched(evernote::edam::Resource)));
     startOperation(operation, "notestore");

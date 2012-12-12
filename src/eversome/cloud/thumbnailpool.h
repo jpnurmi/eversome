@@ -14,12 +14,12 @@
 #ifndef THUMBNAILPOOL_H
 #define THUMBNAILPOOL_H
 
-#include "abstractpool.h"
+#include "networkpool.h"
 #include <Types_types.h>
 
 class Session;
 
-class ThumbnailPool : public AbstractPool
+class ThumbnailPool : public NetworkPool
 {
     Q_OBJECT
 

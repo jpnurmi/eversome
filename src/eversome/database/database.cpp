@@ -14,10 +14,8 @@
 //#define QT_NO_DEBUG_OUTPUT
 
 #include "database.h"
-#include "databaseoperation.h"
-#include <QThreadPool>
 
-Database::Database(QObject* parent) : QObject(parent)
+Database::Database(QObject* parent) : AbstractPool(parent)
 {
 }
 
@@ -27,28 +25,28 @@ Database::~Database()
 
 void Database::open()
 {
-    DatabaseOperation* operation = createOperation(Operation::OpenDatabase);
+    DatabaseOperation* operation = new DatabaseOperation(DatabaseOperation::OpenDatabase);
     qDebug() << "Database::open():" << operation;
-    QThreadPool::globalInstance()->start(operation);
+    startOperation(operation);
 }
 
 void Database::close()
 {
-    DatabaseOperation* operation = createOperation(Operation::CloseDatabase);
+    DatabaseOperation* operation = new DatabaseOperation(DatabaseOperation::CloseDatabase);
     qDebug() << "Database::close():" << operation;
-    QThreadPool::globalInstance()->start(operation);
+    startOperation(operation);
 }
 
 void Database::reset()
 {
-    DatabaseOperation* operation = createOperation(Operation::ResetDatabase);
+    DatabaseOperation* operation = new DatabaseOperation(DatabaseOperation::ResetDatabase);
     qDebug() << "Database::reset():" << operation;
-    QThreadPool::globalInstance()->start(operation);
+    startOperation(operation);
 }
 
 void Database::load(QObject* parent)
 {
-    DatabaseOperation* operation = createOperation(Operation::LoadDatabase);
+    DatabaseOperation* operation = new DatabaseOperation(DatabaseOperation::LoadDatabase);
     connect(operation, SIGNAL(loaded(QList<NotebookItem*>,
                                      QList<ResourceItem*>,
                                      QList<SearchItem*>,
@@ -60,7 +58,7 @@ void Database::load(QObject* parent)
                                      QList<NoteItem*>,
                                      QList<TagItem*>)));
     qDebug() << "Database::load():" << operation;
-    QThreadPool::globalInstance()->start(operation);
+    startOperation(operation);
 }
 
 void Database::saveNotebook(NotebookItem* notebook)
@@ -114,10 +112,10 @@ void Database::save(const QList<NotebookItem*>& notebooks,
                     const QList<NoteItem*>& notes,
                     const QList<TagItem*>& tags)
 {
-    DatabaseOperation* operation = createOperation(Operation::SaveDatabase);
+    DatabaseOperation* operation = new DatabaseOperation(DatabaseOperation::SaveDatabase);
     operation->setData(notebooks, resources, searches, notes, tags);
     qDebug() << "Database::save():" << operation;
-    QThreadPool::globalInstance()->start(operation);
+    startOperation(operation);
 }
 
 void Database::removeNotebook(NotebookItem* notebook)
@@ -157,17 +155,8 @@ void Database::remove(const QList<NotebookItem*>& notebooks,
                       const QList<NoteItem*>& notes,
                       const QList<TagItem*>& tags)
 {
-    DatabaseOperation* operation = createOperation(Operation::RemoveDatabase);
+    DatabaseOperation* operation = new DatabaseOperation(DatabaseOperation::RemoveDatabase);
     operation->setData(notebooks, QList<ResourceItem*>(), searches, notes, tags);
     qDebug() << "Database::remove():" << operation;
-    QThreadPool::globalInstance()->start(operation);
-}
-
-DatabaseOperation* Database::createOperation(Operation::Mode mode)
-{
-    DatabaseOperation* operation = new DatabaseOperation(mode);
-    connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    return operation;
+    startOperation(operation);
 }

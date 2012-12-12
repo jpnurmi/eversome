@@ -62,6 +62,7 @@ public:
     NetworkOperation(Mode mode);
     ~NetworkOperation();
 
+    Mode mode() const;
     bool isValid() const;
 
     QUrl url() const;
@@ -76,6 +77,7 @@ protected:
 
 private:
     QUrl m_url;
+    Mode m_mode;
     QString m_token;
 };
 

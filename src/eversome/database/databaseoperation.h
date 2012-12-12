@@ -14,7 +14,7 @@
 #ifndef DATABASEOPERATION_H
 #define DATABASEOPERATION_H
 
-#include "operation.h"
+#include "abstractoperation.h"
 #include <QSqlDatabase>
 #include <QList>
 
@@ -24,14 +24,26 @@ class SearchItem;
 class ResourceItem;
 class NotebookItem;
 
-class DatabaseOperation : public Operation
+class DatabaseOperation : public AbstractOperation
 {
     Q_OBJECT
+    Q_ENUMS(mode)
 
 public:
+    enum Mode
+    {
+        OpenDatabase,
+        CloseDatabase,
+        ResetDatabase,
+        LoadDatabase,
+        SaveDatabase,
+        RemoveDatabase
+    };
+
     DatabaseOperation(Mode mode);
     ~DatabaseOperation();
 
+    Mode mode() const;
     bool isValid() const;
 
     void setData(const QList<NotebookItem*>& notebooks,
@@ -76,6 +88,7 @@ private:
     QList<SearchItem*> m_searches;
     QList<NoteItem*> m_notes;
     QList<TagItem*> m_tags;
+    Mode m_mode;
 };
 
 #endif // DATABASEOPERATION_H

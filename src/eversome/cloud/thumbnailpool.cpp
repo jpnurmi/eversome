@@ -20,7 +20,7 @@
 
 using namespace evernote;
 
-ThumbnailPool::ThumbnailPool(Session* session) : AbstractPool(session)
+ThumbnailPool::ThumbnailPool(Session* session) : NetworkPool(session)
 {
 }
 

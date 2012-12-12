@@ -35,9 +35,6 @@
 
 Manager::Manager(Session* session) : QObject(session)
 {
-    // thread(s) do not expire -> DB connections per thread
-    QThreadPool::globalInstance()->setExpiryTimeout(-1);
-
     connect(session, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
 
     qRegisterMetaType<TagItem*>();
@@ -165,15 +162,26 @@ Manager::Manager(Session* session) : QObject(session)
 
 Manager::~Manager()
 {
+    m_syncpool->waitForDone();
+    m_files->waitForDone();
+    m_database->close();
+    m_database->waitForDone();
+    foreach (AbstractPool* pool, m_itempools)
+        pool->waitForDone();
     foreach (ItemModel* model, m_itemmodels)
         model->clear();
-    m_database->close();
-    QThreadPool::globalInstance()->waitForDone();
 }
 
+// TODO: get rid of - present more precise busy info
 bool Manager::isBusy() const
 {
-    return QThreadPool::globalInstance()->activeThreadCount();
+    if (m_syncpool->activeThreadCount() || m_files->activeThreadCount() || m_database->activeThreadCount())
+        return true;
+    foreach (AbstractPool* pool, m_itempools) {
+        if (pool->activeThreadCount())
+            return true;
+    }
+    return false;
 }
 
 SyncPool* Manager::syncPool() const

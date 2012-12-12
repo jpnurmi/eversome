@@ -302,7 +302,7 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
         m_database->saveNote(item);
 
         for (uint i = 0; i < note.resources.size(); ++i)
-            m_cloud->fetchResource(note.resources.at(i));
+            m_cloud->fetchThumbnail(note.resources.at(i));
     }
 }
 

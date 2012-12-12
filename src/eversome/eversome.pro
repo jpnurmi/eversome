@@ -37,7 +37,6 @@ SOURCES += \
 
 include(cloud/cloud.pri)
 include(model/model.pri)
-include(operations/operations.pri)
 
 OTHER_FILES += \
     eversome_harmattan.desktop \

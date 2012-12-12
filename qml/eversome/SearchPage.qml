@@ -13,49 +13,72 @@
 */
 import QtQuick 1.1
 import com.nokia.meego 1.0
+import com.evernote.types 1.0
 import "UIConstants.js" as UI
 import "components"
 
 CommonPage {
     id: root
 
+    property Search search
+
     pageHeader: PageHeader {
-        title: qsTr("Search")
-        busy: Manager.isBusy
-        onRefresh: Cloud.sync()
+        id: header
+        title: search ? search.name : ""
+        onEdited: {
+            search.name = text;
+            Cloud.renameSearch(search.data());
+        }
     }
 
     contentHeader: UpdateHeader { }
 
+    menu: NoteListMenu {
+        id: menu
+        parent: root
+        header: header
+        container: search
+    }
+
     flickable: ListView {
-        model: Searches
-        delegate: SearchDelegate {
+        model: search ? search.notes : 0
+        delegate: NoteDelegate {
             id: delegate
-            search: modelData
-            onClicked: {
-                Cloud.search(search.data());
-                pageStack.push(searchPage, {search: search})
-            }
+            note: modelData
+            onClicked: pageStack.push(notePage, {note: note})
             onPressAndHold: {
-                var menu = noteListMenu.createObject(root, {container: search, delegate: delegate});
+                var menu = noteMenu.createObject(root, {note: note, delegate: delegate});
                 menu.open();
             }
         }
     }
 
     Component {
-        id: searchPage
-        SearchPage { }
+        id: notePage
+        NotePage { }
     }
 
     Component {
-        id: noteListMenu
-        NoteListMenu {
+        id: noteMenu
+        NoteMenu {
             id: menu
+            onMoving: {
+                var dialog = notebookDialog.createObject(root, {note: note});
+                dialog.open();
+            }
             onStatusChanged: {
                if (status === DialogStatus.Closing)
                     menu.destroy(1000);
             }
+        }
+    }
+
+    Component {
+        id: notebookDialog
+        NotebookDialog {
+            id: dialog
+            onAccepted: dialog.destroy(1000)
+            onRejected: dialog.destroy(1000)
         }
     }
 }

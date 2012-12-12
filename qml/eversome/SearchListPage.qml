@@ -22,7 +22,7 @@ CommonPage {
     pageHeader: PageHeader {
         title: qsTr("Search")
         busy: Manager.isBusy
-        onRefresh: SyncPool.sync()
+        onRefresh: Cloud.sync()
     }
 
     contentHeader: UpdateHeader { }
@@ -33,7 +33,7 @@ CommonPage {
             id: delegate
             search: modelData
             onClicked: {
-                NotePool.search(search.data());
+                Cloud.search(search.data());
                 pageStack.push(noteListPage, {title: search.name, container: search})
             }
             onPressAndHold: {
@@ -46,7 +46,7 @@ CommonPage {
     Component {
         id: noteListPage
         NoteListPage {
-            pool: SearchPool
+            // TODO: pool: SearchPool
         }
     }
 

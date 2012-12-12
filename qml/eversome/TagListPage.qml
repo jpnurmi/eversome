@@ -41,7 +41,7 @@ CommonPage {
     Component {
         id: noteListPage
         NoteListPage {
-            pool: TagPool
+            // TODO: pool: TagPool
         }
     }
 

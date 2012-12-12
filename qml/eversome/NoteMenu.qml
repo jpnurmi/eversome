@@ -54,7 +54,7 @@ Menu {
         }
         MenuItem {
             text: qsTr("Delete")
-            onClicked: NotePool.destroy(note.data())
+            onClicked: Cloud.trashNote(note.data())
         }
     }
 }

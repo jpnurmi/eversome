@@ -26,7 +26,7 @@ CommonDelegate {
 
     onEdited: {
         search.name = text;
-        SearchPool.rename(search.data());
+        Cloud.renameSearch(search.data());
     }
 
     Label {

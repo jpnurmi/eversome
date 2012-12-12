@@ -20,7 +20,6 @@ import "components"
 CommonPage {
     id: root
 
-    property QtObject pool
     property QtObject container
     property alias title: header.title
 
@@ -28,7 +27,7 @@ CommonPage {
         id: header
         onEdited: {
             container.name = text;
-            pool.rename(container.data());
+            // TODO: Cloud.renameXxx(container.data());
         }
     }
 

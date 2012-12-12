@@ -26,7 +26,7 @@ CommonDelegate {
 
     onEdited: {
         tag.name = text;
-        TagPool.rename(tag.data());
+        Cloud.renameTag(tag.data());
     }
 
     Label {

@@ -65,7 +65,7 @@ Image {
             ToolIcon {
                 iconSource: "image://theme/icon-s-refresh-inverse"
                 onClicked: {
-                    SyncPool.sync();
+                    Cloud.sync();
                     root.refresh();
                 }
             }

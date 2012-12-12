@@ -28,7 +28,7 @@ CommonDelegate {
 
     onEdited: {
         note.title = text;
-        NotePool.rename(note.data());
+        Cloud.renameNote(note.data());
     }
 
     Label {

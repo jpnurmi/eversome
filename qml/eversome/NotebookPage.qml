@@ -27,7 +27,7 @@ CommonPage {
         title: !!notebook ? notebook.name : ""
         onEdited: {
             notebook.name = text;
-            NotebookPool.rename(notebook.data());
+            Cloud.renameNotebook(notebook.data());
         }
     }
 

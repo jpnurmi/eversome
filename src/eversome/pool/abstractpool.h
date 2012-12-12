@@ -34,7 +34,7 @@ signals:
     void error(const QString& error);
 
 protected:
-    void startOperation(NetworkOperation* operation);
+    void startOperation(NetworkOperation* operation, const QString& path);
 
     Session* m_session;
 };

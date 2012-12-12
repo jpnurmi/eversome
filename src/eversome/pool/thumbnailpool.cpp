@@ -33,7 +33,7 @@ void ThumbnailPool::fetch(const edam::Note& note)
     ThumbnailOperation* operation = new ThumbnailOperation(note);
     connect(operation, SIGNAL(fetched(evernote::edam::Note)),
                  this, SIGNAL(fetched(evernote::edam::Note)));
-    startOperation(operation);
+    startOperation(operation, "thm/note");
 }
 
 void ThumbnailPool::fetch(const edam::Resource& resource)
@@ -41,5 +41,5 @@ void ThumbnailPool::fetch(const edam::Resource& resource)
     ThumbnailOperation* operation = new ThumbnailOperation(resource);
     connect(operation, SIGNAL(fetched(evernote::edam::Resource)),
                  this, SIGNAL(fetched(evernote::edam::Resource)));
-    startOperation(operation);
+    startOperation(operation, "thm/res");
 }

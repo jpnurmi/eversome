@@ -32,12 +32,12 @@ Session* AbstractPool::session() const
     return m_session;
 }
 
-void AbstractPool::startOperation(NetworkOperation* operation)
+void AbstractPool::startOperation(NetworkOperation* operation, const QString& path)
 {
     connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    operation->setUrl(m_session->url());
+    operation->setUrl(m_session->url(path));
     operation->setAuthToken(m_session->authToken());
     qDebug().nospace() << metaObject()->className() << "::startOperation(): " << operation;
     QThreadPool::globalInstance()->start(operation);

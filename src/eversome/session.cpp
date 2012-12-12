@@ -27,17 +27,6 @@ Session::~Session()
 {
 }
 
-QUrl Session::url() const
-{
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(m_host);
-    url.setPort(EDAM_PORT);
-    QString uid = m_data.getProperty("Uid").toString();
-    url.setPath(QString("/shard/%1/notestore").arg(uid));
-    return url;
-}
-
 QString Session::userName() const
 {
     return m_data.getProperty("UserName").toString();
@@ -46,6 +35,17 @@ QString Session::userName() const
 QString Session::authToken() const
 {
     return m_data.getProperty("SecretKey").toString();
+}
+
+QUrl Session::url(const QString& path) const
+{
+    QUrl url;
+    url.setScheme("http");
+    url.setHost(m_host);
+    url.setPort(EDAM_PORT);
+    QString uid = m_data.getProperty("Uid").toString();
+    url.setPath(QString("/shard/%1/%2").arg(uid).arg(path));
+    return url;
 }
 
 void Session::establish(int credentialsId)

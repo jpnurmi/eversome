@@ -26,17 +26,15 @@ using namespace SignOn;
 class Session : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QUrl url READ url NOTIFY established)
     Q_PROPERTY(QString userName READ userName NOTIFY established)
-    Q_PROPERTY(QString authToken READ authToken NOTIFY established)
 
 public:
     explicit Session(const QString& host, QObject* parent = 0);
     virtual ~Session();
 
-    QUrl url() const;
     QString userName() const;
     QString authToken() const;
+    QUrl url(const QString& path) const;
 
 public slots:
     void establish(int credentialsId);

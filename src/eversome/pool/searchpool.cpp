@@ -42,7 +42,7 @@ void SearchPool::create(const edam::SavedSearch& search)
     SearchOperation* operation = new SearchOperation(search, Operation::CreateSearch);
     connect(operation, SIGNAL(created(evernote::edam::SavedSearch)),
                  this, SIGNAL(created(evernote::edam::SavedSearch)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void SearchPool::fetch(const edam::SavedSearch& search)
@@ -50,7 +50,7 @@ void SearchPool::fetch(const edam::SavedSearch& search)
     SearchOperation* operation = new SearchOperation(search, Operation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::SavedSearch)),
                  this, SIGNAL(fetched(evernote::edam::SavedSearch)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void SearchPool::search(const edam::SavedSearch& search)
@@ -58,7 +58,7 @@ void SearchPool::search(const edam::SavedSearch& search)
     SearchOperation* operation = new SearchOperation(search, Operation::PerformSearch);
     connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)),
                  this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void SearchPool::rename(const evernote::edam::SavedSearch& search)
@@ -72,5 +72,5 @@ void SearchPool::rename(const evernote::edam::SavedSearch& search)
     SearchOperation* operation = new SearchOperation(modified, Operation::RenameNote);
     connect(operation, SIGNAL(renamed(evernote::edam::SavedSearch)),
                  this, SIGNAL(renamed(evernote::edam::SavedSearch)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }

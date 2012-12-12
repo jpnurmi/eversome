@@ -38,7 +38,7 @@ void TagPool::create(const edam::Tag& tag)
     TagOperation* operation = new TagOperation(tag, Operation::CreateTag);
     connect(operation, SIGNAL(created(evernote::edam::Tag)),
                  this, SIGNAL(created(evernote::edam::Tag)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void TagPool::fetch(const edam::Tag& tag)
@@ -46,7 +46,7 @@ void TagPool::fetch(const edam::Tag& tag)
     TagOperation* operation = new TagOperation(tag, Operation::FetchTag);
     connect(operation, SIGNAL(fetched(evernote::edam::Tag)),
                  this, SIGNAL(fetched(evernote::edam::Tag)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void TagPool::rename(const evernote::edam::Tag& tag)
@@ -60,5 +60,5 @@ void TagPool::rename(const evernote::edam::Tag& tag)
     TagOperation* operation = new TagOperation(modified, Operation::RenameTag);
     connect(operation, SIGNAL(renamed(evernote::edam::Tag)),
                  this, SIGNAL(renamed(evernote::edam::Tag)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }

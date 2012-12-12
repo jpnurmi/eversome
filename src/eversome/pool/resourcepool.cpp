@@ -38,5 +38,5 @@ void ResourcePool::fetch(const edam::Resource& resource)
     ResourceOperation* operation = new ResourceOperation(resource, Operation::FetchResource);
     connect(operation, SIGNAL(fetched(evernote::edam::Resource)),
                  this, SIGNAL(fetched(evernote::edam::Resource)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }

@@ -85,5 +85,5 @@ void SyncPool::sync()
                                        QVector<std::string>,
                                        QVector<std::string>,
                                        QVector<std::string>)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }

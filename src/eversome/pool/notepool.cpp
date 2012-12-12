@@ -38,7 +38,7 @@ void NotePool::create(const edam::Note& note)
     NoteOperation* operation = new NoteOperation(note, Operation::CreateNote);
     connect(operation, SIGNAL(created(evernote::edam::Note)),
                  this, SIGNAL(created(evernote::edam::Note)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void NotePool::fetch(const edam::Note& note)
@@ -46,7 +46,7 @@ void NotePool::fetch(const edam::Note& note)
     NoteOperation* operation = new NoteOperation(note, Operation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::Note)),
                  this, SIGNAL(fetched(evernote::edam::Note)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void NotePool::move(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook)
@@ -62,7 +62,7 @@ void NotePool::move(const evernote::edam::Note& note, const evernote::edam::Note
     NoteOperation* operation = new NoteOperation(modified, Operation::MoveNote);
     connect(operation, SIGNAL(moved(evernote::edam::Note)),
                  this, SIGNAL(moved(evernote::edam::Note)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void NotePool::rename(const evernote::edam::Note& note)
@@ -76,7 +76,7 @@ void NotePool::rename(const evernote::edam::Note& note)
     NoteOperation* operation = new NoteOperation(modified, Operation::RenameNote);
     connect(operation, SIGNAL(renamed(evernote::edam::Note)),
                  this, SIGNAL(renamed(evernote::edam::Note)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }
 
 void NotePool::trash(const edam::Note& note)
@@ -84,5 +84,5 @@ void NotePool::trash(const edam::Note& note)
     NoteOperation* operation = new NoteOperation(note, Operation::TrashNote);
     connect(operation, SIGNAL(trashed(evernote::edam::Note)),
                  this, SIGNAL(trashed(evernote::edam::Note)));
-    startOperation(operation);
+    startOperation(operation, "notestore");
 }

@@ -14,11 +14,11 @@
 #ifndef ABSTRACTPOOL_H
 #define ABSTRACTPOOL_H
 
-#include <QThreadPool>
+#include <QObject>
 
 class AbstractOperation;
 
-class AbstractPool : public QThreadPool
+class AbstractPool : public QObject
 {
     Q_OBJECT
 

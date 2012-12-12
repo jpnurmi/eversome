@@ -22,6 +22,7 @@
 #include "itemmodel.h"
 #include "noteitem.h"
 #include "tagitem.h"
+#include <QThreadPool>
 #include <QVector>
 #include <QTimer>
 #include <QDebug>
@@ -135,17 +136,15 @@ Manager::Manager(Session* session) : QObject(session)
 
 Manager::~Manager()
 {
-    m_cloud->waitForDone();
-    m_files->waitForDone();
+    QThreadPool::globalInstance()->waitForDone();
     m_database->close();
-    m_database->waitForDone();
     foreach (ItemModel* model, m_itemmodels)
         model->clear();
 }
 
 bool Manager::isBusy() const
 {
-    return m_cloud->activeThreadCount() || m_files->activeThreadCount() || m_database->activeThreadCount();
+    return QThreadPool::globalInstance()->activeThreadCount();
 }
 
 Cloud* Manager::cloud() const

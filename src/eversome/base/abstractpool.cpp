@@ -15,12 +15,14 @@
 
 #include "abstractpool.h"
 #include "abstractoperation.h"
+#include <QThreadPool>
 #include <QtDebug>
 
-AbstractPool::AbstractPool(QObject* parent) : QThreadPool(parent)
+AbstractPool::AbstractPool(QObject* parent) : QObject(parent)
 {
     // thread(s) do not expire -> one thread per pool
-    setExpiryTimeout(-1);
+    QThreadPool::globalInstance()->setExpiryTimeout(-1);
+    QThreadPool::globalInstance()->setMaxThreadCount(1);
 }
 
 AbstractPool::~AbstractPool()
@@ -33,5 +35,5 @@ void AbstractPool::startOperation(AbstractOperation* operation)
     connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
     connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     qDebug().nospace() << metaObject()->className() << "::startOperation(): " << operation;
-    start(operation);
+    QThreadPool::globalInstance()->start(operation);
 }

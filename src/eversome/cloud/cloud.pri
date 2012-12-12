@@ -2,7 +2,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
-    abstractpool.h \
+    networkpool.h \
     notebookpool.h \
     notepool.h \
     resourcepool.h \
@@ -15,7 +15,6 @@ HEADERS += \
     networkoperation.h \
     notebookoperation.h \
     noteoperation.h \
-    operation.h \
     operationerror.h \
     resourceoperation.h \
     searchoperation.h \
@@ -24,7 +23,7 @@ HEADERS += \
     thumbnailoperation.h
 
 SOURCES += \
-    abstractpool.cpp \
+    networkpool.cpp \
     notebookpool.cpp \
     notepool.cpp \
     resourcepool.cpp \
@@ -37,7 +36,6 @@ SOURCES += \
     networkoperation.cpp \
     notebookoperation.cpp \
     noteoperation.cpp \
-    operation.cpp \
     operationerror.cpp \
     resourceoperation.cpp \
     searchoperation.cpp \

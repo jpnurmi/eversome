@@ -11,27 +11,23 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef ABSTRACTPOOL_H
-#define ABSTRACTPOOL_H
+#ifndef NETWORKPOOL_H
+#define NETWORKPOOL_H
 
-#include <QObject>
+#include "abstractpool.h"
 
 class Session;
 class NetworkOperation;
 
-class AbstractPool : public QObject
+class NetworkPool : public AbstractPool
 {
     Q_OBJECT
 
 public:
-    explicit AbstractPool(Session* session);
-    virtual ~AbstractPool();
+    explicit NetworkPool(Session* session);
+    virtual ~NetworkPool();
 
     Session* session() const;
-
-signals:
-    void activityChanged();
-    void error(const QString& error);
 
 protected:
     void startOperation(NetworkOperation* operation, const QString& path);
@@ -39,4 +35,4 @@ protected:
     Session* m_session;
 };
 
-#endif // ABSTRACTPOOL_H
+#endif // NETWORKPOOL_H

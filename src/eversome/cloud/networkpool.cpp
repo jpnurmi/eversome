@@ -13,32 +13,26 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "abstractpool.h"
+#include "networkpool.h"
 #include "networkoperation.h"
 #include "session.h"
-#include <QThreadPool>
-#include <QtDebug>
 
-AbstractPool::AbstractPool(Session* session) : QObject(session), m_session(session)
+NetworkPool::NetworkPool(Session* session) : AbstractPool(session), m_session(session)
 {
 }
 
-AbstractPool::~AbstractPool()
+NetworkPool::~NetworkPool()
 {
 }
 
-Session* AbstractPool::session() const
+Session* NetworkPool::session() const
 {
     return m_session;
 }
 
-void AbstractPool::startOperation(NetworkOperation* operation, const QString& path)
+void NetworkPool::startOperation(NetworkOperation* operation, const QString& path)
 {
-    connect(operation, SIGNAL(started()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(finished()), this, SIGNAL(activityChanged()));
-    connect(operation, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     operation->setUrl(m_session->url(path));
     operation->setAuthToken(m_session->authToken());
-    qDebug().nospace() << metaObject()->className() << "::startOperation(): " << operation;
-    QThreadPool::globalInstance()->start(operation);
+    startOperation(operation);
 }

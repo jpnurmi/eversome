@@ -14,15 +14,51 @@
 #ifndef NETWORKOPERATION_H
 #define NETWORKOPERATION_H
 
-#include "operation.h"
+#include "abstractoperation.h"
 #include <thrift/protocol/TProtocol.h>
 #include <QUrl>
 
-class NetworkOperation : public Operation
+class NetworkOperation : public AbstractOperation
 {
     Q_OBJECT
+    Q_ENUMS(Mode)
 
 public:
+    enum Mode
+    {
+        // store operations
+        Sync,
+
+        // search operations
+        CreateSearch,
+        FetchSearch,
+        PerformSearch,
+        RenameSearch,
+
+        // note operations
+        CreateNote,
+        FetchNote,
+        MoveNote,
+        RenameNote,
+        TrashNote,
+
+        // notebook operations
+        CreateNotebook,
+        FetchNotebook,
+        RenameNotebook,
+
+        // tag operations
+        CreateTag,
+        FetchTag,
+        RenameTag,
+
+        // resource operations
+        FetchResource,
+
+        // thumbnail operations
+        FetchThumbnail
+    };
+
     NetworkOperation(Mode mode);
     ~NetworkOperation();
 

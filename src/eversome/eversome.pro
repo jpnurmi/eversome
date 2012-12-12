@@ -31,6 +31,7 @@ SOURCES += \
     manager.cpp \
     session.cpp
 
+include(base/base.pri)
 include(cloud/cloud.pri)
 include(database/database.pri)
 include(filesystem/filesystem.pri)

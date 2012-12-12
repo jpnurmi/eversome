@@ -16,14 +16,18 @@
 #include "networkpool.h"
 #include "tagoperation.h"
 #include "noteoperation.h"
+#include "syncoperation.h"
 #include "searchoperation.h"
 #include "networkoperation.h"
 #include "notebookoperation.h"
 #include "resourceoperation.h"
 #include "thumbnailoperation.h"
 #include "session.h"
+#include <QSettings>
 
 using namespace evernote;
+
+Q_DECLARE_METATYPE(QVector<std::string>)
 
 Q_DECLARE_METATYPE(QVector<evernote::edam::Notebook>)
 Q_DECLARE_METATYPE(evernote::edam::Notebook)
@@ -45,6 +49,10 @@ Q_DECLARE_METATYPE(evernote::edam::Resource)
 
 NetworkPool::NetworkPool(Session* session) : AbstractPool(session), m_session(session)
 {
+    connect(session, SIGNAL(established()), SLOT(sync()));
+
+    qRegisterMetaType<QVector<std::string> >();
+
     qRegisterMetaType<QVector<evernote::edam::Notebook> >();
     qRegisterMetaType<evernote::edam::Notebook>();
 
@@ -71,6 +79,60 @@ NetworkPool::~NetworkPool()
 Session* NetworkPool::session() const
 {
     return m_session;
+}
+
+int NetworkPool::usn() const
+{
+    return QSettings().value("usn").toInt();
+}
+
+void NetworkPool::setUsn(int val)
+{
+    int old = usn();
+    if (old != val) {
+        QSettings().setValue("usn", val);
+        emit usnChanged();
+    }
+}
+
+QDateTime NetworkPool::currentTime() const
+{
+    return QSettings().value("time").toDateTime();
+}
+
+void NetworkPool::setCurrentTime(const QDateTime& val)
+{
+    QDateTime old = currentTime();
+    if (old != val) {
+        QSettings().setValue("time", val);
+        emit currentTimeChanged();
+    }
+}
+
+void NetworkPool::sync()
+{
+    SyncOperation* operation = new SyncOperation(usn());
+    connect(operation, SIGNAL(usnChanged(int)), this, SLOT(setUsn(int)));
+    connect(operation, SIGNAL(currentTimeChanged(QDateTime)), this, SLOT(setCurrentTime(QDateTime)));
+    connect(operation, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+                                     QVector<evernote::edam::Resource>,
+                                     QVector<evernote::edam::SavedSearch>,
+                                     QVector<evernote::edam::Note>,
+                                     QVector<evernote::edam::Tag>)),
+                 this, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+                                     QVector<evernote::edam::Resource>,
+                                     QVector<evernote::edam::SavedSearch>,
+                                     QVector<evernote::edam::Note>,
+                                     QVector<evernote::edam::Tag>)));
+    connect(operation, SIGNAL(expunged(QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>)),
+                 this, SIGNAL(expunged(QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>,
+                                       QVector<std::string>)));
+    startOperation(operation, "notestore");
 }
 
 void NetworkPool::createNotebook(const edam::Notebook& notebook)

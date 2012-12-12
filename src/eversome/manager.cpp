@@ -14,7 +14,6 @@
 #include "manager.h"
 #include "session.h"
 #include "database.h"
-#include "syncpool.h"
 #include "filesystem.h"
 #include "networkpool.h"
 #include "notebookitem.h"
@@ -84,20 +83,18 @@ Manager::Manager(Session* session) : QObject(session)
     connect(m_networkpool, SIGNAL(thumbnailFetched(const QString& guid, const QByteArray& data)),
             this, SLOT(onThumbnailFetched(const QString& guid, const QByteArray& data)), Qt::QueuedConnection);
 
-    m_syncpool = new SyncPool(session);
-    connect(m_syncpool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
-    connect(m_syncpool, SIGNAL(synced(QVector<evernote::edam::Notebook>,
-                                       QVector<evernote::edam::Resource>,
-                                       QVector<evernote::edam::SavedSearch>,
-                                       QVector<evernote::edam::Note>,
-                                       QVector<evernote::edam::Tag>)),
+    connect(m_networkpool, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+                                         QVector<evernote::edam::Resource>,
+                                         QVector<evernote::edam::SavedSearch>,
+                                         QVector<evernote::edam::Note>,
+                                         QVector<evernote::edam::Tag>)),
                    this, SLOT(onSynced(QVector<evernote::edam::Notebook>,
                                        QVector<evernote::edam::Resource>,
                                        QVector<evernote::edam::SavedSearch>,
                                        QVector<evernote::edam::Note>,
                                        QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
-    connect(m_syncpool, SIGNAL(expunged(QVector<std::string>,QVector<std::string>,
-                                         QVector<std::string>,QVector<std::string>)),
+    connect(m_networkpool, SIGNAL(expunged(QVector<std::string>,QVector<std::string>,
+                                           QVector<std::string>,QVector<std::string>)),
                    this, SLOT(onExpunged(QVector<std::string>,QVector<std::string>,
                                          QVector<std::string>,QVector<std::string>)), Qt::QueuedConnection);
 
@@ -120,7 +117,6 @@ Manager::Manager(Session* session) : QObject(session)
     m_database->open();
     m_database->load(this);
 
-    connect(m_syncpool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_files, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_database, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_networkpool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
@@ -139,24 +135,17 @@ Manager::Manager(Session* session) : QObject(session)
 
 Manager::~Manager()
 {
-    m_syncpool->waitForDone();
+    m_networkpool->waitForDone();
     m_files->waitForDone();
     m_database->close();
     m_database->waitForDone();
-    m_networkpool->waitForDone();
     foreach (ItemModel* model, m_itemmodels)
         model->clear();
 }
 
 bool Manager::isBusy() const
 {
-    return m_syncpool->activeThreadCount() || m_files->activeThreadCount() ||
-           m_database->activeThreadCount() || m_networkpool->activeThreadCount();
-}
-
-SyncPool* Manager::syncPool() const
-{
-    return m_syncpool;
+    return m_networkpool->activeThreadCount() || m_files->activeThreadCount() || m_database->activeThreadCount();
 }
 
 Database* Manager::database() const

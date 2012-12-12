@@ -21,7 +21,6 @@
 
 class Session;
 class Database;
-class SyncPool;
 class FileSystem;
 class NetworkPool;
 
@@ -43,7 +42,6 @@ public:
 
     bool isBusy() const;
 
-    SyncPool* syncPool() const;
     Database* database() const;
     NetworkPool* networkPool() const;
 
@@ -105,7 +103,6 @@ private:
 
     FileSystem* m_files;
     Database* m_database;
-    SyncPool* m_syncpool;
     NetworkPool* m_networkpool;
     QHash<Item, ItemModel*> m_itemmodels;
 };

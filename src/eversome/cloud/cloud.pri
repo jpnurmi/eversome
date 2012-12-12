@@ -3,9 +3,6 @@ DEPENDPATH += $$PWD
 
 HEADERS += \
     networkpool.h \
-    syncpool.h
-
-HEADERS += \
     networkoperation.h \
     notebookoperation.h \
     noteoperation.h \
@@ -18,9 +15,6 @@ HEADERS += \
 
 SOURCES += \
     networkpool.cpp \
-    syncpool.cpp
-
-SOURCES += \
     networkoperation.cpp \
     notebookoperation.cpp \
     noteoperation.cpp \

@@ -17,7 +17,6 @@
 
 #include "filesystem.h"
 #include "networkpool.h"
-#include "syncpool.h"
 #include "database.h"
 #include "account.h"
 #include "session.h"

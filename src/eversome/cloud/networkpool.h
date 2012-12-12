@@ -17,6 +17,7 @@
 #include "abstractpool.h"
 #include <Types_types.h>
 #include <NoteStore_types.h>
+#include <QDateTime>
 
 class Session;
 class NetworkOperation;
@@ -24,6 +25,8 @@ class NetworkOperation;
 class NetworkPool : public AbstractPool
 {
     Q_OBJECT
+    Q_PROPERTY(int usn READ usn NOTIFY usnChanged)
+    Q_PROPERTY(QDateTime currentTime READ currentTime NOTIFY currentTimeChanged)
 
 public:
     explicit NetworkPool(Session* session);
@@ -31,7 +34,12 @@ public:
 
     Session* session() const;
 
+    int usn() const;
+    QDateTime currentTime() const;
+
 public slots:
+    void sync();
+
     void createNotebook(const evernote::edam::Notebook& notebook);
     void fetchNotebook(const evernote::edam::Notebook& notebook);
     void renameNotebook(const evernote::edam::Notebook& notebook);
@@ -57,6 +65,20 @@ public slots:
     void fetchThumbnail(const evernote::edam::Resource& resource);
 
 signals:
+    void usnChanged();
+    void currentTimeChanged();
+
+    void synced(const QVector<evernote::edam::Notebook>& notebooks,
+                const QVector<evernote::edam::Resource>& resources,
+                const QVector<evernote::edam::SavedSearch>& searches,
+                const QVector<evernote::edam::Note>& notes,
+                const QVector<evernote::edam::Tag>& tags);
+
+    void expunged(const QVector<std::string>& notebooks,
+                  const QVector<std::string>& searches,
+                  const QVector<std::string>& notes,
+                  const QVector<std::string>& tags);
+
     void notebookCreated(const evernote::edam::Notebook& notebook);
     void notebookFetched(const evernote::edam::Notebook& notebook);
     void notebookRenamed(const evernote::edam::Notebook& notebook);
@@ -80,7 +102,11 @@ signals:
     void resourceFetched(const evernote::edam::Resource& resource);
     void thumbnailFetched(const QString& guid, const QByteArray& data);
 
-protected:
+private slots:
+    void setUsn(int usn);
+    void setCurrentTime(const QDateTime& time);
+
+private:
     using AbstractPool::startOperation;
     void startOperation(NetworkOperation* operation, const QString& path);
 

@@ -22,20 +22,18 @@ include(../3rdparty/thrift.pri)
 
 HEADERS += \
     account.h \
-    database.h \
-    filesystem.h \
     manager.h \
     session.h
 
 SOURCES += \
     account.cpp \
-    database.cpp \
-    filesystem.cpp \
     main.cpp \
     manager.cpp \
     session.cpp
 
 include(cloud/cloud.pri)
+include(database/database.pri)
+include(filesystem/filesystem.pri)
 include(model/model.pri)
 
 OTHER_FILES += \

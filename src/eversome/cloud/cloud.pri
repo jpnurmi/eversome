@@ -12,8 +12,6 @@ HEADERS += \
     thumbnailpool.h
 
 HEADERS += \
-    databaseoperation.h \
-    fileoperation.h \
     networkoperation.h \
     notebookoperation.h \
     noteoperation.h \
@@ -36,8 +34,6 @@ SOURCES += \
     thumbnailpool.cpp
 
 SOURCES += \
-    databaseoperation.cpp \
-    fileoperation.cpp \
     networkoperation.cpp \
     notebookoperation.cpp \
     noteoperation.cpp \

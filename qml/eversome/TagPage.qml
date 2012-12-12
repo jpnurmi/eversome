@@ -13,44 +13,72 @@
 */
 import QtQuick 1.1
 import com.nokia.meego 1.0
+import com.evernote.types 1.0
 import "UIConstants.js" as UI
 import "components"
 
 CommonPage {
     id: root
 
+    property Tag tag
+
     pageHeader: PageHeader {
-        title: qsTr("Tags")
+        id: header
+        title: tag ? tag.name : ""
+        onEdited: {
+            tag.name = text;
+            Cloud.renameTag(tag.data());
+        }
     }
 
     contentHeader: UpdateHeader { }
 
+    menu: NoteListMenu {
+        id: menu
+        parent: root
+        header: header
+        container: tag
+    }
+
     flickable: ListView {
-        model: Tags
-        delegate: TagDelegate {
+        model: tag ? tag.notes : 0
+        delegate: NoteDelegate {
             id: delegate
-            tag: modelData
-            onClicked: pageStack.push(tagPage, {tag: tag})
+            note: modelData
+            onClicked: pageStack.push(notePage, {note: note})
             onPressAndHold: {
-                var menu = noteListMenu.createObject(root, {container: tag, delegate: delegate});
+                var menu = noteMenu.createObject(root, {note: note, delegate: delegate});
                 menu.open();
             }
         }
     }
 
     Component {
-        id: tagPage
-        TagPage { }
+        id: notePage
+        NotePage { }
     }
 
     Component {
-        id: noteListMenu
-        NoteListMenu {
+        id: noteMenu
+        NoteMenu {
             id: menu
+            onMoving: {
+                var dialog = notebookDialog.createObject(root, {note: note});
+                dialog.open();
+            }
             onStatusChanged: {
                if (status === DialogStatus.Closing)
                     menu.destroy(1000);
             }
+        }
+    }
+
+    Component {
+        id: notebookDialog
+        NotebookDialog {
+            id: dialog
+            onAccepted: dialog.destroy(1000)
+            onRejected: dialog.destroy(1000)
         }
     }
 }

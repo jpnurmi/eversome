@@ -21,6 +21,7 @@
 #include "searchpool.h"
 #include "resourcepool.h"
 #include "notebookpool.h"
+#include "thumbnailpool.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "searchitem.h"
@@ -101,6 +102,14 @@ Manager::Manager(Session* session) : QObject(session)
     connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
     connect(pool, SIGNAL(fetched(evernote::edam::Resource)),
              this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
+
+    pool = new ThumbnailPool(session);
+    m_itempools[Thumbnail] = pool;
+    connect(pool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    connect(pool, SIGNAL(fetched(evernote::edam::Note)),
+            this, SLOT(onFetched(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(pool, SIGNAL(fetched(evernote::edam::Resource)),
+            this, SLOT(onFetched(evernote::edam::Resource)), Qt::QueuedConnection);
 
     m_syncpool = new SyncPool(session);
     connect(m_syncpool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));

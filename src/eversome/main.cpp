@@ -17,6 +17,7 @@
 
 #include "filesystem.h"
 #include "searchpool.h"
+#include "thumbnailpool.h"
 #include "notebookpool.h"
 #include "notepool.h"
 #include "syncpool.h"
@@ -91,6 +92,7 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     viewer.rootContext()->setContextProperty("NotePool", manager->itemPool(Manager::Note));
     viewer.rootContext()->setContextProperty("SearchPool", manager->itemPool(Manager::Search));
     viewer.rootContext()->setContextProperty("NotebookPool", manager->itemPool(Manager::Notebook));
+    viewer.rootContext()->setContextProperty("ThumbnailPool", manager->itemPool(Manager::Thumbnail));
     viewer.rootContext()->setContextProperty("Notebooks", manager->itemModel(Manager::Notebook));
     viewer.rootContext()->setContextProperty("Searches", manager->itemModel(Manager::Search));
     viewer.rootContext()->setContextProperty("Notes", manager->itemModel(Manager::Note));

@@ -8,7 +8,8 @@ HEADERS += \
     resourcepool.h \
     searchpool.h \
     syncpool.h \
-    tagpool.h
+    tagpool.h \
+    thumbnailpool.h
 
 SOURCES += \
     abstractpool.cpp \
@@ -17,4 +18,5 @@ SOURCES += \
     resourcepool.cpp \
     searchpool.cpp \
     syncpool.cpp \
-    tagpool.cpp
+    tagpool.cpp \
+    thumbnailpool.cpp

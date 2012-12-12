@@ -12,7 +12,8 @@ HEADERS += \
     resourceoperation.h \
     searchoperation.h \
     syncoperation.h \
-    tagoperation.h
+    tagoperation.h \
+    thumbnailoperation.h
 
 SOURCES += \
     databaseoperation.cpp \
@@ -25,4 +26,5 @@ SOURCES += \
     resourceoperation.cpp \
     searchoperation.cpp \
     syncoperation.cpp \
-    tagoperation.cpp
+    tagoperation.cpp \
+    thumbnailoperation.cpp

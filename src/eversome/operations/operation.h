@@ -68,7 +68,11 @@ public:
         RenameTag,
 
         // resource operations
-        FetchResource
+        FetchResource,
+
+        // thumbnail operations
+        FetchNoteThumbnail,
+        FetchResourceThumbnail
     };
 
     Operation(Mode mode);

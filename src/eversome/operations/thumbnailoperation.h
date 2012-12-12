@@ -11,36 +11,33 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef NETWORKOPERATION_H
-#define NETWORKOPERATION_H
+#ifndef THUMBNAILOPERATION_H
+#define THUMBNAILOPERATION_H
 
-#include "operation.h"
-#include <thrift/protocol/TProtocol.h>
-#include <QUrl>
+#include "networkoperation.h"
+#include <Types_types.h>
 
-class NetworkOperation : public Operation
+class ThumbnailOperation : public NetworkOperation
 {
     Q_OBJECT
 
 public:
-    NetworkOperation(Mode mode);
-    ~NetworkOperation();
+    ThumbnailOperation(const evernote::edam::Note& note);
+    ThumbnailOperation(const evernote::edam::Resource& resource);
+    ~ThumbnailOperation();
 
     bool isValid() const;
 
-    QUrl url() const;
-    void setUrl(const QUrl& url);
-
-    QString authToken() const;
-    void setAuthToken(const QString& token);
+signals:
+    void fetched(const evernote::edam::Note& note);
+    void fetched(const evernote::edam::Resource& resource);
 
 protected:
-    virtual void operate();
-    virtual void operate(boost::shared_ptr<apache::thrift::protocol::TProtocol>);
+    void operate();
 
 private:
-    QUrl m_url;
-    QString m_token;
+    evernote::edam::Note m_note;
+    evernote::edam::Resource m_resource;
 };
 
-#endif // NETWORKOPERATION_H
+#endif // THUMBNAILOPERATION_H

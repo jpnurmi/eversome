@@ -46,7 +46,7 @@ public:
     SyncPool* syncPool() const;
     Database* database() const;
 
-    enum Item { Notebook, Resource, Search, Note, Tag };
+    enum Item { Notebook, Resource, Search, Note, Tag, Thumbnail };
     AbstractPool* itemPool(Item item) const;
     ItemModel* itemModel(Item item) const;
 

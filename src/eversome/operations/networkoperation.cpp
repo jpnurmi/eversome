@@ -82,3 +82,8 @@ void NetworkOperation::operate()
         emit error(OperationError::toString(OperationError::UnknownError));
     }
 }
+
+void NetworkOperation::operate(shared_ptr<thrift::protocol::TProtocol> protocol)
+{
+    Q_ASSERT(false);
+}

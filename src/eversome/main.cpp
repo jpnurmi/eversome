@@ -15,12 +15,12 @@
 #include <MComponentData>
 #include "qmlapplicationviewer.h"
 
-#include "filesystem.h"
-#include "networkpool.h"
-#include "database.h"
-#include "account.h"
+#include "cloud.h"
 #include "session.h"
+#include "account.h"
 #include "manager.h"
+#include "database.h"
+#include "filesystem.h"
 
 #include "itemmodel.h"
 #include "notebookitem.h"
@@ -81,8 +81,8 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     viewer.rootContext()->setContextProperty("AppTitle", QString("%1 %2").arg(QApplication::applicationName(), QApplication::applicationVersion()));
     viewer.rootContext()->setContextProperty("Session", &session);
     viewer.rootContext()->setContextProperty("Manager", manager);
+    viewer.rootContext()->setContextProperty("Cloud", manager->cloud());
     viewer.rootContext()->setContextProperty("Database", manager->database());
-    viewer.rootContext()->setContextProperty("NetworkPool", manager->networkPool());
     viewer.rootContext()->setContextProperty("Notebooks", manager->itemModel(Manager::Notebook));
     viewer.rootContext()->setContextProperty("Searches", manager->itemModel(Manager::Search));
     viewer.rootContext()->setContextProperty("Notes", manager->itemModel(Manager::Note));

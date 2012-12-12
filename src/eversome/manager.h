@@ -19,10 +19,10 @@
 #include <Types_types.h>
 #include <NoteStore_types.h>
 
+class Cloud;
 class Session;
 class Database;
 class FileSystem;
-class NetworkPool;
 
 class ItemModel;
 class NotebookItem;
@@ -42,8 +42,8 @@ public:
 
     bool isBusy() const;
 
+    Cloud* cloud() const;
     Database* database() const;
-    NetworkPool* networkPool() const;
 
     enum Item { Notebook, Resource, Search, Note, Tag };
     ItemModel* itemModel(Item item) const;
@@ -101,9 +101,9 @@ private:
     void addNotes(const QList<NoteItem*>& notes);
     void removeNotes(const QList<NoteItem*>& notes);
 
+    Cloud* m_cloud;
     FileSystem* m_files;
     Database* m_database;
-    NetworkPool* m_networkpool;
     QHash<Item, ItemModel*> m_itemmodels;
 };
 

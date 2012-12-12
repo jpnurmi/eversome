@@ -13,7 +13,7 @@
 */
 //#define QT_NO_DEBUG_OUTPUT
 
-#include "networkpool.h"
+#include "cloud.h"
 #include "tagoperation.h"
 #include "noteoperation.h"
 #include "syncoperation.h"
@@ -47,7 +47,7 @@ Q_DECLARE_METATYPE(evernote::edam::NoteMetadata)
 Q_DECLARE_METATYPE(QVector<evernote::edam::Resource>)
 Q_DECLARE_METATYPE(evernote::edam::Resource)
 
-NetworkPool::NetworkPool(Session* session) : AbstractPool(session), m_session(session)
+Cloud::Cloud(Session* session) : AbstractPool(session), m_session(session)
 {
     connect(session, SIGNAL(established()), SLOT(sync()));
 
@@ -72,21 +72,21 @@ NetworkPool::NetworkPool(Session* session) : AbstractPool(session), m_session(se
     qRegisterMetaType<evernote::edam::Resource>();
 }
 
-NetworkPool::~NetworkPool()
+Cloud::~Cloud()
 {
 }
 
-Session* NetworkPool::session() const
+Session* Cloud::session() const
 {
     return m_session;
 }
 
-int NetworkPool::usn() const
+int Cloud::usn() const
 {
     return QSettings().value("usn").toInt();
 }
 
-void NetworkPool::setUsn(int val)
+void Cloud::setUsn(int val)
 {
     int old = usn();
     if (old != val) {
@@ -95,12 +95,12 @@ void NetworkPool::setUsn(int val)
     }
 }
 
-QDateTime NetworkPool::currentTime() const
+QDateTime Cloud::currentTime() const
 {
     return QSettings().value("time").toDateTime();
 }
 
-void NetworkPool::setCurrentTime(const QDateTime& val)
+void Cloud::setCurrentTime(const QDateTime& val)
 {
     QDateTime old = currentTime();
     if (old != val) {
@@ -109,7 +109,7 @@ void NetworkPool::setCurrentTime(const QDateTime& val)
     }
 }
 
-void NetworkPool::sync()
+void Cloud::sync()
 {
     SyncOperation* operation = new SyncOperation(usn());
     connect(operation, SIGNAL(usnChanged(int)), this, SLOT(setUsn(int)));
@@ -135,7 +135,7 @@ void NetworkPool::sync()
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::createNotebook(const edam::Notebook& notebook)
+void Cloud::createNotebook(const edam::Notebook& notebook)
 {
     NotebookOperation* operation = new NotebookOperation(notebook, NetworkOperation::CreateNotebook);
     connect(operation, SIGNAL(created(evernote::edam::Notebook)),
@@ -143,7 +143,7 @@ void NetworkPool::createNotebook(const edam::Notebook& notebook)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::fetchNotebook(const evernote::edam::Notebook& notebook)
+void Cloud::fetchNotebook(const evernote::edam::Notebook& notebook)
 {
     NotebookOperation* operation = new NotebookOperation(notebook, NetworkOperation::FetchNotebook);
     connect(operation, SIGNAL(fetched(evernote::edam::Notebook)),
@@ -151,7 +151,7 @@ void NetworkPool::fetchNotebook(const evernote::edam::Notebook& notebook)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::renameNotebook(const evernote::edam::Notebook& notebook)
+void Cloud::renameNotebook(const evernote::edam::Notebook& notebook)
 {
     evernote::edam::Notebook modified;
     modified.guid = notebook.guid;
@@ -165,7 +165,7 @@ void NetworkPool::renameNotebook(const evernote::edam::Notebook& notebook)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::createNote(const edam::Note& note)
+void Cloud::createNote(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, NetworkOperation::CreateNote);
     connect(operation, SIGNAL(created(evernote::edam::Note)),
@@ -173,7 +173,7 @@ void NetworkPool::createNote(const edam::Note& note)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::fetchNote(const edam::Note& note)
+void Cloud::fetchNote(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, NetworkOperation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::Note)),
@@ -181,7 +181,7 @@ void NetworkPool::fetchNote(const edam::Note& note)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::moveNote(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook)
+void Cloud::moveNote(const evernote::edam::Note& note, const evernote::edam::Notebook& notebook)
 {
     evernote::edam::Note modified;
     modified.guid = note.guid;
@@ -197,7 +197,7 @@ void NetworkPool::moveNote(const evernote::edam::Note& note, const evernote::eda
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::renameNote(const evernote::edam::Note& note)
+void Cloud::renameNote(const evernote::edam::Note& note)
 {
     evernote::edam::Note modified;
     modified.guid = note.guid;
@@ -211,7 +211,7 @@ void NetworkPool::renameNote(const evernote::edam::Note& note)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::trashNote(const edam::Note& note)
+void Cloud::trashNote(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, NetworkOperation::TrashNote);
     connect(operation, SIGNAL(trashed(evernote::edam::Note)),
@@ -219,7 +219,7 @@ void NetworkPool::trashNote(const edam::Note& note)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::createTag(const edam::Tag& tag)
+void Cloud::createTag(const edam::Tag& tag)
 {
     TagOperation* operation = new TagOperation(tag, NetworkOperation::CreateTag);
     connect(operation, SIGNAL(created(evernote::edam::Tag)),
@@ -227,7 +227,7 @@ void NetworkPool::createTag(const edam::Tag& tag)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::fetchTag(const edam::Tag& tag)
+void Cloud::fetchTag(const edam::Tag& tag)
 {
     TagOperation* operation = new TagOperation(tag, NetworkOperation::FetchTag);
     connect(operation, SIGNAL(fetched(evernote::edam::Tag)),
@@ -235,7 +235,7 @@ void NetworkPool::fetchTag(const edam::Tag& tag)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::renameTag(const evernote::edam::Tag& tag)
+void Cloud::renameTag(const evernote::edam::Tag& tag)
 {
     evernote::edam::Tag modified;
     modified.guid = tag.guid;
@@ -249,7 +249,7 @@ void NetworkPool::renameTag(const evernote::edam::Tag& tag)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::createSearch(const edam::SavedSearch& search)
+void Cloud::createSearch(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, NetworkOperation::CreateSearch);
     connect(operation, SIGNAL(created(evernote::edam::SavedSearch)),
@@ -257,7 +257,7 @@ void NetworkPool::createSearch(const edam::SavedSearch& search)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::fetchSearch(const edam::SavedSearch& search)
+void Cloud::fetchSearch(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, NetworkOperation::FetchSearch);
     connect(operation, SIGNAL(fetched(evernote::edam::SavedSearch)),
@@ -265,7 +265,7 @@ void NetworkPool::fetchSearch(const edam::SavedSearch& search)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::search(const edam::SavedSearch& search)
+void Cloud::search(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, NetworkOperation::PerformSearch);
     connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)),
@@ -273,7 +273,7 @@ void NetworkPool::search(const edam::SavedSearch& search)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::renameSearch(const evernote::edam::SavedSearch& search)
+void Cloud::renameSearch(const evernote::edam::SavedSearch& search)
 {
     evernote::edam::SavedSearch modified;
     modified.guid = search.guid;
@@ -287,7 +287,7 @@ void NetworkPool::renameSearch(const evernote::edam::SavedSearch& search)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::fetchResource(const edam::Resource& resource)
+void Cloud::fetchResource(const edam::Resource& resource)
 {
     ResourceOperation* operation = new ResourceOperation(resource, NetworkOperation::FetchResource);
     connect(operation, SIGNAL(fetched(evernote::edam::Resource)),
@@ -295,7 +295,7 @@ void NetworkPool::fetchResource(const edam::Resource& resource)
     startOperation(operation, "notestore");
 }
 
-void NetworkPool::fetchThumbnail(const edam::Note& note)
+void Cloud::fetchThumbnail(const edam::Note& note)
 {
     QString guid = QString::fromStdString(note.guid);
     ThumbnailOperation* operation = new ThumbnailOperation(guid);
@@ -304,7 +304,7 @@ void NetworkPool::fetchThumbnail(const edam::Note& note)
     startOperation(operation, QString("thm/note/%1.png").arg(guid));
 }
 
-void NetworkPool::fetchThumbnail(const edam::Resource& resource)
+void Cloud::fetchThumbnail(const edam::Resource& resource)
 {
     QString guid = QString::fromStdString(resource.guid);
     ThumbnailOperation* operation = new ThumbnailOperation(guid);
@@ -313,7 +313,7 @@ void NetworkPool::fetchThumbnail(const edam::Resource& resource)
     startOperation(operation, QString("thm/res/%1.png").arg(guid));
 }
 
-void NetworkPool::startOperation(NetworkOperation* operation, const QString& path)
+void Cloud::startOperation(NetworkOperation* operation, const QString& path)
 {
     operation->setUrl(m_session->url(path));
     operation->setAuthToken(m_session->authToken());

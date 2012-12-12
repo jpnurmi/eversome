@@ -11,8 +11,8 @@
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
 */
-#ifndef NETWORKPOOL_H
-#define NETWORKPOOL_H
+#ifndef CLOUD_H
+#define CLOUD_H
 
 #include "abstractpool.h"
 #include <Types_types.h>
@@ -22,15 +22,15 @@
 class Session;
 class NetworkOperation;
 
-class NetworkPool : public AbstractPool
+class Cloud : public AbstractPool
 {
     Q_OBJECT
     Q_PROPERTY(int usn READ usn NOTIFY usnChanged)
     Q_PROPERTY(QDateTime currentTime READ currentTime NOTIFY currentTimeChanged)
 
 public:
-    explicit NetworkPool(Session* session);
-    virtual ~NetworkPool();
+    explicit Cloud(Session* session);
+    virtual ~Cloud();
 
     Session* session() const;
 
@@ -113,4 +113,4 @@ private:
     Session* m_session;
 };
 
-#endif // NETWORKPOOL_H
+#endif // CLOUD_H

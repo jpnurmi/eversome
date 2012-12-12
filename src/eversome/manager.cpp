@@ -12,10 +12,10 @@
 * GNU General Public License for more details.
 */
 #include "manager.h"
+#include "cloud.h"
 #include "session.h"
 #include "database.h"
 #include "filesystem.h"
-#include "networkpool.h"
 #include "notebookitem.h"
 #include "resourceitem.h"
 #include "searchitem.h"
@@ -41,62 +41,62 @@ Manager::Manager(Session* session) : QObject(session)
     qRegisterMetaType<QList<ResourceItem*> >();
     qRegisterMetaType<QList<NotebookItem*> >();
 
-    m_networkpool = new NetworkPool(session);
-    connect(m_networkpool, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
+    m_cloud = new Cloud(session);
+    connect(m_cloud, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
 
-    connect(m_networkpool, SIGNAL(noteCreated(evernote::edam::Note)),
-            this, SLOT(onNoteCreated(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(noteFetched(evernote::edam::Note)),
-            this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(noteMoved(evernote::edam::Note)),
-            this, SLOT(onNoteMoved(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(noteRenamed(evernote::edam::Note)),
-            this, SLOT(onNoteRenamed(evernote::edam::Note)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(noteTrashed(evernote::edam::Note)),
-            this, SLOT(onNoteTrashed(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(noteCreated(evernote::edam::Note)),
+               this, SLOT(onNoteCreated(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(noteFetched(evernote::edam::Note)),
+               this, SLOT(onNoteFetched(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(noteMoved(evernote::edam::Note)),
+               this, SLOT(onNoteMoved(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(noteRenamed(evernote::edam::Note)),
+               this, SLOT(onNoteRenamed(evernote::edam::Note)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(noteTrashed(evernote::edam::Note)),
+               this, SLOT(onNoteTrashed(evernote::edam::Note)), Qt::QueuedConnection);
 
-    connect(m_networkpool, SIGNAL(searchCreated(evernote::edam::SavedSearch)),
-            this, SLOT(onSearchCreated(evernote::edam::SavedSearch)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(searchFetched(evernote::edam::SavedSearch)),
-            this, SLOT(onSearchFetched(evernote::edam::SavedSearch)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
-            this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(searchRenamed(evernote::edam::SavedSearch)),
-            this, SLOT(onSearchRenamed(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(searchCreated(evernote::edam::SavedSearch)),
+               this, SLOT(onSearchCreated(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(searchFetched(evernote::edam::SavedSearch)),
+               this, SLOT(onSearchFetched(evernote::edam::SavedSearch)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
+               this, SLOT(onSearched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(searchRenamed(evernote::edam::SavedSearch)),
+               this, SLOT(onSearchRenamed(evernote::edam::SavedSearch)), Qt::QueuedConnection);
 
-    connect(m_networkpool, SIGNAL(notebookCreated(evernote::edam::Notebook)),
-            this, SLOT(onNotebookCreated(evernote::edam::Notebook)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(notebookFetched(evernote::edam::Notebook)),
-            this, SLOT(onNotebookFetched(evernote::edam::Notebook)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(notebookRenamed(evernote::edam::Notebook)),
-            this, SLOT(onNotebookRenamed(evernote::edam::Notebook)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(notebookCreated(evernote::edam::Notebook)),
+               this, SLOT(onNotebookCreated(evernote::edam::Notebook)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(notebookFetched(evernote::edam::Notebook)),
+               this, SLOT(onNotebookFetched(evernote::edam::Notebook)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(notebookRenamed(evernote::edam::Notebook)),
+               this, SLOT(onNotebookRenamed(evernote::edam::Notebook)), Qt::QueuedConnection);
 
-    connect(m_networkpool, SIGNAL(tagCreated(evernote::edam::Tag)),
-            this, SLOT(onTagCreated(evernote::edam::Tag)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(tagFetched(evernote::edam::Tag)),
-            this, SLOT(onTagFetched(evernote::edam::Tag)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(tagRenamed(evernote::edam::Tag)),
-            this, SLOT(onTagRenamed(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(tagCreated(evernote::edam::Tag)),
+               this, SLOT(onTagCreated(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(tagFetched(evernote::edam::Tag)),
+               this, SLOT(onTagFetched(evernote::edam::Tag)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(tagRenamed(evernote::edam::Tag)),
+               this, SLOT(onTagRenamed(evernote::edam::Tag)), Qt::QueuedConnection);
 
-    connect(m_networkpool, SIGNAL(resourceFetched(evernote::edam::Resource)),
-            this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(thumbnailFetched(const QString& guid, const QByteArray& data)),
-            this, SLOT(onThumbnailFetched(const QString& guid, const QByteArray& data)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(resourceFetched(evernote::edam::Resource)),
+               this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(thumbnailFetched(const QString& guid, const QByteArray& data)),
+               this, SLOT(onThumbnailFetched(const QString& guid, const QByteArray& data)), Qt::QueuedConnection);
 
-    connect(m_networkpool, SIGNAL(synced(QVector<evernote::edam::Notebook>,
-                                         QVector<evernote::edam::Resource>,
-                                         QVector<evernote::edam::SavedSearch>,
-                                         QVector<evernote::edam::Note>,
-                                         QVector<evernote::edam::Tag>)),
-                   this, SLOT(onSynced(QVector<evernote::edam::Notebook>,
-                                       QVector<evernote::edam::Resource>,
-                                       QVector<evernote::edam::SavedSearch>,
-                                       QVector<evernote::edam::Note>,
-                                       QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
-    connect(m_networkpool, SIGNAL(expunged(QVector<std::string>,QVector<std::string>,
-                                           QVector<std::string>,QVector<std::string>)),
-                   this, SLOT(onExpunged(QVector<std::string>,QVector<std::string>,
-                                         QVector<std::string>,QVector<std::string>)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(synced(QVector<evernote::edam::Notebook>,
+                                   QVector<evernote::edam::Resource>,
+                                   QVector<evernote::edam::SavedSearch>,
+                                   QVector<evernote::edam::Note>,
+                                   QVector<evernote::edam::Tag>)),
+               this, SLOT(onSynced(QVector<evernote::edam::Notebook>,
+                                   QVector<evernote::edam::Resource>,
+                                   QVector<evernote::edam::SavedSearch>,
+                                   QVector<evernote::edam::Note>,
+                                   QVector<evernote::edam::Tag>)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(expunged(QVector<std::string>,QVector<std::string>,
+                                     QVector<std::string>,QVector<std::string>)),
+               this, SLOT(onExpunged(QVector<std::string>,QVector<std::string>,
+                                     QVector<std::string>,QVector<std::string>)), Qt::QueuedConnection);
 
     m_files = new FileSystem(this);
     connect(m_files, SIGNAL(error(QString)), this, SIGNAL(error(QString)));
@@ -117,9 +117,9 @@ Manager::Manager(Session* session) : QObject(session)
     m_database->open();
     m_database->load(this);
 
+    connect(m_cloud, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_files, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
     connect(m_database, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
-    connect(m_networkpool, SIGNAL(activityChanged()), this, SLOT(onActivityChanged()));
 
     m_itemmodels[Notebook] = new ItemModel(this);
     m_itemmodels[Resource] = new ItemModel(this);
@@ -135,7 +135,7 @@ Manager::Manager(Session* session) : QObject(session)
 
 Manager::~Manager()
 {
-    m_networkpool->waitForDone();
+    m_cloud->waitForDone();
     m_files->waitForDone();
     m_database->close();
     m_database->waitForDone();
@@ -145,17 +145,17 @@ Manager::~Manager()
 
 bool Manager::isBusy() const
 {
-    return m_networkpool->activeThreadCount() || m_files->activeThreadCount() || m_database->activeThreadCount();
+    return m_cloud->activeThreadCount() || m_files->activeThreadCount() || m_database->activeThreadCount();
+}
+
+Cloud* Manager::cloud() const
+{
+    return m_cloud;
 }
 
 Database* Manager::database() const
 {
     return m_database;
-}
-
-NetworkPool* Manager::networkPool() const
-{
-    return m_networkpool;
 }
 
 ItemModel* Manager::itemModel(Manager::Item item) const
@@ -302,7 +302,7 @@ void Manager::onNoteFetched(const evernote::edam::Note& note)
         m_database->saveNote(item);
 
         for (uint i = 0; i < note.resources.size(); ++i)
-            m_networkpool->fetchResource(note.resources.at(i));
+            m_cloud->fetchResource(note.resources.at(i));
     }
 }
 

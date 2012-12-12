@@ -2,7 +2,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
-    networkpool.h \
+    cloud.h \
     networkoperation.h \
     notebookoperation.h \
     noteoperation.h \
@@ -14,7 +14,7 @@ HEADERS += \
     thumbnailoperation.h
 
 SOURCES += \
-    networkpool.cpp \
+    cloud.cpp \
     networkoperation.cpp \
     notebookoperation.cpp \
     noteoperation.cpp \

@@ -35,9 +35,9 @@ SOURCES += \
     manager.cpp \
     session.cpp
 
+include(cloud/cloud.pri)
 include(model/model.pri)
 include(operations/operations.pri)
-include(pool/pool.pri)
 
 OTHER_FILES += \
     eversome_harmattan.desktop \

@@ -139,7 +139,7 @@ void Cloud::createNotebook(const edam::Notebook& notebook)
 {
     NotebookOperation* operation = new NotebookOperation(notebook, NetworkOperation::CreateNotebook);
     connect(operation, SIGNAL(created(evernote::edam::Notebook)),
-                 this, SIGNAL(created(evernote::edam::Notebook)));
+                 this, SIGNAL(notebookCreated(evernote::edam::Notebook)));
     startOperation(operation, "notestore");
 }
 
@@ -147,7 +147,7 @@ void Cloud::fetchNotebook(const evernote::edam::Notebook& notebook)
 {
     NotebookOperation* operation = new NotebookOperation(notebook, NetworkOperation::FetchNotebook);
     connect(operation, SIGNAL(fetched(evernote::edam::Notebook)),
-                 this, SIGNAL(fetched(evernote::edam::Notebook)));
+                 this, SIGNAL(notebookFetched(evernote::edam::Notebook)));
     startOperation(operation, "notestore");
 }
 
@@ -161,7 +161,7 @@ void Cloud::renameNotebook(const evernote::edam::Notebook& notebook)
 
     NotebookOperation* operation = new NotebookOperation(modified, NetworkOperation::RenameNotebook);
     connect(operation, SIGNAL(renamed(evernote::edam::Notebook)),
-                 this, SIGNAL(renamed(evernote::edam::Notebook)));
+                 this, SIGNAL(notebookRenamed(evernote::edam::Notebook)));
     startOperation(operation, "notestore");
 }
 
@@ -169,7 +169,7 @@ void Cloud::createNote(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, NetworkOperation::CreateNote);
     connect(operation, SIGNAL(created(evernote::edam::Note)),
-                 this, SIGNAL(created(evernote::edam::Note)));
+                 this, SIGNAL(noteCreated(evernote::edam::Note)));
     startOperation(operation, "notestore");
 }
 
@@ -177,7 +177,7 @@ void Cloud::fetchNote(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, NetworkOperation::FetchNote);
     connect(operation, SIGNAL(fetched(evernote::edam::Note)),
-                 this, SIGNAL(fetched(evernote::edam::Note)));
+                 this, SIGNAL(noteFetched(evernote::edam::Note)));
     startOperation(operation, "notestore");
 }
 
@@ -193,7 +193,7 @@ void Cloud::moveNote(const evernote::edam::Note& note, const evernote::edam::Not
 
     NoteOperation* operation = new NoteOperation(modified, NetworkOperation::MoveNote);
     connect(operation, SIGNAL(moved(evernote::edam::Note)),
-                 this, SIGNAL(moved(evernote::edam::Note)));
+                 this, SIGNAL(noteMoved(evernote::edam::Note)));
     startOperation(operation, "notestore");
 }
 
@@ -207,7 +207,7 @@ void Cloud::renameNote(const evernote::edam::Note& note)
 
     NoteOperation* operation = new NoteOperation(modified, NetworkOperation::RenameNote);
     connect(operation, SIGNAL(renamed(evernote::edam::Note)),
-                 this, SIGNAL(renamed(evernote::edam::Note)));
+                 this, SIGNAL(noteRenamed(evernote::edam::Note)));
     startOperation(operation, "notestore");
 }
 
@@ -215,7 +215,7 @@ void Cloud::trashNote(const edam::Note& note)
 {
     NoteOperation* operation = new NoteOperation(note, NetworkOperation::TrashNote);
     connect(operation, SIGNAL(trashed(evernote::edam::Note)),
-                 this, SIGNAL(trashed(evernote::edam::Note)));
+                 this, SIGNAL(noteTrashed(evernote::edam::Note)));
     startOperation(operation, "notestore");
 }
 
@@ -223,7 +223,7 @@ void Cloud::createTag(const edam::Tag& tag)
 {
     TagOperation* operation = new TagOperation(tag, NetworkOperation::CreateTag);
     connect(operation, SIGNAL(created(evernote::edam::Tag)),
-                 this, SIGNAL(created(evernote::edam::Tag)));
+                 this, SIGNAL(tagCreated(evernote::edam::Tag)));
     startOperation(operation, "notestore");
 }
 
@@ -231,7 +231,7 @@ void Cloud::fetchTag(const edam::Tag& tag)
 {
     TagOperation* operation = new TagOperation(tag, NetworkOperation::FetchTag);
     connect(operation, SIGNAL(fetched(evernote::edam::Tag)),
-                 this, SIGNAL(fetched(evernote::edam::Tag)));
+                 this, SIGNAL(tagFetched(evernote::edam::Tag)));
     startOperation(operation, "notestore");
 }
 
@@ -245,7 +245,7 @@ void Cloud::renameTag(const evernote::edam::Tag& tag)
 
     TagOperation* operation = new TagOperation(modified, NetworkOperation::RenameTag);
     connect(operation, SIGNAL(renamed(evernote::edam::Tag)),
-                 this, SIGNAL(renamed(evernote::edam::Tag)));
+                 this, SIGNAL(tagRenamed(evernote::edam::Tag)));
     startOperation(operation, "notestore");
 }
 
@@ -253,7 +253,7 @@ void Cloud::createSearch(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, NetworkOperation::CreateSearch);
     connect(operation, SIGNAL(created(evernote::edam::SavedSearch)),
-                 this, SIGNAL(created(evernote::edam::SavedSearch)));
+                 this, SIGNAL(searchCreated(evernote::edam::SavedSearch)));
     startOperation(operation, "notestore");
 }
 
@@ -261,15 +261,15 @@ void Cloud::fetchSearch(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, NetworkOperation::FetchSearch);
     connect(operation, SIGNAL(fetched(evernote::edam::SavedSearch)),
-                 this, SIGNAL(fetched(evernote::edam::SavedSearch)));
+                 this, SIGNAL(searchFetched(evernote::edam::SavedSearch)));
     startOperation(operation, "notestore");
 }
 
 void Cloud::search(const edam::SavedSearch& search)
 {
     SearchOperation* operation = new SearchOperation(search, NetworkOperation::PerformSearch);
-    connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)),
-                 this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::SavedSearchMetadata>)));
+    connect(operation, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)),
+                 this, SIGNAL(searched(evernote::edam::SavedSearch,QVector<evernote::edam::NoteMetadata>)));
     startOperation(operation, "notestore");
 }
 
@@ -283,7 +283,7 @@ void Cloud::renameSearch(const evernote::edam::SavedSearch& search)
 
     SearchOperation* operation = new SearchOperation(modified, NetworkOperation::RenameSearch);
     connect(operation, SIGNAL(renamed(evernote::edam::SavedSearch)),
-                 this, SIGNAL(renamed(evernote::edam::SavedSearch)));
+                 this, SIGNAL(searchRenamed(evernote::edam::SavedSearch)));
     startOperation(operation, "notestore");
 }
 
@@ -291,7 +291,7 @@ void Cloud::fetchResource(const edam::Resource& resource)
 {
     ResourceOperation* operation = new ResourceOperation(resource, NetworkOperation::FetchResource);
     connect(operation, SIGNAL(fetched(evernote::edam::Resource)),
-                 this, SIGNAL(fetched(evernote::edam::Resource)));
+                 this, SIGNAL(resourceFetched(evernote::edam::Resource)));
     startOperation(operation, "notestore");
 }
 
@@ -300,7 +300,7 @@ void Cloud::fetchThumbnail(const edam::Note& note)
     QString guid = QString::fromStdString(note.guid);
     ThumbnailOperation* operation = new ThumbnailOperation(guid);
     connect(operation, SIGNAL(fetched(QString,QByteArray)),
-                 this, SIGNAL(fetched(QString,QByteArray)));
+                 this, SIGNAL(thumbnailFetched(QString,QByteArray)));
     startOperation(operation, QString("thm/note/%1.png").arg(guid));
 }
 
@@ -309,7 +309,7 @@ void Cloud::fetchThumbnail(const edam::Resource& resource)
     QString guid = QString::fromStdString(resource.guid);
     ThumbnailOperation* operation = new ThumbnailOperation(guid);
     connect(operation, SIGNAL(fetched(QString,QByteArray)),
-                 this, SIGNAL(fetched(QString,QByteArray)));
+                 this, SIGNAL(thumbnailFetched(QString,QByteArray)));
     startOperation(operation, QString("thm/res/%1.png").arg(guid));
 }
 

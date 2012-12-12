@@ -80,8 +80,8 @@ Manager::Manager(Session* session) : QObject(session)
 
     connect(m_cloud, SIGNAL(resourceFetched(evernote::edam::Resource)),
                this, SLOT(onResourceFetched(evernote::edam::Resource)), Qt::QueuedConnection);
-    connect(m_cloud, SIGNAL(thumbnailFetched(const QString& guid, const QByteArray& data)),
-               this, SLOT(onThumbnailFetched(const QString& guid, const QByteArray& data)), Qt::QueuedConnection);
+    connect(m_cloud, SIGNAL(thumbnailFetched(QString,QByteArray)),
+               this, SLOT(onThumbnailFetched(QString,QByteArray)), Qt::QueuedConnection);
 
     connect(m_cloud, SIGNAL(synced(QVector<evernote::edam::Notebook>,
                                    QVector<evernote::edam::Resource>,
